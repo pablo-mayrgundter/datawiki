@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project basedir="." default="war">
   <property environment="env"/>
-  <property name="appengine.home" value="${env.GAE_HOME}"/>
+  <!-- Point this to GAE, and edit ant-macros.xml to do the same. -->
+  <property name="appengine.home" value="${env.HOME}/appengine-java-sdk-1.3.4"/>
   <property name="appname" value="datawiki"/>
   <property name="classes" value="build/classes"/>
   <property name="srcDir" value="${basedir}/java"/>
