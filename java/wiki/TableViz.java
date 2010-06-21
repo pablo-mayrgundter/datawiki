@@ -1,0 +1,175 @@
+package wiki;
+
+import com.google.visualization.datasource.DataSourceServlet;
+import com.google.visualization.datasource.base.TypeMismatchException;
+import com.google.visualization.datasource.datatable.ColumnDescription;
+import com.google.visualization.datasource.datatable.DataTable;
+import com.google.visualization.datasource.datatable.TableCell;
+import com.google.visualization.datasource.datatable.TableRow;
+import com.google.visualization.datasource.datatable.value.ValueType;
+import com.google.visualization.datasource.datatable.value.NumberValue;
+import com.google.visualization.datasource.datatable.value.DateTimeValue;
+import com.google.visualization.datasource.query.Query;
+
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.List;
+import java.util.Map;
+import java.util.SortedMap;
+import java.util.TimeZone;
+import java.util.TreeMap;
+import java.util.logging.Logger;
+
+import javax.servlet.http.HttpServletRequest;
+
+/** Adapted from Google Visualization SimpleExampleServlet. */
+public class TableViz extends DataSourceServlet {
+
+  static final Logger logger = Logger.getLogger(TableViz.class.getName());
+
+  public DataTable generateDataTable(final Query query, final HttpServletRequest request) {
+
+    // TODO(pmy): choose either attribute or parameter passing.
+    final String reqFormatName = request.getParameter("format");
+    if (reqFormatName == null)
+      throw new IllegalStateException("Missing format name");
+
+    final Format format = Formats.lookupFormat(reqFormatName);
+    if (format == null)
+      throw new IllegalArgumentException("Format not found");
+
+    final List<MultiPartDocument> matchingDocs =
+      Documents.queryOrAll(request, reqFormatName, format);
+
+    if (request.getParameter("summary") != null) {
+      return summaryTable(matchingDocs);
+    } else {
+      return detailTable(matchingDocs, format);
+    }
+  }
+
+  DataTable summaryTable(final List<MultiPartDocument> docs) {
+    final DataTable data = new DataTable();
+    final List<ColumnDescription> cd = new ArrayList<ColumnDescription>();
+    cd.add(new ColumnDescription("created", ValueType.DATETIME, "created"));
+    cd.add(new ColumnDescription("count", ValueType.NUMBER, "count"));
+    data.addColumns(cd);
+    final SortedMap<DateTimeValue,Integer> dateCounts = new TreeMap<DateTimeValue,Integer>();
+    for (final MultiPartDocument doc : docs) {
+      final DateTimeValue createDate = dateToDateTime(doc.getCreatedDate(), Calendar.MINUTE);
+      Integer count = dateCounts.get(createDate);
+      if (count == null)
+        dateCounts.put(createDate, count = 0);
+      dateCounts.put(createDate, ++count);
+    }
+    for (final Map.Entry<DateTimeValue,Integer> dateCount : dateCounts.entrySet()) {
+      final DateTimeValue date = dateCount.getKey();
+      final Integer count = dateCount.getValue();
+      final TableRow row = new TableRow();
+      row.addCell(date);
+      row.addCell(new NumberValue(count));
+      try {
+        data.addRow(row);
+      } catch (TypeMismatchException e) {
+        throw new IllegalStateException(e);
+      }
+    }
+    return data;
+  }
+
+  DataTable detailTable(final List<MultiPartDocument> docs, final Format format) {
+    final DataTable data = new DataTable();
+    boolean first = true;
+    for (final MultiPartDocument doc : docs) {
+      if (first) {
+        final List<ColumnDescription> cd = new ArrayList<ColumnDescription>();
+        cd.add(new ColumnDescription("id", ValueType.NUMBER, "id"));
+        cd.add(new ColumnDescription("created", ValueType.DATETIME, "created"));
+        cd.add(new ColumnDescription("updated", ValueType.DATETIME, "updated"));
+        if (doc.getFields() != null) {
+          for (final DocumentField field : doc.getFields()) {
+            // TODO(pmy): change to map.
+            FormField formField = null;
+            for (final FormField f : format.getFields())
+              if (f.getName().equals(field.getName())) {
+                formField = f;
+                break;
+              }
+            if (formField == null)
+              continue;
+            final ColumnDescription desc =
+              new ColumnDescription(field.getName(), ValueType.TEXT, formField.getText());
+            logger.info("COLUMN DESC: "+ desc);
+            cd.add(desc);
+          }
+        }
+        data.addColumns(cd);
+        first = false;
+      }
+
+      final TableRow row = new TableRow();
+      row.addCell(new TableCell(new NumberValue(doc.getId()),
+                                "<a href=\"/wiki/documents/"+ doc.getId() +"\">"+ doc.getId() +"</a>"));
+      row.addCell(dateToDateTime(doc.getCreatedDate()));
+      row.addCell(dateToDateTime(doc.getUpdatedDate()));
+      if (doc.getFields() != null) {
+        for (final DocumentField field : doc.getFields())
+          row.addCell(field.getValue());
+        try {
+          data.addRow(row);
+        } catch (TypeMismatchException e) {
+          logger.warning("Field mismatch in doc "+ doc.getId() +", nested: "+ e);
+          continue;
+        }
+      }
+    }
+    return data;
+  }
+
+  DateTimeValue dateToDateTime(final Date date) {
+    return dateToDateTime(date, -1);
+  }
+
+  /**
+   * All time fields including and shorter than the given timeBucket
+   * will be set to 0 in the returned DateTimeValue.
+   *
+   * @param timeBucket Must be a Calendar contant field value between
+   * or including MONTH and MILLISECONDS or specify a value of -1 for
+   * no bucketing.
+   */
+  DateTimeValue dateToDateTime(final Date date, final int timeBucket) {
+    int month, day, hour, min, sec, mil;
+    month = day = hour = min = sec = mil = 1;
+    switch (timeBucket) {
+    case Calendar.MONTH: month = 0;
+    case Calendar.DAY_OF_MONTH: day = 0;
+    case Calendar.HOUR: hour = 0;
+    case Calendar.MINUTE: min = 0;
+    case Calendar.SECOND: sec = 0;
+    case Calendar.MILLISECOND: mil = 0;
+    }
+    final GregorianCalendar cal = new GregorianCalendar(TimeZone.getTimeZone("GMT-8"));
+    cal.setTime(date);
+    return new DateTimeValue(cal.get(Calendar.YEAR), month * cal.get(Calendar.MONTH),
+                             day == 0 ? 1 : cal.get(Calendar.DAY_OF_MONTH), hour * cal.get(Calendar.HOUR),
+                             min * cal.get(Calendar.MINUTE), sec * cal.get(Calendar.SECOND),
+                             mil * cal.get(Calendar.MILLISECOND));
+  }
+
+  /**
+   * NOTE: By default, this function returns true, which means that cross
+   * domain requests are rejected.
+   * This check is disabled here so examples can be used directly from the
+   * address bar of the browser. Bear in mind that this exposes your
+   * data source to xsrf attacks.
+   * If the only use of the data source url is from your application,
+   * that runs on the same domain, it is better to remain in restricted mode.
+   */
+  @Override
+  protected boolean isRestrictedAccessMode() {
+    return false;
+  }
+}

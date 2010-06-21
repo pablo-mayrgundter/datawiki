@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<appengine-web-app xmlns="http://appengine.google.com/ns/1.0">
+  <application>reliefhub</application>
+  <version>1</version>
+
+  <!-- Configure java.util.logging -->
+  <system-properties>
+    <property name="java.util.logging.config.file" value="WEB-INF/classes/logging.properties"/>
+    <property name="com.google.gdata.DisableCookieHandler" value="true"/>
+  </system-properties>
+</appengine-web-app>

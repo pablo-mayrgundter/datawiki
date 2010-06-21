@@ -1,0 +1,46 @@
+.button, input[type~=submit], input[type~=reset] {
+  height: 2.4em;
+  margin: 0;
+  white-space: nowrap;
+  color: #333;
+  font-weight: bold;
+  background-color: #f7f7f7;
+  border: solid 1px #bbb;
+  border-radius: 2px;
+  cursor: pointer;
+}
+
+/* Adding spriting common attrs. */
+.button > div {
+  display: inline-block;
+  width: 13px;
+  height: 13px;
+  background: transparent url(/sprites_2.png);
+  vertical-align: top;
+}
+
+/* TODO(pmy): hack to handle textNode-less buttons dropping down. */
+button[class='button edit'], button[class='button plus'], button[class='button delete'] {
+  padding-left: 0.75em;
+  width: 2.75em;
+}
+
+.edit > div {
+  background-position: -55px -61px;
+}
+
+.plus > div {
+  background-position: -117px -41px;
+}
+
+.delete > div {
+  background-position: -87px -60px;
+}
+
+button.text.delete {
+  width: 6em;
+}
+
+button.text > div {
+  margin-right: 0.5em;
+}
