@@ -1,0 +1,106 @@
+<html>
+  <head>
+<style>
+ul.tabs {
+  display: block;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+ul.tabs > li {
+  float: left;
+  position: relative;
+  top: 1px;
+  z-index: 1;
+  margin-right: -3px;
+  padding: 0.5em 1em;
+  background-color: white;
+  border: solid 1px #a7d7f9;
+  border-radius: 3px 3px 0 0;
+}
+
+.tabs > li:first-child {
+  border-top-left-radius: 3px;
+}
+
+.tabs > li:last-child {
+  border-top-right-radius: 3px;
+}
+
+ul > li.activeTab {
+  border-bottom-color: white;
+  z-index: 2;
+}
+
+.activeTab a {
+  color: inherit;
+}
+
+.tabbed {
+  display: none;
+  clear: both;
+}
+
+.activeTabbed {
+  display: block;
+}
+</style>
+    <script src="/Util.js" type="text/javascript"></script>
+    <script type="text/javascript">
+function Tabs(tabElts, contentElts, activeNdx) {
+  if (tabElts.length != contentElts.length)
+    throw 'tab and content arrays must be equal';
+  this.tabEltPairs = new Array();
+  for (var i = 0; i < tabElts.length; i++)
+    this.tabEltPairs[i] = [tabElts[i],contentElts[i]];
+  if (!activeNdx)
+    activeNdx = 0;
+  this.activeTab = this.tabEltPairs[activeNdx][0];
+  this.activeElt = this.tabEltPairs[activeNdx][1];
+  for (var i = 0; i < this.tabEltPairs.length; i++) {
+    var tabEltPair = this.tabEltPairs[i];
+    var tab = tabEltPair[0];
+    var elt = tabEltPair[1];
+    d('adding onclick to tab: '+ tab +' for content elt: '+ elt);
+    tab.onclick = func(this, this.handleClick, [i]);
+  }
+};
+
+Tabs.prototype.handleClick = function(ndx) {
+  d('click on ndx: '+ ndx);
+  var tab = this.tabEltPairs[ndx][0];
+  if (this.activeTab == tab)
+    return;
+  var elt = this.tabEltPairs[ndx][1];
+  removeClass(this.activeTab, 'activeTab');
+  removeClass(this.activeElt, 'activeTabbed');
+  this.activeTab = tab;
+  this.activeElt = elt;
+  addClass(this.activeTab, 'activeTab');
+  addClass(this.activeElt, 'activeTabbed');
+  return false;
+};
+      function init() {
+        new Tabs(get('tabs').getElementsByTagName('li'),
+                 get('tabContent').getElementsByTagName('div'),
+                 1);
+      }
+    </script>
+  </head>
+  <body onload="init()">
+    <div class="mainPanel">
+      <ul id="tabs" class="tabs">
+        <li><a>A</a></li>
+        <li class="activeTab"><a>B</a></li>
+        <li><a>C</a></li>
+      </ul>
+      <div id="tabContent">
+        <div class="box tabbed">Aaaa</div>
+        <div class="box tabbed activeTabbed">Bbbb</div>
+        <div class="box tabbed">Cccc</div>
+      </div>
+    </div>
+    <div id="debug"></div>
+  </body>
+</html>

@@ -1,0 +1,87 @@
+@import '/buttons.css';
+@import '/tabs.css';
+
+body {
+  font-size: 16px;
+  font-family: Arial,sans-serif;
+/*  background: no-repeat url(/ears.png); */
+/*  background-position: 300px -10px; */
+}
+
+a {
+  color: #0000CC;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+img {
+  border-width: 0;
+}
+
+h1, h2, h3, th {
+  font-size: 1em;
+}
+
+h1 {
+  font-weight: bold;
+}
+
+h2, h3 {
+  font-weight: bold;
+}
+
+input[readonly] {
+  background-color: inherit;
+  border: none;
+}
+
+.removed {
+  display: none;
+}
+
+.invisible {
+  visibility: hidden;
+}
+
+.logoBody {
+  padding: 1em;
+  padding-left: 1.5em;
+}
+
+.logoBody img {
+  visibility: hidden;
+}
+
+.sidePanel, .mainPanel {
+  position: absolute;
+}
+
+.sidePanel {
+  top: 135px;
+}
+
+.sidePanel {
+  width: 80px; /* make the same as .mainPanel.left */
+  padding: 1em 0.8em;
+}
+
+.sidePanel li {
+  list-style-type: none;
+  margin-bottom: 5px;
+  margin-left: 10px;
+}
+
+.mainPanel {
+  top: 85px;
+  min-width: 400px;
+  right: 3em;
+  left: 100px;
+  padding: 1em 0 1em 2em;
+}
+
+.box {
+  padding: 1em;
+  border: solid 1px #a7d7f9;
+  background-color: white;
+  border-radius: 0 3px 0 0;
+}

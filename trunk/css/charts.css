@@ -1,0 +1,33 @@
+.chart {
+  border-top: solid 1px #c7d7ff;
+  border-bottom: solid 1px #c7d7ff;
+  border-top-right-radius: 0;
+}
+
+.chart table {
+  width: 100%;
+}
+
+#chartTabs > li {
+  top: -1px;
+  margin-bottom: -2px;
+}
+
+#chartTabs .activeTab {
+  border-top: solid 1px white;
+  border-radius: 0;
+  left: 0px;
+  z-index: 0;
+}
+
+#statsChart {
+  height: 200px;
+}
+
+#listChart {
+  padding: 0;
+}
+
+.statsLeft {
+  font-size: 0.9em;
+}

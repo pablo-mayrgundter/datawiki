@@ -1,0 +1,24 @@
+@import '/main.css';
+
+div.mainPanel > table {
+  width: 100%;
+}
+
+div.mainPanel td {
+  width: 50%;
+  padding: 1em;
+  vertical-align: top;
+}
+
+td.createFormat {
+  border-left: solid 1px #ccc;
+  background-color: #ffffe8;
+}
+
+ul.formats {
+  padding-left: 1em;
+}
+
+.formats h2 {
+  text-decoration: underline;
+}

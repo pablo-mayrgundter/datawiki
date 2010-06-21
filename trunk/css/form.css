@@ -1,0 +1,61 @@
+.form {
+  width: 40%;
+  padding-top: 1em;
+  border: solid 1px #ccc;
+  border-spacing: 0;
+  background-color: #ffffe8;
+}
+
+/* Hack to push down doclist after relative elements. */
+.form + div {
+  clear: both;
+}
+
+.form td {
+  height: 2em;
+}
+
+.form td:first-child {
+  padding-left: 1em;
+}
+
+.form input[name] {
+  display: inline;
+  width: 100%;
+}
+
+[class~=hover-reveal] {
+  background-color: inherit;
+  display: none;
+}
+
+.form.editing input[name] {
+  width: 70%;
+}
+
+.form td + td {
+  width: 60%;
+  padding-right: 2em;
+}
+
+.formButtons {
+  float: right;
+  padding-right: 1em;
+  white-space: nowrap;
+}
+
+.formButtons, .button-add-field {
+  margin: 1em 1em 1em 0;
+}
+
+.form .edit-buttons * {
+  float: right;
+}
+
+.form.editing tr:hover {
+  background-color: #fff4c2;
+}
+
+.form.editing tr:hover [class~=hover-reveal] {
+  display: inline;
+}

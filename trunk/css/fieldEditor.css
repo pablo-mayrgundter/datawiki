@@ -1,0 +1,33 @@
+.fieldEditor table {
+  padding: 0;
+  border-collapse: collapse;
+}
+
+.fieldEditor table td:first-child {
+  padding-left: 0;
+}
+
+.button-edit, .button-delete {
+  float: right;
+}
+
+.fieldEditor table {
+  width: 90%;
+}
+
+.fieldEditor {
+  width: 100%;
+  background-color: #fff4c2;
+}
+
+.fieldEditor * {
+  font-weight: bold;
+}
+
+.fieldEditor > td {
+  padding: 1em;
+}
+
+.fieldEditor td td {
+  padding: 0;
+}
