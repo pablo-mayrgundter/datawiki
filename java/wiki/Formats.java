@@ -164,7 +164,7 @@ public class Formats extends PersistentList<Format> {
     // Used to track the largest fieldNdx for the reconstructed
     // ordering.  This will be compared with the number of fields to
     // ensure there is no field index missing.
-    int fieldNdxMax = 0;
+    int fieldNdxMax = -1;
     final SortedMap<Integer, FormField> sortedFields = new TreeMap<Integer, FormField>();
     for (final String fieldName : params.keySet()) {
       final String reqAttrs = params.getFirst(fieldName);
