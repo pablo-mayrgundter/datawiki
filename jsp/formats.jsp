@@ -1,4 +1,4 @@
-<%
+<%@page import="wiki.Util" %><%
   final String reqXml = (String) request.getAttribute("reqXml");
   final Exception reqXmlException = (Exception) request.getAttribute("reqXmlException");
 %><html>
@@ -19,7 +19,8 @@
           <td class="createFormat">
             <h3>Create a new dataset format from scratch...</h3>
             Format Name: <input id="target" value=""/>
-            <a id="link" href="" onclick="setTarget(get('target'))">Go</a> (must match: [a-zA-Z_-]+)
+            <a id="link" href="" onclick="setTarget(get('target'))">Go</a>
+            (Allowed characters: <%= Util.XML_SAFE_CHARS %>)
 
             <h3>or use an existing XML template</h3>
             <form action="/wiki/formats" method="POST" enctype="multipart/form-data">
