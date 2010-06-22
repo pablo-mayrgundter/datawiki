@@ -36,6 +36,7 @@ public class Documents extends PersistentList<MultiPartDocument> {
   static final String JSP_SINGLE = "/document.jsp";
   static final String JSP_COLLECTION = "/documents.jsp";
   static final String JSP_COLLECTION_XML = "/documentsXml.jsp";
+  static final String JSP_UNKNOWN = "/unknown.jsp";
 
   public Documents() {
     super(MultiPartDocument.class);
@@ -59,8 +60,9 @@ public class Documents extends PersistentList<MultiPartDocument> {
   Response pageList(final HttpServletRequest req, final HttpServletResponse rsp, final String formatName)
     throws ServletException, IOException {
     final Format format = Formats.lookupFormat(formatName);
-    if (format == null)
-      return Response.status(Response.Status.NOT_FOUND).entity("Unknown format: "+ formatName).build();
+    if (format == null) {
+      return Formats.formatNotFound(formatName, req, rsp);
+    }
     req.setAttribute("formatName", formatName);
     req.setAttribute("format", format);
     if (req.getParameter("q") != null)
