@@ -49,6 +49,7 @@ public class Formats extends PersistentList<Format> {
     return formats.get(0);
   }
 
+  static final String JSP_FORMAT_NOT_FOUND = "/formatNotFound.jsp";
   static final String JSP_COLLECTION = "/formats.jsp";
   static final String JSP_SINGLE = "/format.jsp";
 
@@ -70,31 +71,20 @@ public class Formats extends PersistentList<Format> {
   public Response get(@PathParam("formatName") String formatName,
                       @Context HttpServletRequest req,
                       @Context HttpServletResponse rsp) throws ServletException, IOException {
-    return getFormat(formatName, req, rsp);
-  }
-
-  String makeFormatNamespace(final HttpServletRequest req) {
-    return Util.getHostURL(req) + req.getRequestURI();
-  }
-
-  Response getFormat(final String formatName,
-                     final HttpServletRequest req,
-                     final HttpServletResponse rsp) throws ServletException, IOException {
+    Format format = null;
     final List<Format> formats = query(Format.gqlFilterForMatchingFormat(formatName));
+    if (formats.size() == 0) {
+      if (req.getParameter("action") != null && req.getParameter("action").equals("edit")) {
+        format = new Format(formatName, makeFormatNamespace(req), "");
+      } else {
+        return formatNotFound(formatName, req, rsp);
+      }
+    } else {
+      format = formats.get(0);
+    }
     req.setAttribute("formatName", formatName);
-    final Format format = formats.size() > 0 ?
-      formats.get(0)
-      : new Format(formatName, makeFormatNamespace(req), "");
     showFormat(format, req, rsp);
     return Response.ok().build();
-  }
-
-  void showFormat(final Format format,
-                  final HttpServletRequest req,
-                  final HttpServletResponse rsp) throws ServletException, IOException {
-    req.setAttribute("format", format);
-    System.out.printf("Showing format with %d fields.\n", format.fields.size());
-    req.getRequestDispatcher(JSP_SINGLE).include(req, rsp);
   }
 
   @POST
@@ -211,8 +201,12 @@ public class Formats extends PersistentList<Format> {
         logger.warning("Skipping field with non-numeric index attribute: "+ fieldName +", index value: "+ fieldNdxStr);
         continue;
       }
-
-      final FormField field = new FormField(fieldText, fieldName, "");
+      FormField field = null;
+      try {
+        field = new FormField(fieldText, fieldName, "");
+      } catch (IllegalArgumentException e) {
+        return Response.status(500).entity(e.getMessage()).build();
+      }
       sortedFields.put(fieldNdx, field);
       if (fieldNdx > fieldNdxMax)
         fieldNdxMax = fieldNdx;
@@ -257,5 +251,26 @@ public class Formats extends PersistentList<Format> {
     save(format);
 
     return Response.ok().build(); // TODO(pmy): change to 201 when this method is changed to POST.
+  }
+
+  static Response formatNotFound(final String formatName,
+                                 final HttpServletRequest req,
+                                 final HttpServletResponse rsp)
+    throws ServletException, IOException {
+    req.setAttribute("formatName", formatName);
+    req.getRequestDispatcher(JSP_FORMAT_NOT_FOUND).include(req, rsp);
+    return Response.ok().build();
+  }
+
+  void showFormat(final Format format,
+                  final HttpServletRequest req,
+                  final HttpServletResponse rsp) throws ServletException, IOException {
+    req.setAttribute("format", format);
+    System.out.printf("Showing format with %d fields.\n", format.fields.size());
+    req.getRequestDispatcher(JSP_SINGLE).include(req, rsp);
+  }
+
+  String makeFormatNamespace(final HttpServletRequest req) {
+    return Util.getHostURL(req) + req.getRequestURI();
   }
 }

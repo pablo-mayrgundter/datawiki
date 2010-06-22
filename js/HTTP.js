@@ -52,7 +52,7 @@ function alertContents() {
       if (callback)
         callback.call();
     } else {
-      alert('There was a problem with the request.');
+      alert('There was a problem with this request.  '+ http_request.responseText);
     }
   }
 }

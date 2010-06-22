@@ -22,8 +22,15 @@ public class FormField implements Serializable {
   String name;
   Text value;
 
+  /**
+   * @throws IllegalArgumentException if the given field name cannot
+   * be used as an XML tag name.
+   */
   public FormField(final String text, final String name, final String value) {
     this.text = text;
+    if (!Util.safeForXmlTag(name)) {
+      throw new IllegalArgumentException(String.format("The given field name '%s' cannot be used.  It must use only these characters: %s", name, Util.XML_SAFE_CHARS));
+    }
     this.name = name;
     this.value = new Text(value);
   }
