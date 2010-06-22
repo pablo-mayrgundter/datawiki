@@ -1,10 +1,9 @@
 function setTarget(elt) {
   var link = get('link');
   var newHref = elt.value;
-  var trans = newHref.replace(/[^a-zA-Z_-]+/, '');
-  if (newHref != trans) {
+  if (!newHref.match(/^[a-zA-Z_-]+$/)) {
     elt.value = '';
-    alert('Format name must be composed of only upper and lower-case letters, underscores and dashes.');
+    alert('The given format name is invalid.');
     return;
   }
   link.href = newHref;
