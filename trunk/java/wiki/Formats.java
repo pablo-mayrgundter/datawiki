@@ -2,6 +2,7 @@ package wiki;
 
 import java.io.IOException;
 import java.io.StringBufferInputStream;
+import java.net.URI;
 import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.Enumeration;
@@ -33,6 +34,7 @@ import javax.ws.rs.core.Variant;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
+import org.xml.sax.SAXException;
 
 @Path("/formats")
 public class Formats extends PersistentList<Format> {
@@ -75,25 +77,31 @@ public class Formats extends PersistentList<Format> {
     return Util.getHostURL(req) + req.getRequestURI();
   }
 
-  public Response getFormat(final String formatName,
-                            final HttpServletRequest req,
-                            final HttpServletResponse rsp) throws ServletException, IOException {
+  Response getFormat(final String formatName,
+                     final HttpServletRequest req,
+                     final HttpServletResponse rsp) throws ServletException, IOException {
     final List<Format> formats = query(Format.gqlFilterForMatchingFormat(formatName));
     req.setAttribute("formatName", formatName);
     final Format format = formats.size() > 0 ?
       formats.get(0)
       : new Format(formatName, makeFormatNamespace(req), "");
+    showFormat(format, req, rsp);
+    return Response.ok().build();
+  }
+
+  void showFormat(final Format format,
+                  final HttpServletRequest req,
+                  final HttpServletResponse rsp) throws ServletException, IOException {
     req.setAttribute("format", format);
     System.out.printf("Showing format with %d fields.\n", format.fields.size());
     req.getRequestDispatcher(JSP_SINGLE).include(req, rsp);
-    return Response.ok().build();
   }
 
   @POST
   @Consumes({"multipart/form-data"})
   @Produces({"text/html"})
-  public String post(@Context HttpServletRequest req,
-                     @Context HttpServletResponse rsp) throws Exception {
+  public Response post(@Context HttpServletRequest req,
+                       @Context HttpServletResponse rsp) throws Exception {
     if (!ServletFileUpload.isMultipartContent(req)) {
       throw new IllegalArgumentException("Must specify enctype=\"multipart/form-data\" in form definition."
                                          +" See http://www.w3.org/TR/html401/interact/forms.html#h-17.13.4");
@@ -118,7 +126,14 @@ public class Formats extends PersistentList<Format> {
       final String fieldName = item.getFieldName();
       final String fieldValue = new String(item.get());
       if (fieldName.equals("xml")) {
-        format = XmlSerializer.formatFromXml(new StringBufferInputStream(fieldValue));
+        try {
+          format = XmlSerializer.formatFromXml(new StringBufferInputStream(fieldValue));
+        } catch (SAXException e) {
+          req.setAttribute("reqXml", fieldValue);
+          req.setAttribute("reqXmlException", e);
+          req.getRequestDispatcher(JSP_COLLECTION).include(req, rsp);
+          return Response.ok().build();
+        }
       }
     }
 
@@ -128,7 +143,8 @@ public class Formats extends PersistentList<Format> {
       field.getValue();
     }
     save(format);
-    return "<html><head><meta http-equiv=\"refresh\" content=\"0;url=/wiki/formats/"+format.getName()+"\" /></head></html>";
+    showFormat(format, req, rsp);
+    return Response.created(new URI("/wiki/formats/"+format.getName())).build();
   }
 
   /**

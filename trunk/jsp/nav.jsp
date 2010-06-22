@@ -3,6 +3,7 @@
   final LinkedHashMap<String,String> links = new LinkedHashMap();
   links.put("Home", "/");
   links.put("Datasets", "/wiki/formats/");
+  links.put("Bugs!", "http://code.google.com/p/datawiki/issues/list");
 //  links.put("FAQ", "/faq");
 %><!-- nav -->
 <div class="logoBody">

@@ -1,4 +1,7 @@
-<html>
+<%
+  final String reqXml = (String) request.getAttribute("reqXml");
+  final Exception reqXmlException = (Exception) request.getAttribute("reqXmlException");
+%><html>
   <head>
     <script src="/Util.js" type="text/javascript"></script>
     <script src="/Tabs.js" type="text/javascript"></script>
@@ -20,7 +23,15 @@
 
             <h3>or use an existing XML template</h3>
             <form action="/wiki/formats" method="POST" enctype="multipart/form-data">
-              <textarea name="xml" cols="80" rows="20"></textarea><br/>
+              <textarea name="xml" cols="80" rows="20"><%= reqXml == null ? "" : reqXml %></textarea><br/>
+<%
+   if (reqXml != null && reqXmlException != null) {
+%>
+     <em>The XML template cannot be parsed.  The parser generated the following exception:<br/>
+       <%= reqXmlException %></em><br/>
+<%
+   }
+%>
               <input type="submit"/><input type="reset"/>
             </form>
           </td>
