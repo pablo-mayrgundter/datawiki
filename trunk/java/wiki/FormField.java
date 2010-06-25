@@ -18,6 +18,11 @@ public class FormField implements Serializable {
 
   private static final long serialVersionUID = 2765740961462495537L;
 
+  enum Type {
+    String, Latitude, Longitude
+  }
+
+  final Type type;
   String text;
   String name;
   Text value;
@@ -27,12 +32,21 @@ public class FormField implements Serializable {
    * be used as an XML tag name.
    */
   public FormField(final String text, final String name, final String value) {
+    this(text, name, value, Type.String);
+  }
+
+  /**
+   * @throws IllegalArgumentException if the given field name cannot
+   * be used as an XML tag name.
+   */
+  public FormField(final String text, final String name, final String value, final Type type) {
     this.text = text;
     if (!Util.safeForXmlTag(name)) {
       throw new IllegalArgumentException(String.format("The given field name '%s' cannot be used.  It must use only these characters: %s", name, Util.XML_SAFE_CHARS));
     }
     this.name = name;
     this.value = new Text(value);
+    this.type = type;
   }
 
   public String getText() {
@@ -49,6 +63,10 @@ public class FormField implements Serializable {
 
   public String getValue() {
     return value.getValue();
+  }
+
+  public Type getType() {
+    return type;
   }
 
   public String toString() {

@@ -207,13 +207,8 @@ public class Documents extends PersistentList<MultiPartDocument> {
         doc.addField(field);
     } else {
       doc = get(Integer.parseInt(id) - 1);
-      doc.getFormat(); // TODO(pmy): needed?
-      final List<DocumentField> docFields = doc.getFields();
-      for (int i = 0; i < docFields.size(); i++) {
-        final DocumentField docField = docFields.get(i);
-        final DocumentField newField = fields.get(i);
-        docField.setValue(newField.getValue());
-      }
+      doc.fields.clear();
+      doc.fields.addAll(fields);
     }
     save(doc);
     req.setAttribute("formatName", format);
