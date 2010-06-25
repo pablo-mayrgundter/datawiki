@@ -6,9 +6,9 @@
   final Format format = Formats.lookupFormat(doc.getFormat());
   if (format == null)
     throw new IllegalStateException("Document format not known: "+ doc.getFormat());
-  final Map<String,FormField> formFieldsByName = new HashMap<String,FormField>();
-  for (final FormField field : format.getFields()) {
-    formFieldsByName.put(field.getName(), field);
+  final Map<String, DocumentField> docFields = new HashMap<String, DocumentField>();
+  for (final DocumentField field : doc.getFields()) {
+    docFields.put(field.getName(), field);
   }
 %>
 <html>
@@ -24,12 +24,12 @@
         <input name="id" value="<%= doc.getId() %>" type="hidden"/>
         <table>
 <%
-  for (final DocumentField field : doc.getFields()) {
-    final FormField formField = formFieldsByName.get(field.getName());
+  for (final FormField formField : format.getFields()) {
+    final DocumentField docField = docFields.get(formField.getName());
 %>
           <tr>
             <td><%= formField.getText() %>:</td>
-            <td><input name="<%= field.getName() %>" value="<%= field.getValue() %>"/></td>
+            <td><input name="<%= formField.getName() %>" value="<%= docField == null ? "" : docField.getValue() %>"/></td>
           </tr>
 <%
   }

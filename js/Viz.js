@@ -15,8 +15,6 @@ function handleSummaryResponse(response) {
   }
   var data = response.getDataTable();
   drawSummary(document.getElementById('timelineChart'), data);
-  if (window.location.search.indexOf('map') != -1)
-    drawMap(document.getElementById('mapChart'), data);
 }
 
 function handleDetailResponse(response) {
@@ -27,6 +25,12 @@ function handleDetailResponse(response) {
   var data = response.getDataTable();
   var elt = document.getElementById('listChart');
   drawDetailTable(elt, data);
+  if (data.getTableProperty('hasMap')) {
+    var mapHeader = create('h3', {}, 'Overview');
+    var mapElt = document.getElementById('mapChart');
+    before(mapHeader, mapElt);
+    drawMap(mapElt, data);
+  }
 }
 
 function drawSummary(elt, data) {
@@ -36,6 +40,8 @@ function drawSummary(elt, data) {
 
 function drawMap(elt, data) {
   var chart = new google.visualization.Map(elt);
+  if (data.getNumberOfColumns() > 3)
+    data.removeColumns(3, data.getNumberOfColumns());
   chart.draw(data);
 }
 

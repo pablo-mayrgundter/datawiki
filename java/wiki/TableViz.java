@@ -15,6 +15,9 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.SortedMap;
@@ -81,48 +84,71 @@ public class TableViz extends DataSourceServlet {
 
   DataTable detailTable(final List<MultiPartDocument> docs, final Format format) {
     final DataTable data = new DataTable();
-    boolean first = true;
-    for (final MultiPartDocument doc : docs) {
-      if (first) {
-        final List<ColumnDescription> cd = new ArrayList<ColumnDescription>();
-        cd.add(new ColumnDescription("id", ValueType.NUMBER, "id"));
-        cd.add(new ColumnDescription("created", ValueType.DATETIME, "created"));
-        cd.add(new ColumnDescription("updated", ValueType.DATETIME, "updated"));
-        if (doc.getFields() != null) {
-          for (final DocumentField field : doc.getFields()) {
-            // TODO(pmy): change to map.
-            FormField formField = null;
-            for (final FormField f : format.getFields())
-              if (f.getName().equals(field.getName())) {
-                formField = f;
-                break;
-              }
-            if (formField == null)
-              continue;
-            final ColumnDescription desc =
-              new ColumnDescription(field.getName(), ValueType.TEXT, formField.getText());
-            logger.info("COLUMN DESC: "+ desc);
-            cd.add(desc);
-          }
-        }
-        data.addColumns(cd);
-        first = false;
+    final LinkedList<ColumnDescription> cols = new LinkedList<ColumnDescription>();
+    ColumnDescription latitudeCol = null, longitudeCol = null;
+    for (final FormField field : format.getFields()) {
+      if (field.getType() == FormField.Type.Latitude || field.getName().equals("latitude")) {
+        latitudeCol = new ColumnDescription(field.getName(), ValueType.NUMBER, field.getText());
+        continue;
       }
+      if (field.getType() == FormField.Type.Longitude || field.getName().equals("longitude")) {
+        longitudeCol = new ColumnDescription(field.getName(), ValueType.NUMBER, field.getText());
+        continue;
+      }
+      cols.add(new ColumnDescription(field.getName(), ValueType.TEXT, field.getText()));
+    }
+    // TODO(pmy): handle only one being here, i.e. convert to a single GeoPoint objectn.
+    if (latitudeCol != null && longitudeCol != null) {
+      data.setCustomProperty("hasMap", "true");
+    }
+    if (latitudeCol != null) {
+      data.addColumn(latitudeCol);
+    }
+    if (longitudeCol != null) {
+      data.addColumn(longitudeCol);
+    }
+    data.addColumn(new ColumnDescription("id", ValueType.NUMBER, "id"));
+    data.addColumn(new ColumnDescription("created", ValueType.DATETIME, "created"));
+    data.addColumn(new ColumnDescription("updated", ValueType.DATETIME, "updated"));
+    data.addColumns(cols);
 
+    for (final MultiPartDocument doc : docs) {
+      final Map<String,String> docFields = new HashMap<String,String>();
+      for (final DocumentField field : doc.getFields()) {
+        docFields.put(field.getName(), field.getValue());
+      }
       final TableRow row = new TableRow();
+      if (latitudeCol != null) {
+        double val = Double.NaN;
+        // TODO(pmy): missing values handled as NaN;
+        try {
+          val = Double.parseDouble(docFields.get(latitudeCol.getId()));
+        } catch (Exception e) {}
+        row.addCell(val);
+      }
+      if (longitudeCol != null) {
+        double val = Double.NaN;
+        try {
+          val = Double.parseDouble(docFields.get(longitudeCol.getId()));
+        } catch (Exception e) {}
+        row.addCell(val);
+      }
       row.addCell(new TableCell(new NumberValue(doc.getId()),
                                 "<a href=\"/wiki/documents/"+ doc.getId() +"\">"+ doc.getId() +"</a>"));
       row.addCell(dateToDateTime(doc.getCreatedDate()));
       row.addCell(dateToDateTime(doc.getUpdatedDate()));
-      if (doc.getFields() != null) {
-        for (final DocumentField field : doc.getFields())
-          row.addCell(field.getValue());
-        try {
-          data.addRow(row);
-        } catch (TypeMismatchException e) {
-          logger.warning("Field mismatch in doc "+ doc.getId() +", nested: "+ e);
-          continue;
-        }
+      for (final ColumnDescription col : cols) {
+        final String val = docFields.get(col.getId());
+        if (val == null)
+          row.addCell("N/A"); // TODO(pmy): i18n
+        else
+          row.addCell(val);
+      }
+      try {
+        data.addRow(row);
+      } catch (TypeMismatchException e) {
+        logger.warning("Field mismatch in doc "+ doc.getId() +", nested: "+ e);
+        continue;
       }
     }
     return data;
