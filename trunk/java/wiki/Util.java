@@ -8,6 +8,11 @@ public class Util {
 
   public static final String XML_SAFE_CHARS = "a-zA-Z_-";
 
+  public static String getParameter(final HttpServletRequest req, final String name, final String defaultValue) {
+    final String value = req.getParameter(name);
+    return value == null ? defaultValue : value;
+  }
+
   /**
    * @return String of the form http://host.com or http://host.com:port
    * if the port != 80.
