@@ -101,17 +101,25 @@ public class TableViz extends DataSourceServlet {
     if (latitudeCol != null && longitudeCol != null) {
       data.setCustomProperty("hasMap", "true");
     }
+    boolean hasLatLon = false; // TODO(pmy): currently possible to have only one.
     if (latitudeCol != null) {
       data.addColumn(latitudeCol);
+      hasLatLon |= true;
     }
     if (longitudeCol != null) {
       data.addColumn(longitudeCol);
+      hasLatLon &= true;
+    }
+    // Used for map view only.  Use ID as stored field and show summary as formatted version.
+    if (hasLatLon) {
+      data.addColumn(new ColumnDescription("Summary", ValueType.NUMBER, "summary"));
     }
     data.addColumn(new ColumnDescription("id", ValueType.NUMBER, "id"));
     data.addColumn(new ColumnDescription("created", ValueType.DATETIME, "created"));
     data.addColumn(new ColumnDescription("updated", ValueType.DATETIME, "updated"));
     data.addColumns(cols);
 
+    int rowCount = 0;
     for (final MultiPartDocument doc : docs) {
       final Map<String,String> docFields = new HashMap<String,String>();
       for (final DocumentField field : doc.getFields()) {
@@ -133,16 +141,42 @@ public class TableViz extends DataSourceServlet {
         } catch (Exception e) {}
         row.addCell(val);
       }
-      row.addCell(new TableCell(new NumberValue(doc.getId()),
-                                "<a href=\"/wiki/documents/"+ doc.getId() +"\">"+ doc.getId() +"</a>"));
+
+      // Compute a summary even though it may not be used if !hasLatLon.
+      String summary = "<table class=\"chartBubble\">\n";
+      TableCell summaryCell = null;
+      if (hasLatLon) {
+        // Only added if its column added above.  Now client will have
+        // first 3 columns as lat, lon, summary for construction of
+        // the map table.  Otherwise, it will still have lat, lon
+        // first, but will jump right to ID.
+        summaryCell = new TableCell(new NumberValue(doc.getId()));
+        row.addCell(summaryCell);
+      }
+
+      String itemLink = String.format("<a href=\"/wiki/documents/%d\">%d</a>",
+                                      doc.getId(), doc.getId());
+      row.addCell(new TableCell(new NumberValue(doc.getId()), itemLink));
+      summary += String.format("  <tr><td>ID:</td><td>%s</td></tr>\n", itemLink);
+
+
       row.addCell(dateToDateTime(doc.getCreatedDate()));
+      summary += String.format("  <tr><td>Created:</td><td>%s</td></tr>\n", doc.getCreatedDate());
+
       row.addCell(dateToDateTime(doc.getUpdatedDate()));
+      summary += String.format("  <tr><td>Updated:</td><td>%s</td></tr>\n", doc.getUpdatedDate());
+
       for (final ColumnDescription col : cols) {
-        final String val = docFields.get(col.getId());
-        if (val == null)
-          row.addCell("N/A"); // TODO(pmy): i18n
-        else
-          row.addCell(val);
+        String val = docFields.get(col.getId());
+        if (val == null) {
+          val = "N/A"; // TODO(pmy): i18n
+        }
+        row.addCell(val);
+        summary += String.format("  <tr><td>%s:</td><td>%s</td></tr>\n", col.getId(), val);
+      }
+      summary += "</table>\n";
+      if (hasLatLon) {
+        summaryCell.setFormattedValue(summary);
       }
       try {
         data.addRow(row);

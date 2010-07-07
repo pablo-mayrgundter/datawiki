@@ -1,3 +1,5 @@
+var itemCharts = new Array();
+
 function vizQuery() {
   var activeQuery = window.location.search;
   var queryStr = '/viz?';
@@ -24,12 +26,14 @@ function handleDetailResponse(response) {
   }
   var data = response.getDataTable();
   var elt = document.getElementById('listChart');
-  drawDetailTable(elt, data);
   if (data.getTableProperty('hasMap')) {
-    var mapHeader = create('h3', {}, 'Overview');
+    var dataWithoutMapSummaryColumn = data.clone();
+    dataWithoutMapSummaryColumn.removeColumns(0,3);
+    drawDetailTable(elt, dataWithoutMapSummaryColumn);
     var mapElt = document.getElementById('mapChart');
-    before(mapHeader, mapElt);
-    drawMap(mapElt, data);
+    drawMap(mapElt, data.clone());
+  } else {
+    drawDetailTable(elt, data);
   }
 }
 
@@ -42,7 +46,9 @@ function drawMap(elt, data) {
   var chart = new google.visualization.Map(elt);
   if (data.getNumberOfColumns() > 3)
     data.removeColumns(3, data.getNumberOfColumns());
-  chart.draw(data);
+  chart.draw(data, {showTip: true});
+  itemCharts.push(chart);
+  google.visualization.events.addListener(chart, 'select', function() { selectHandler(chart); });
 }
 
 function drawDetailTable(elt, data) {
@@ -53,4 +59,12 @@ function drawDetailTable(elt, data) {
   options['pagingSymbols'] = {prev: 'Previous', next: 'Next'};
   options['pagingButtonsConfiguration'] = 'auto';
   chart.draw(data, options);
+  itemCharts.push(chart);
+  google.visualization.events.addListener(chart, 'select', function() { selectHandler(chart); });
+}
+
+function selectHandler(chart) {
+  var selection = chart.getSelection();
+  for (var chart in itemCharts)
+    itemCharts[chart].setSelection(selection);
 }

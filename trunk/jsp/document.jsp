@@ -1,4 +1,4 @@
-<%@page import="wiki.*,java.util.HashMap,java.util.Map"%>
+<%@page import="wiki.*,java.net.URLEncoder,java.util.HashMap,java.util.Map"%>
 <%
   final MultiPartDocument doc = (MultiPartDocument) request.getAttribute("doc");
   if (doc == null)
@@ -18,7 +18,9 @@
   <body>
     <jsp:include page="nav.jsp"/>
     <div class="mainPanel">
-      <h1>Document Fields</h1>
+      <p><a href="/wiki/documents?format=<%= doc.getFormat() %>"><%= doc.getFormat() %></a> &gt; <%= doc.getId() %>
+      <p>&nbsp;</p>
+      <h2>Fields</h2>
       <form action="/wiki/documents?format=<%= doc.getFormat() %>" method="POST" enctype="multipart/form-data">
         <input name="format" value="<%= doc.getFormat() %>" type="hidden"/>
         <input name="id" value="<%= doc.getId() %>" type="hidden"/>
@@ -35,15 +37,14 @@
   }
 %>
         </table>
-        <h2>Metadata</h2>
-        <ul>
-          <li>Format: <a href="/wiki/documents?format=<%= doc.getFormat() %>"><%= doc.getFormat() %></a></li>
-        </ul>
         <div class="buttons">
           <input type="submit" value="Submit"/>
           <input type="reset" value="Clear"/>
         </div>
       </form>
+      <p>&nbsp;</p>
+      <h2>Scannable Link To This Page</h2>
+      <img src="http://chart.apis.google.com/chart?chs=150x150&cht=qr&chl=<%= URLEncoder.encode(request.getRequestURL().toString(), "UTF-8") %>&choe=UTF-8">
     </div>
   </body>
 </html>
