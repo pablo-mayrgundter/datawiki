@@ -15,19 +15,12 @@
   <body>
     <jsp:include page="nav.jsp"/>
     <div class="mainPanel">
-      <h3>DataWiki: Open Datasets and Formats</h3>
-
-      <p>DataWiki is an open, collaborative system to help people
-      create, maintain and share public collections of data.</p>
-
-      <p>Creating a new dataset is as easy as creating a new web form
-      for a person to enter it.  DataWiki automatically transforms the
-      description of the data into formats that can be browsed, shared
-      in social networks like Twitter or even accessed via SMS on
-      mobile phones.  And like Wikipedia, users can contribute
-      anonymously, under a pseudonym or with their real identity.</p>
-
-      <object width="480" height="385"><param name="movie" value="http://www.youtube.com/v/kZGCOara3hU&hl=en_US&fs=1&"></param><param name="allowFullScreen" value="true"></param><param name="allowscriptaccess" value="always"></param><embed src="http://www.youtube.com/v/kZGCOara3hU&hl=en_US&fs=1&" type="application/x-shockwave-flash" allowscriptaccess="always" allowfullscreen="true" width="480" height="385"></embed></object>
+      <h1>ReliefHub</h1> 
+      <p>This app is a test instance of
+      of <a href="http://code.google.com/p/datawiki/">DataWiki</a> for
+      use in sharing disaster response and humanitarian assistance
+      data.  All data and current storage formats should be considered
+      for testing use only.</p> 
     </div>
   </body>
 </html>

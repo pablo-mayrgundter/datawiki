@@ -13,18 +13,18 @@
     <div class="mainPanel">
       <table>
         <tr>
-          <td>
+          <td class="featured">
             <jsp:include page="featured.jsp"/>
           </td>
           <td class="createFormat">
             <h3>Create a new dataset format from scratch...</h3>
             Format Name: <input id="target" value=""/>
             <a id="link" href="" onclick="setTarget(get('target'))">Go</a>
-            (Allowed characters: <%= Util.XML_SAFE_CHARS %>)
+            <span class="note">(Allowed characters: <%= Util.XML_SAFE_CHARS %>)</span>
 
             <h3>or use an existing XML template</h3>
             <form action="/wiki/formats" method="POST" enctype="multipart/form-data">
-              <textarea name="xml" cols="80" rows="20"><%= reqXml == null ? "" : reqXml %></textarea><br/>
+              <textarea name="xml" cols="40" rows="20"><%= reqXml == null ? "" : reqXml %></textarea><br/>
 <%
    if (reqXml != null && reqXmlException != null) {
 %>

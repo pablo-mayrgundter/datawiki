@@ -5,12 +5,16 @@ div.mainPanel > table {
 }
 
 div.mainPanel td {
-  width: 50%;
   padding: 1em;
   vertical-align: top;
 }
 
-td.createFormat {
+div.mainPanel td.featured {
+  width: 40%;
+}
+
+div.mainPanel td.createFormat {
+  width: 60%;
   border-left: solid 1px #ccc;
   background-color: #ffffe8;
 }
