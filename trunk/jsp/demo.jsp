@@ -5,10 +5,12 @@
     host += ":" + port;
   final String formatName = request.getParameter("format");
 %><html> 
-  <head> 
+  <head>
+    <title>Dataset: <%= formatName %></title>
     <script src="http://www.google.com/jsapi" type="text/javascript"></script> 
     <script src="<%= host %>/Util.js" type="text/javascript"></script> 
     <script src="<%= host %>/StatsTable.js" type="text/javascript"></script> 
+    <script src="<%= host %>/Translate.js" type="text/javascript"></script>
     <script src="<%= host %>/Viz.js" type="text/javascript"></script> 
     <script type="text/javascript">
       // Needs to be called before page loaded.
@@ -23,42 +25,61 @@
       }
     </script>
     <style>
-      table.td {
+      body {
+        font-family: helvetica, arial, sans;
+        margin: 0;
+        padding: 0;
+      }
+      table, tr, td {
+        margin: 0;
+        padding: 0;
+        border-spacing: 0;
+      }
+      table {
+        width: 100%;
+        height: 100%;
+      }
+      tr.header {
+        height: 1em;
+      }
+      tr.header h1 {
+        font-size: 1.1em;
+        margin: 0;
+        padding: 0.5em;
+      }
+      tr.main > td {
         vertical-align: top;
+      }
+      .onebar {
+        float: right;
+        padding: 0.5em;
+      }
+      .nobr {
+        text-spacing: no-break;
       }
     </style>
   </head>
-  <body>
-    <h1>Demo</h1>
+  <body onload="translateInit('langSelect')">
     <table>
-      <tr>
+      <tr class="header">
+        <td><h1><%= formatName %></h1></td>
         <td>
-          <div id="timelineChart" style="width:50%; height:90%"></div>
-        </td>
-        <td>
-          <h2>Forms</h2>
-          <h3>Find</h3>
-          <form action="http://localhost:8080/wiki/documents?format=test" method="GET">
-            foo: <input name="foo"><br/>
-            bar: <input name="bar"><br/>
-            <input type="Submit"><input type="Reset">
-            <input name="q" type="hidden">
-            <input name="format" value="test" type="hidden">
-          </form>
-          <h3>Create</h3>
-          <form action="http://localhost:8080/wiki/documents?format=test" method="POST" enctype="multipart/form-data">
-            foo: <input name="foo"><br/>
-            bar: <input name="bar"><br/>
-            <input type="Submit"><input type="Reset">
-            <input name="format" value="test" type="hidden">
-          </form>
+          <div class="onebar">
+<%
+  final String loginContinuePage = request.getRequestURI() +"?format="+ formatName;
+%>
+            <jsp:include page="signin.jsp">
+              <jsp:param name="uri" value="<%= loginContinuePage %>"/>
+            </jsp:include>
+          </div>
+          <span class="nobr">Language:<span id="langSelect"></span></span>
         </td>
       </tr>
-      <tr>
-        <td width="50%" valign="top">
-          <div id="listChart"></div>
+      <tr class="main">
+        <td width="40%">
+          <div id="listChart" class="trans"></div>
         </td>
-        <td width="50%">
+        <td width="60%">
           <div id="mapChart"></div>
         </td>
       </tr>

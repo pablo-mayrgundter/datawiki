@@ -10,8 +10,9 @@
     <link href="/documents.css" rel="stylesheet" type="text/css"/>
     <script src="http://www.google.com/jsapi" type="text/javascript"></script>
     <script src="/Util.js" type="text/javascript"></script>
-    <script src="/Tabs.js" type="text/javascript"></script>
     <script src="/StatsTable.js" type="text/javascript"></script>
+    <script src="/Tabs.js" type="text/javascript"></script>
+    <script src="/Translate.js" type="text/javascript"></script>
     <script src="/Viz.js" type="text/javascript"></script>
     <script src="/Documents.js" type="text/javascript"></script>
     <script type="text/javascript">
@@ -27,9 +28,10 @@
       }
     </script>
   </head>
-  <body onload="Documents()">
+  <body onload="Documents();translateInit('langSelect')">
+    <jsp:include page="onebar.jsp"/>
     <jsp:include page="nav.jsp"/>
-    <div class="mainPanel">
+    <div class="mainPanel trans">
       <ul class="tabs">
         <li class="activeTab">Dataset</li>
         <li><a href="/wiki/formats/<%= formatName %>">Format</a></li>

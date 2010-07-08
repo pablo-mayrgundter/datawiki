@@ -3,14 +3,17 @@
   final Exception reqXmlException = (Exception) request.getAttribute("reqXmlException");
 %><html>
   <head>
+    <script src="http://www.google.com/jsapi" type="text/javascript"></script>
     <script src="/Util.js" type="text/javascript"></script>
-    <script src="/Tabs.js" type="text/javascript"></script>
     <script src="/Formats.js" type="text/javascript"></script>
+    <script src="/Tabs.js" type="text/javascript"></script>
+    <script src="/Translate.js" type="text/javascript"></script>
     <link rel="stylesheet" href="/formats.css" type="text/css"/>
   </head>
-  <body>
+  <body onload="translateInit('langSelect')">
+    <jsp:include page="onebar.jsp"/>
     <jsp:include page="nav.jsp"/>
-    <div class="mainPanel">
+    <div class="mainPanel trans">
       <table>
         <tr>
           <td class="featured">
