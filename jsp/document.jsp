@@ -38,7 +38,7 @@
 %>
         </table>
         <div class="buttons">
-          <input type="submit" value="Submit"/>
+          <input type="submit" value="Save"/>
           <input type="reset" value="Clear"/>
         </div>
       </form>

@@ -46,7 +46,7 @@ function drawMap(elt, data) {
   var chart = new google.visualization.Map(elt);
   if (data.getNumberOfColumns() > 3)
     data.removeColumns(3, data.getNumberOfColumns());
-  chart.draw(data, {showTip: true});
+  chart.draw(data, {showTip: true, mapType: 'hybrid', useMapTypeControl: true});
   itemCharts.push(chart);
   google.visualization.events.addListener(chart, 'select', function() { selectHandler(chart); });
 }

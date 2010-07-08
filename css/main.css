@@ -18,21 +18,36 @@ img {
   border-width: 0;
 }
 
-h1, h2, h3, th {
-  font-size: 1em;
-}
-
 h1 {
-  font-weight: bold;
+  font-size: 1.2em;
+  margin: 0.5em 0px;
 }
 
-h2, h3 {
-  font-weight: bold;
+h2 {
+  font-size: 1.1em;
+  margin: 0.3em 0px;
+}
+
+h3 {
+  font-size: 1em;
+  margin: 0.25em 0px;
 }
 
 input[readonly] {
   background-color: inherit;
   border: none;
+}
+
+.onebar {
+  position: absolute;
+  top: 0;
+  right: 0; 
+  padding: 0.5em;
+  white-space: no-wrap;
+}
+
+.onebar > .langControl {
+  margin-right: 3em;
 }
 
 .removed {

@@ -9,7 +9,7 @@
 <div class="logoBody">
   <a href="/"><img src="/logo.png" alt="Google Public Data Wiki Home"></a>
 </div>
-<span class="sidePanel">
+<span class="sidePanel trans">
 <%
   for (final String name : links.keySet()) {
     final String link = links.get(name);
