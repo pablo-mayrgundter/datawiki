@@ -3,6 +3,7 @@ package wiki;
 import java.util.List;
 import java.util.logging.Logger;
 import javax.jdo.JDOHelper;
+import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
 import javax.jdo.PersistenceManagerFactory;
 import javax.jdo.Query;
@@ -53,7 +54,7 @@ public interface Persistable<T> {
         final T obj = pm.getObjectById(clazz, key);
         tx.commit();
         return obj;
-      } catch (Exception e) {
+      } catch (JDOObjectNotFoundException e) {
         // If not found.
         return null;
       } finally {
