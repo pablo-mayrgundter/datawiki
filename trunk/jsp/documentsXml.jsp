@@ -8,7 +8,7 @@
   if (port != 80)
     host += ":" + port;
   final String self = host + request.getRequestURI();
-  final String wikiPage = self +"?format="+ formatName;
+  final String wikiPage = self;
 
   final List<MultiPartDocument> matchingDocs =
     Documents.queryOrAll(request, formatName, format);
@@ -24,7 +24,7 @@
 %><?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom">
   <title>Documents of format: <%= formatName %> from <%= request.getServerName() %></title>
-  <link href="<%= wikiPage %>&amp;output=xml" rel="self"/>
+  <link href="<%= wikiPage %>?output=xml" rel="self"/>
   <link href="<%= wikiPage %>" />
   <id>urn:uuid:<%= java.util.UUID.randomUUID() %></id>
   <updated><%= feedUpdateDate %></updated>
@@ -38,7 +38,7 @@
     <title><%= formatName%> document #<%= count++ %></title>
     <author><name>anonymous</name></author>
     <summary>Serialized XML according to the format described at <%= wikiPage %></summary>
-    <link href="<%= host %>/wiki/documents/<%= doc.getId() %>"/>
+    <link href="<%= host %>/wiki/<%= formatName %>/<%= doc.getId() %>"/>
     <id>urn:uuid:<%= java.util.UUID.randomUUID() %></id>
     <updated><%= dateFormat.format(doc.getUpdatedDate()) %></updated>
     <content type="application/xml+<%= formatName %>">

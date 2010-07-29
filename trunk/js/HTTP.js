@@ -14,15 +14,25 @@ function formEncode(params) {
   return encoded;
 }
 
-function makePOSTRequest(url, encodedParams, cb) {
+var boundary = 'AaB03xbleh42';
+
+/** http://www.w3.org/TR/html401/interact/forms.html#h-17.13.4.2 */
+function multipartEncode(params) {
+  var body = '--'+ boundary;
+  for (var name in params) {
+    body += '\r\nContent-Disposition: form-data; name="'+ name +'"\r\n\r\n'+ params[name] +'\r\n--'+ boundary;
+  }
+  return body + '--';
+}
+
+function makePOSTRequest(url, params, cb) {
+  httpRequest(url, multipartEncode(params), cb, 'POST', "multipart/form-data; boundary="+ boundary);
+}
+
+function httpRequest(url, encodedParams, cb, verb, contentType) {
   http_request = false;
   if (window.XMLHttpRequest) { // Mozilla, Safari,...
     http_request = new XMLHttpRequest();
-    if (http_request.overrideMimeType) {
-      // set type accordingly to anticipated content type
-      //http_request.overrideMimeType('text/xml');
-      http_request.overrideMimeType('text/html');
-    }
   } else if (window.ActiveXObject) { // IE
     try {
       http_request = new ActiveXObject("Msxml2.XMLHTTP");
@@ -39,8 +49,8 @@ function makePOSTRequest(url, encodedParams, cb) {
 
   callback = cb;
   http_request.onreadystatechange = alertContents;
-  http_request.open('POST', url, true);
-  http_request.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+  http_request.open(verb, url, true);
+  http_request.setRequestHeader("Content-Type", contentType);
   http_request.send(encodedParams);
 }
 

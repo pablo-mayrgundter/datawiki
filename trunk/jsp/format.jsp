@@ -8,6 +8,7 @@
 %>
 <html>
   <head>
+    <script src="http://www.google.com/jsapi" type="text/javascript"></script>
     <link rel="stylesheet" href="/format.css" type="text/css"/>
     <script src="/Util.js" type="text/javascript"></script>
     <script src="/HTTP.js" type="text/javascript"></script>
@@ -15,17 +16,19 @@
     <script src="/FormEditor.js" type="text/javascript"></script>
     <script src="/FormConverter.js" type="text/javascript"></script>
     <script src="/FieldEditor.js" type="text/javascript"></script>
+    <script src="/Translate.js" type="text/javascript"></script>
     <script>
       function init() {
         new Format(<%= startEdit %>);
       }
     </script>
   </head>
-  <body onload="init()">
+  <body onload="init();translateInit('langSelect')">
+    <jsp:include page="onebar.jsp"/>
     <jsp:include page="nav.jsp"/>
-    <div class="mainPanel">
+    <div class="mainPanel trans">
       <ul class="tabs">
-        <li><a href="/wiki/documents?format=<%= formatName %>">Dataset</a></li>
+        <li><a href="/wiki/<%= format.getURLTitle() %>">Dataset</a></li>
         <li class="activeTab">Format</li>
       </ul>
       <div id="formatBox" class="box">
@@ -48,7 +51,7 @@
               <jsp:param name="jspFormId" value="formEdit"/>
               <jsp:param name="jspFormTitle" value="Edit"/>
               <jsp:param name="jspFormMethod" value="GET"/>
-              <jsp:param name="jspFormAction" value="<%= "/wiki/formats/"+ formatName %>"/>
+              <jsp:param name="jspFormAction" value="<%= "/wiki/"+ format.getURLTitle() %>"/>
             </jsp:include>
           </div>
         </div>
@@ -60,7 +63,7 @@
           Service</a> <a href="http://en.wikipedia.org/wiki/Application_programming_interface">API</a>.</p>
 
           <p>All documents may be retrieved in Atom format using this URL:</p>
-          <pre><%= hostURL %>/wiki/documents?format=<%= formatName %>&amp;output=xml</pre>
+          <pre><%= hostURL %>/wiki/<%= format.getURLTitle() %>?output=xml</pre>
 
           <p>A search for documents matching some criteria may be
           specified by setting the <code>q</code> request parameter
@@ -70,7 +73,7 @@
           the value of the name attribute used in the HTML form input
           for the associated field, as desribed in the "HTML Find and
           Create Forms" section below.</p>
-          <pre><%= hostURL %>/wiki/documents?format=<%= formatName %>&amp;q&amp;output=xml&amp;/Item/ID=1</pre>
+          <pre><%= hostURL %>/wiki/<%= format.getURLTitle() %>?q&amp;output=xml&amp;/Item/ID=1</pre>
 
           <h4>XML Template</h4>
           <p>Documents retrieved in XML format will have the following
@@ -86,9 +89,9 @@
           browser to this site.</p>
 
           <p>Find:</p>
-<pre><%= XmlSerializer.toFindForm(formatName, hostURL, format.getFields()).replaceAll("<", "&lt;").replaceAll(">", "&gt;") %></pre>
+<pre><%= XmlSerializer.toFindForm(format, hostURL, format.getFields()).replaceAll("<", "&lt;").replaceAll(">", "&gt;") %></pre>
           <p>Create:</p>
-<pre><%= XmlSerializer.toCreateForm(formatName, hostURL, format.getFields()).replaceAll("<", "&lt;").replaceAll(">", "&gt;") %></pre>
+<pre><%= XmlSerializer.toCreateForm(format, hostURL, format.getFields()).replaceAll("<", "&lt;").replaceAll(">", "&gt;") %></pre>
         </div>
       </div>
       <jsp:include page="form-template.jsp"/><!-- Has to be outside of formatBox to hide input elts from FormEditor.js. -->

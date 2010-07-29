@@ -179,29 +179,30 @@ public class XmlSerializer {
   }
 
   // TODO(pmy): it may be possible to have a jsp output escaped HTML.
-  public static String toFindForm(final String formatName, final String hostName, final List<FormField> fields)
+  public static String toFindForm(final Format format, final String hostName, final List<FormField> fields)
     throws TransformerException {
-    String html = String.format("<form action=\"%s/wiki/documents?format=%s\" method=\"GET\">\n", hostName, formatName);
+    String html = String.format("<form action=\"%s/wiki/%s\" method=\"GET\">\n", hostName, format.getURLTitle());
     for (final FormField field : fields) {
       html += String.format("  %s: <input name=\"%s\"><br/>\n",
                             field.getText(), field.getName());
     }
     html += "  <input type=\"Submit\"><input type=\"Reset\">\n";
     html += "  <input name=\"q\" type=\"hidden\">\n";
-    html += "  <input name=\"format\" value=\""+ formatName +"\" type=\"hidden\">\n";
+    html += "  <input name=\"format\" value=\""+ format.getName() +"\" type=\"hidden\">\n";
     html += "</form>\n";
     return html;
   }
 
-  public static String toCreateForm(final String formatName, final String hostName, final List<FormField> fields)
+  public static String toCreateForm(final Format format, final String hostName, final List<FormField> fields)
     throws TransformerException {
-    String html = String.format("<form action=\"%s/wiki/documents?format=%s\" method=\"POST\" enctype=\"multipart/form-data\">\n", hostName, formatName);
+    String html = String.format("<form action=\"%s/wiki/%s\" method=\"POST\" enctype=\"multipart/form-data\">\n",
+                                hostName, format.getURLTitle());
     for (final FormField field : fields) {
       html += String.format("  %s: <input name=\"%s\"><br/>\n",
                             field.getText(), field.getName());
     }
     html += "  <input type=\"Submit\"><input type=\"Reset\">\n";
-    html += "  <input name=\"format\" value=\""+ formatName +"\" type=\"hidden\">\n";
+    html += "  <input name=\"format\" value=\""+ format.getName() +"\" type=\"hidden\">\n";
     html += "</form>\n";
     return html;
   }

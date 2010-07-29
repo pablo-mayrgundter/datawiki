@@ -91,7 +91,7 @@ FormEditor.prototype.editForm = function(button) {
 
 FormEditor.prototype.saveForm = function(button) {
   makePOSTRequest(location.href,
-                  formEncode(this.getFields()),
+                  this.getFields(),
                   func(this, this.wakeForm, [button]));
 };
 

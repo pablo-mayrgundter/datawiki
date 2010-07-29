@@ -1,3 +1,14 @@
 @import '/main.css';
 @import '/formatBox.css';
 @import '/charts.css';
+
+#detailCharts {
+  margin: 0;
+  padding: 0;
+}
+
+#detailCharts > table, #detailCharts > table > tbody, #detailCharts > table > tbody > tr, #detailCharts > table > tbody > tr > td {
+  margin: 0;
+  padding: 0;
+  border-spacing: 0;
+}

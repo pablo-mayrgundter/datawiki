@@ -13,17 +13,18 @@
 %>
 <html>
   <head>
+    <script src="http://www.google.com/jsapi" type="text/javascript"></script>
     <link rel="stylesheet" href="/documents.css" type="text/css"/>
+    <script src="/Translate.js" type="text/javascript"></script>
   </head>
-  <body>
+  <body onload="translateInit('langSelect')">
+    <jsp:include page="onebar.jsp"/>
     <jsp:include page="nav.jsp"/>
-    <div class="mainPanel">
-      <p><a href="/wiki/documents?format=<%= doc.getFormat() %>"><%= doc.getFormat() %></a> &gt; <%= doc.getId() %>
+    <div class="mainPanel trans">
+      <p><a href="/wiki/<%= doc.getFormat() %>"><%= doc.getFormat() %></a> &gt; <%= doc.getId() %>
       <p>&nbsp;</p>
       <h2>Fields</h2>
-      <form action="/wiki/documents?format=<%= doc.getFormat() %>" method="POST" enctype="multipart/form-data">
-        <input name="format" value="<%= doc.getFormat() %>" type="hidden"/>
-        <input name="id" value="<%= doc.getId() %>" type="hidden"/>
+      <form action="/wiki/<%= doc.getFormat() %>/<%= doc.getId() %>" method="POST" enctype="multipart/form-data">
         <table>
 <%
   for (final FormField formField : format.getFields()) {

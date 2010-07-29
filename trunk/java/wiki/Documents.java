@@ -3,6 +3,7 @@ package wiki;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.logging.Logger;
 import javax.jdo.PersistenceManager;
@@ -11,24 +12,25 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
+import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.Response;
 import org.apache.commons.fileupload.FileItem;
-import org.apache.commons.fileupload.FileItemFactory;
-import org.apache.commons.fileupload.servlet.ServletFileUpload;
+import org.apache.commons.fileupload.FileUploadException;
 
 // TODO(pmy): generalize this to AbstractDocument, or store documents
 // as XML and use objects for indices.  Also, the flow between
 // POST/GET and pageList could probably make better use of dispatchers
 // so that pageList is a real entry point and can be dispatched to.
-@Path("/documents")
+@Path("/")
 public class Documents extends PersistentList<MultiPartDocument> {
 
   static final Logger logger = Logger.getLogger(Documents.class.getName());
@@ -48,25 +50,108 @@ public class Documents extends PersistentList<MultiPartDocument> {
 
   @GET
   @Produces({"text/html"})
-  public Response pageList(@Context HttpServletRequest req,
-                           @Context HttpServletResponse rsp)
+  public Response getDocs(@Context HttpServletRequest req,
+                          @Context HttpServletResponse rsp) {
+    return Response.status(Response.Status.BAD_REQUEST).entity("Must specify a format.").build();
+  }
+
+  @GET
+  @Path("{formatTitle}")
+  @Produces({"text/html"})
+  public Response getDocsForFormat(@Context HttpServletRequest req,
+                                   @Context HttpServletResponse rsp,
+                                   @PathParam("formatTitle") String formatTitle)
     throws ServletException, IOException {
-    final String format = req.getParameter("format");
-    if (format == null)
-      return Response.status(Response.Status.BAD_REQUEST).entity("Must specify a format.").build();
+    final Format format = Formats.lookupFormatByTitle(formatTitle);
+    if (format == null) {
+      return Formats.formatWithTitleNotFound(formatTitle, req, rsp);
+    }
     return pageList(req, rsp, format);
   }
 
-  Response pageList(final HttpServletRequest req, final HttpServletResponse rsp, final String formatName)
+  @GET
+  @Path("{format}/{id}")
+  @Produces({"text/html"})
+  public Response getSingleDoc(@Context HttpServletRequest req,
+                               @Context HttpServletResponse rsp,
+                               @PathParam("id") String id)
     throws ServletException, IOException {
-    final Format format = Formats.lookupFormat(formatName);
-    if (format == null) {
-      return Formats.formatNotFound(formatName, req, rsp);
+    req.setAttribute("doc", get(Integer.parseInt(id) - 1));
+    req.getRequestDispatcher(JSP_SINGLE).include(req, rsp);
+    return Response.ok().build();
+  }
+
+  @POST
+  @Path("{formatTitle}")
+  @Consumes({"multipart/form-data"})
+  @Produces({"text/html"})
+  public Response postDoc(@Context HttpServletRequest req,
+                          @Context HttpServletResponse rsp,
+                          @PathParam("formatTitle") String formatTitle) throws Exception {
+    List<FileItem> items = null;
+    try {
+      items = FormUpload.processFormData(req);
+    } catch (FileUploadException e) {
+      return Response.status(Response.Status.BAD_REQUEST).entity("Submission could not be parsed: "+ e).build();
     }
-    req.setAttribute("formatName", formatName);
+    final LinkedHashMap<String,DocumentField> fields = fileItemsToDocumentFields(items);
+    final Format format = Formats.lookupFormatByTitle(formatTitle);
+    if (format == null) {
+      return Formats.formatWithTitleNotFound(formatTitle, req, rsp);
+    }
+    final MultiPartDocument doc = new MultiPartDocument(format.getName());
+    for (final String fieldName : fields.keySet()) {
+      doc.addField(fields.get(fieldName));
+    }
+    save(doc);
+    return pageList(req, rsp, format);
+  }
+
+  @POST
+  @Path("{format}/{id}")
+  @Consumes({"multipart/form-data"})
+  @Produces({"text/html"})
+  public Response handlePost(@Context HttpServletRequest req,
+                             @Context HttpServletResponse rsp,
+                             @PathParam("format") String format,
+                             @PathParam("id") String reqId) throws Exception {
+    final int id = Integer.parseInt(reqId) - 1;
+    final MultiPartDocument doc = get(id);
+    if (doc == null) {
+      return Response.status(Response.Status.NOT_FOUND).build();
+    }
+    List<FileItem> items = null;
+    try {
+      items = FormUpload.processFormData(req);
+    } catch (FileUploadException e) {
+      return Response.status(Response.Status.BAD_REQUEST).entity("Submission could not be parsed: "+ e).build();
+    }
+    final LinkedHashMap<String,DocumentField> fields = fileItemsToDocumentFields(items);
+    doc.fields.clear();
+    for (final String fieldName : fields.keySet()) {
+      doc.addField(fields.get(fieldName));
+    }
+    save(doc);
+    req.setAttribute("doc", doc);
+    req.getRequestDispatcher(JSP_SINGLE).include(req, rsp);
+    return Response.ok().build();
+  }
+
+  static LinkedHashMap<String,DocumentField> fileItemsToDocumentFields(final List<FileItem> items) {
+    final LinkedHashMap<String,DocumentField> fields = new LinkedHashMap<String,DocumentField>();
+    String format = null, id = null;
+    for (final FileItem item : items) {
+      final String fieldName = item.getFieldName();
+      final String fieldValue = new String(item.get());
+      fields.put(fieldName, new DocumentField(fieldName, fieldValue));
+    }
+    return fields;
+  }
+
+  Response pageList(final HttpServletRequest req, final HttpServletResponse rsp, final Format format)
+    throws ServletException, IOException {
+    req.setAttribute("formatName", format.getName());
     req.setAttribute("format", format);
-    if (req.getParameter("q") != null)
-      req.setAttribute("showDocs", true);
     // TODO(pmy): hack for craig, move this to @Produces control.
     final String output = req.getParameter("output");
     if (output != null && output.equals("xml"))
@@ -143,76 +228,5 @@ public class Documents extends PersistentList<MultiPartDocument> {
     }
     logger.info("queryWithVariables: "+ query + ", and var decl: "+ varDecl);
     return queryWithVariables(query, varDecl);
-  }
-
-  @GET
-  @Path("{id}")
-  @Produces({"text/html"})
-  public String getDoc(@Context HttpServletRequest req,
-                       @Context HttpServletResponse rsp,
-                       @PathParam("id") String id)
-    throws ServletException, IOException {
-    req.setAttribute("doc", get(Integer.parseInt(id) - 1));
-    req.getRequestDispatcher(JSP_SINGLE).include(req, rsp);
-    return "";
-  }
-
-  @POST
-  @Consumes({"multipart/form-data"})
-  @Produces({"text/html"})
-  public Response handlePost(@Context HttpServletRequest req,
-                             @Context HttpServletResponse rsp) throws Exception {
-    if (!ServletFileUpload.isMultipartContent(req)) {
-      throw new IllegalArgumentException("Must specify enctype=\"multipart/form-data\" in form definition."
-                                         +" See http://www.w3.org/TR/html401/interact/forms.html#h-17.13.4");
-    }
-    final FileItemFactory factory = new FileItemFactory() {
-        public FileItem createItem(final String fieldName, final String contentType,
-                                   final boolean isFormField, final String fileName) {
-          logger.info("Documents: handlePost: createItem: "+ fieldName);
-          // TODO(pmy): clean up isFormField usage in related classes.
-          return new DataStoreFileItem(contentType, fieldName, fileName, isFormField);
-        }
-      };
-    final ServletFileUpload upload = new ServletFileUpload(factory);
-    final List<FileItem> items = upload.parseRequest(req);
-
-    if (items == null)
-      throw new NullPointerException("Empty form yeilds no (null) items.");
-
-    final List<DocumentField> fields = new ArrayList<DocumentField>();
-    String format = null, id = null;
-    for (final FileItem item : items) {
-      final String fieldName = item.getFieldName();
-      final String fieldValue = new String(item.get());
-      if (fieldName.equals("format")) {
-        format = fieldValue;
-        continue;
-      }
-      if (fieldName.equals("id")) {
-        id = fieldValue;
-        continue;
-      }
-      fields.add(new DocumentField(fieldName, fieldValue));
-    }
-    if (format == null)
-      throw new IllegalArgumentException("Must specify a format name.");
-
-    matchingFormat(format); // TODO(pmy): needed?
-    MultiPartDocument doc;
-    if (id == null) {
-      doc = new MultiPartDocument(format);
-      doc.getFormat(); // TODO(pmy): needed?
-      for (final DocumentField field : fields)
-        doc.addField(field);
-    } else {
-      doc = get(Integer.parseInt(id) - 1);
-      doc.fields.clear();
-      doc.fields.addAll(fields);
-    }
-    save(doc);
-    req.setAttribute("formatName", format);
-    req.setAttribute("showDocs", true);
-    return pageList(req, rsp, format);
   }
 }

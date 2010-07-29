@@ -43,11 +43,15 @@ input[readonly] {
   top: 0;
   right: 0; 
   padding: 0.5em;
-  white-space: no-wrap;
+  white-space: nowrap;
+}
+
+.onebar * {
+  white-space: nowrap;
 }
 
 .onebar > .langControl {
-  margin-right: 3em;
+  margin-right: 1em;
 }
 
 .removed {
@@ -59,7 +63,7 @@ input[readonly] {
 }
 
 .logoBody {
-  visibility: hidden;
+  visibility: normal;
   padding: 1em;
   padding-left: 1.5em;
 }

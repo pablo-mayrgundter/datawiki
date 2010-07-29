@@ -30,59 +30,48 @@
         margin: 0;
         padding: 0;
       }
-      table, tr, td {
-        margin: 0;
-        padding: 0;
-        border-spacing: 0;
-      }
-      table {
-        width: 100%;
-        height: 100%;
-      }
-      tr.header {
-        height: 1em;
-      }
-      tr.header h1 {
-        font-size: 1.1em;
-        margin: 0;
-        padding: 0.5em;
-      }
-      tr.main > td {
-        vertical-align: top;
+      .header > h1 {
+        display: inline;
+        margin: 0.25em;
       }
       .onebar {
-        float: right;
+        display: inline;
+        position: absolute;
+        right: 0;
         padding: 0.5em;
       }
-      .nobr {
-        text-spacing: no-break;
+      .header * {
+        white-spac: nowrap;
+      }
+      #content {
+        position: absolute;
+        width: 100%;
+        height: 95%;
+        top: 5%;
+      }
+      #listChart, #mapChart {
+        width: 50%;
+        height: 100%;
+      }
+      #listChart {
+        left: 0;
+      }
+      #mapChart {
+        float: right;
+      }
+      input {
+        border: none;
       }
     </style>
   </head>
   <body onload="translateInit('langSelect')">
-    <table>
-      <tr class="header">
-        <td><h1><%= formatName %></h1></td>
-        <td>
-          <div class="onebar">
-<%
-  final String loginContinuePage = request.getRequestURI() +"?format="+ formatName;
-%>
-            <jsp:include page="signin.jsp">
-              <jsp:param name="uri" value="<%= loginContinuePage %>"/>
-            </jsp:include>
-          </div>
-          <span class="nobr">Language:<span id="langSelect"></span></span>
-        </td>
-      </tr>
-      <tr class="main">
-        <td width="40%">
-          <div id="listChart" class="trans"></div>
-        </td>
-        <td width="60%">
-          <div id="mapChart"></div>
-        </td>
-      </tr>
-    </table>
+    <div class="header">
+      <h1><%= formatName %></h1>
+      <jsp:include page="onebar.jsp"/>
+    </div>
+    <div id="content" class="trans">
+      <div id="mapChart"></div>
+      <div id="listChart"></div>
+    </div>
   </body>
 </html>

@@ -3,6 +3,7 @@ package wiki;
 import java.io.IOException;
 import java.io.StringBufferInputStream;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.Enumeration;
@@ -28,12 +29,10 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Variant;
 import org.apache.commons.fileupload.FileItem;
-import org.apache.commons.fileupload.FileItemFactory;
-import org.apache.commons.fileupload.servlet.ServletFileUpload;
+import org.apache.commons.fileupload.FileUploadException;
 import org.xml.sax.SAXException;
 
 @Path("/formats")
@@ -41,9 +40,17 @@ public class Formats extends PersistentList<Format> {
 
   static final Logger logger = Logger.getLogger(Formats.class.getName());
 
-  /** @return The form or null if not found. */
+  /** @return The format or null if not found. */
   public static Format lookupFormat(final String name) {
     final List<Format> formats = new Formats().query(Format.gqlFilterForMatchingFormat(name));
+    if (formats.size() == 0)
+      return null;
+    return formats.get(0);
+  }
+
+  /** @return The format or null if not found. */
+  public static Format lookupFormatByTitle(final String title) {
+    final List<Format> formats = new Formats().query(Format.gqlFilterForMatchingFormatTitle(title.replaceAll("_", " ")));
     if (formats.size() == 0)
       return null;
     return formats.get(0);
@@ -91,25 +98,9 @@ public class Formats extends PersistentList<Format> {
   @Consumes({"multipart/form-data"})
   @Produces({"text/html"})
   public Response post(@Context HttpServletRequest req,
-                       @Context HttpServletResponse rsp) throws Exception {
-    if (!ServletFileUpload.isMultipartContent(req)) {
-      throw new IllegalArgumentException("Must specify enctype=\"multipart/form-data\" in form definition."
-                                         +" See http://www.w3.org/TR/html401/interact/forms.html#h-17.13.4");
-    }
-    final FileItemFactory factory = new FileItemFactory() {
-        public FileItem createItem(final String fieldName, final String contentType,
-                                   final boolean isFormField, final String fileName) {
-          System.err.println("Documents: handlePost: createItem: "+ fieldName);
-          // TODO(pmy): clean up isFormField usage in related classes.
-          return new DataStoreFileItem(contentType, fieldName, fileName, isFormField);
-        }
-      };
-    final ServletFileUpload upload = new ServletFileUpload(factory);
-    final List<FileItem> items = upload.parseRequest(req);
-
-    if (items == null)
-      throw new NullPointerException("Empty form yeilds no (null) items.");
-
+                       @Context HttpServletResponse rsp)
+    throws IOException, ServletException, FileUploadException, URISyntaxException {
+    final List<FileItem> items = FormUpload.processFormData(req);
     final List<FormField> fields = new ArrayList<FormField>();
     Format format = null;
     for (final FileItem item : items) {
@@ -126,12 +117,6 @@ public class Formats extends PersistentList<Format> {
         }
       }
     }
-
-    System.out.printf("Saving format:\n%s\n", format);
-    for (FormField field : format.getFields()) {
-      field.getName();
-      field.getValue();
-    }
     save(format);
     showFormat(format, req, rsp);
     return Response.created(new URI("/wiki/formats/"+format.getName())).build();
@@ -143,23 +128,21 @@ public class Formats extends PersistentList<Format> {
    */
   @POST
   @Path("{formatName}")
-  @Consumes({"application/x-www-form-urlencoded"})
+  @Consumes({"multipart/form-data"})
   @Produces({"text/html"})
-  public Response post(final MultivaluedMap<String,String> params,
-                       @PathParam("formatName") String formatName,
+  public Response post(@PathParam("formatName") String formatName,
                        @Context HttpServletRequest req,
                        @Context HttpServletResponse rsp) throws Exception {
-    logger.warning("in post to: "+ formatName +", numParams: "+ params.size());
+    final List<FileItem> items = FormUpload.processFormData(req);
     String description = null, title = "";
     // Used to track the largest fieldNdx for the reconstructed
     // ordering.  This will be compared with the number of fields to
     // ensure there is no field index missing.
     int fieldNdxMax = -1;
     final SortedMap<Integer, FormField> sortedFields = new TreeMap<Integer, FormField>();
-    for (final String fieldName : params.keySet()) {
-      final String reqAttrs = params.getFirst(fieldName);
-      if (reqAttrs == null)
-        throw new IllegalArgumentException("Invalid field parameter for field: "+ fieldName);
+    for (final FileItem item : items) {
+      final String fieldName = item.getFieldName();
+      final String reqAttrs = new String(item.get());
       logger.warning("### Field name: "+ fieldName + ", value: "+ reqAttrs);
       final Map<String,String> fieldAttrMap = new HashMap<String,String>();
       final String [] fieldAttrs = reqAttrs.split(";");
@@ -251,6 +234,14 @@ public class Formats extends PersistentList<Format> {
     save(format);
 
     return Response.ok().build(); // TODO(pmy): change to 201 when this method is changed to POST.
+  }
+
+  static Response formatWithTitleNotFound(final String formatTitle,
+                                          final HttpServletRequest req,
+                                          final HttpServletResponse rsp)
+    throws ServletException, IOException {
+    // TODO(pmy): do something different for by title?
+    return formatNotFound(formatTitle, req, rsp);
   }
 
   static Response formatNotFound(final String formatName,
