@@ -57,6 +57,10 @@ public class Format extends AbstractDocument<Format> {
     return title;
   }
 
+  public String getURLTitle() {
+    return title.replaceAll(" ", "_");
+  }
+
   public String getNamespace() {
     return namespace;
   }
@@ -79,6 +83,10 @@ public class Format extends AbstractDocument<Format> {
 
   public static String gqlFilterForMatchingFormat(final String otherFormatName) {
     return String.format("name == '%s'", otherFormatName);
+  }
+
+  public static String gqlFilterForMatchingFormatTitle(final String otherFormatTitle) {
+    return String.format("title == '%s'", otherFormatTitle);
   }
 
   public List<FormField> getFields() {

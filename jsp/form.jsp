@@ -10,11 +10,6 @@
 %>
 <form id="<%= formId %>" class="tabbed <%= activeClass %>" action="<%= action %>" enctype="multipart/form-data" method="<%= method %>">
 <%
-  if (!formId.equals("formEdit")) {
-%>
-  <input name="format" value="<%= formatName %>" type="hidden"/>
-<%
-  }
   if (formId.equals("formFind")) {
 %>
   <input name="q" value="" type="hidden"/>

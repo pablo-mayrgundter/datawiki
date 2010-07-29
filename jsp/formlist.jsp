@@ -11,7 +11,7 @@
     if (title == null || title.trim().equals("")) {
       title = format.getName().toUpperCase();
     }
-    title = "<a href=\"/wiki/documents?format="+ format.getName() +"\">"+ title +"</a>";
+    title = "<a href=\"/wiki/"+ format.getURLTitle() +"\">"+ title +"</a>";
 %>
   <li>
     <h2><%= title %></h2>

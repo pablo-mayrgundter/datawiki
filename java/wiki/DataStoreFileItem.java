@@ -22,12 +22,10 @@ public class DataStoreFileItem implements FileItem {
   static class OutputStreamConvertor extends ByteArrayOutputStream {
     final DataStoreFileItem item;
     OutputStreamConvertor(final DataStoreFileItem item) {
-      System.err.println("DataStoreFileItem: OutputStreamConvertor: ctor: in");
       this.item = item;
     }
     public void close() throws IOException {
       super.close();
-      System.err.println("DataStoreFileItem: OutputStreamConvertor: close: buf: "+ new String(toByteArray()));
       item.content = new Blob(toByteArray());
     }
   }

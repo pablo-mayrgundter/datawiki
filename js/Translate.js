@@ -1,13 +1,26 @@
 google.load("language", "1");
 
 function translateInit(eltId) {
-  languageSelector(document.getElementById(eltId));
+  var curLang = 'en';
+  if (document.cookie) {
+    var langParam = document.cookie.match(/lang=[^;]+/);
+    if (langParam) {
+      curLang = langParam[0].split('=')[1];
+    }
+  }
+  languageSelector(curLang);
+  if (curLang != 'en') {
+    document.getElementById('transProgress').style.visibility = 'visible';
+    setTimeout('translate(\''+ curLang + '\')', 1000);
+    setTimeout('failsafeProgressHide()', 3000);
+  }
 }
 
-function languageSelector(elt) {
+function languageSelector(curLang) {
+  var elt = document.getElementById('langSelect')
   var languages = google.language.Languages;
   var select = document.createElement('select');
-  select.setAttribute('onchange', 'translate(this.value)');
+  select.setAttribute('onchange', 'setLangCookie(this.value)');
   for (var lang in languages) {
     var langCode = languages[lang];
     var translatable = google.language.isTranslatable(langCode);
@@ -15,13 +28,18 @@ function languageSelector(elt) {
       var option = document.createElement('option');
       option.value = langCode;
       option.innerHTML = lang.substring(0,1) + lang.substring(1).toLowerCase();
-      if (langCode == 'en') {
+      if (langCode == curLang) {
         option.setAttribute('selected');
       }
       select.appendChild(option);
     }
   }
   elt.appendChild(select);
+  var img = document.createElement('img');
+  img.id = 'transProgress';
+  img.style.visibility = 'hidden';
+  img.src = '/loader.gif';
+  elt.appendChild(img);
 }
 
 function translate(toLang) {
@@ -70,31 +88,32 @@ function translate(toLang) {
 
 function translateDone(response) {
   var responseData = response['responseData'];
-  if (!responseData) {
-    alert('Cannot translate page.');
-    return;
-  }
-  if (!(responseData instanceof Array)) {
-    responseData = [{'responseData':responseData}];
-  }
-  for (var i = 0; i < responseData.length; i++) {
-    var result = responseData[i].responseData;
-    var translation = result.translatedText;
-    var detectedSourceLanguage = result.detectedSourceLanguage;
-    if (translation) {
-      var transNode = transNodes[i];
-      transNode.nodeValue = translation;
-      transNode.lang = transToLang;
-      if (!transNode['origLang']) {
-        if (detectedSourceLanguage) {
-          transNode['origLang'] = detectedSourceLanguage;
-        } else {
-          transNode['origText'] = translation;
-          transNode['origLang'] = transToLang;
+  if (responseData) {
+    if (!(responseData instanceof Array)) {
+      responseData = [{'responseData':responseData}];
+    }
+    for (var i = 0; i < responseData.length; i++) {
+      var result = responseData[i].responseData;
+      var translation = result.translatedText;
+      var detectedSourceLanguage = result.detectedSourceLanguage;
+      if (translation) {
+        var transNode = transNodes[i];
+        transNode.nodeValue = translation;
+        transNode.lang = transToLang;
+        if (!transNode['origLang']) {
+          if (detectedSourceLanguage) {
+            transNode['origLang'] = detectedSourceLanguage;
+          } else {
+            transNode['origText'] = translation;
+            transNode['origLang'] = transToLang;
+          }
         }
       }
     }
+  } else {
+    alert('Cannot translate page.');
   }
+  document.getElementById('transProgress').style.visibility = 'hidden';
 }
 
 function eltsToTranslate() {
@@ -140,4 +159,15 @@ function eltsByClass(className) {
     }
   }
   return elts;
+}
+
+function setLangCookie(lang) {
+  document.cookie = 'lang='+ lang +'; path=/';
+  // TODO(pmy): Rethink this.
+  // Need the timeout so cookie can register before refresh.
+  setTimeout('location.href = location.href', 10);
+}
+
+function failsafeProgressHide() {
+  document.getElementById('transProgress').style.visibility = 'hidden';
 }

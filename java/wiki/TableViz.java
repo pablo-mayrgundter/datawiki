@@ -56,8 +56,8 @@ public class TableViz extends DataSourceServlet {
   DataTable summaryTable(final List<MultiPartDocument> docs) {
     final DataTable data = new DataTable();
     final List<ColumnDescription> cd = new ArrayList<ColumnDescription>();
-    cd.add(new ColumnDescription("created", ValueType.DATETIME, "created"));
-    cd.add(new ColumnDescription("count", ValueType.NUMBER, "count"));
+    cd.add(new ColumnDescription("created", ValueType.DATETIME, "Created"));
+    cd.add(new ColumnDescription("count", ValueType.NUMBER, "Count"));
     data.addColumns(cd);
     final SortedMap<DateTimeValue,Integer> dateCounts = new TreeMap<DateTimeValue,Integer>();
     for (final MultiPartDocument doc : docs) {
@@ -112,11 +112,11 @@ public class TableViz extends DataSourceServlet {
     }
     // Used for map view only.  Use ID as stored field and show summary as formatted version.
     if (hasLatLon) {
-      data.addColumn(new ColumnDescription("Summary", ValueType.NUMBER, "summary"));
+      data.addColumn(new ColumnDescription("summary", ValueType.NUMBER, "Summary"));
     }
-    data.addColumn(new ColumnDescription("id", ValueType.NUMBER, "id"));
-    data.addColumn(new ColumnDescription("created", ValueType.DATETIME, "created"));
-    data.addColumn(new ColumnDescription("updated", ValueType.DATETIME, "updated"));
+    data.addColumn(new ColumnDescription("id", ValueType.NUMBER, "Edit"));
+    data.addColumn(new ColumnDescription("created", ValueType.DATETIME, "Created"));
+    data.addColumn(new ColumnDescription("updated", ValueType.DATETIME, "Updated"));
     data.addColumns(cols);
 
     int rowCount = 0;
@@ -154,8 +154,11 @@ public class TableViz extends DataSourceServlet {
         row.addCell(summaryCell);
       }
 
-      String itemLink = String.format("<a href=\"/wiki/documents/%d\">%d</a>",
-                                      doc.getId(), doc.getId());
+      // Note, displayed id row id, not instance id.  instance id is
+      // still available in client table.
+      //String itemLink = String.format("<a href=\"\" onclick=\"editItem(this, '%d');return false;\">%d</a>",
+      String itemLink = String.format("<a href=\"/wiki/%s/%d\">%d</a>",
+                                      format.getName(), doc.getId(), rowCount, rowCount);
       row.addCell(new TableCell(new NumberValue(doc.getId()), itemLink));
       summary += String.format("  <tr><td>ID:</td><td>%s</td></tr>\n", itemLink);
 
@@ -184,6 +187,7 @@ public class TableViz extends DataSourceServlet {
         logger.warning("Field mismatch in doc "+ doc.getId() +", nested: "+ e);
         continue;
       }
+      rowCount++;
     }
     return data;
   }

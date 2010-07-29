@@ -23,11 +23,11 @@
   </servlet-mapping>
 
   <servlet>
-    <servlet-name>viz</servlet-name>
+    <servlet-name>chart</servlet-name>
     <servlet-class>wiki.TableViz</servlet-class>
   </servlet>
   <servlet-mapping>
-    <servlet-name>viz</servlet-name>
-    <url-pattern>/viz</url-pattern>
+    <servlet-name>chart</servlet-name>
+    <url-pattern>/chart</url-pattern>
   </servlet-mapping>
 </web-app>

@@ -2,13 +2,12 @@
 <%
   final String formatName = (String) request.getAttribute("formatName");
   final Format format = (Format) request.getAttribute("format");
-  final Boolean reqShowDocs = (Boolean) request.getAttribute("showDocs");
-  final boolean showDocs = reqShowDocs == null ? false : true;
 %>
 <html>
   <head>
     <link href="/documents.css" rel="stylesheet" type="text/css"/>
     <script src="http://www.google.com/jsapi" type="text/javascript"></script>
+    <script src="/HTTP.js" type="text/javascript"></script>
     <script src="/Util.js" type="text/javascript"></script>
     <script src="/StatsTable.js" type="text/javascript"></script>
     <script src="/Tabs.js" type="text/javascript"></script>
@@ -54,13 +53,13 @@
               <jsp:param name="jspFormId" value="formFind"/>
               <jsp:param name="jspFormTitle" value="Find"/>
               <jsp:param name="jspFormMethod" value="GET"/>
-              <jsp:param name="jspFormAction" value="<%= "/wiki/documents?format="+ formatName %>"/>
+              <jsp:param name="jspFormAction" value="<%= "/wiki/"+ format.getURLTitle() %>"/>
             </jsp:include>
             <jsp:include page="form.jsp">
               <jsp:param name="jspFormId" value="formCreate"/>
               <jsp:param name="jspFormTitle" value="Create"/>
               <jsp:param name="jspFormMethod" value="POST"/>
-              <jsp:param name="jspFormAction" value="<%= "/wiki/documents?format="+ formatName %>"/>
+              <jsp:param name="jspFormAction" value="<%= "/wiki/"+ format.getURLTitle() %>"/>
               <jsp:param name="jspFormActive" value="false"/>
             </jsp:include>
           </div>
@@ -68,11 +67,25 @@
         <div>&nbsp;</div>
       </div>
       <ul id="chartTabs" class="tabs">
-        <li <%= showDocs ? "" : "class=\"activeTab\"" %>><a>Stats</a></li>
-        <li <%= showDocs ? "class=\"activeTab\"" : "" %>><a>Documents</a></li>
+        <li class="activeTab"><a>Documents</a></li>
+        <li><a>Stats</a></li>
       </ul>
       <div id="tabbedCharts">
-        <div id="statsChart" class="box tabbed chart <%= showDocs ? "" : "activeTabbed" %>">
+        <div id="detailCharts" class="box tabbed chart activeTabbed">
+          <table>
+            <tr>
+              <td width="50%" valign="top">
+                <div id="listChart">
+                  <div style="margin: 1em"><img src="/loader.gif" alt="Loading..."></div>
+                </div>
+              </td>
+              <td width="50%" valign="top">
+                <div id="mapChart"></div>
+              </td>
+            </tr>
+          </table>
+        </div>
+        <div id="statsCharts" class="box tabbed chart">
           <table>
             <tr>
               <td width="50%" valign="top" class="statsLeft">
@@ -82,16 +95,12 @@
                   <li>Namespace: <%= format.getNamespace() %></li>
                 </ul>
                 <h3>Documents</h3>
-                <div id="timelineChart" style="width:50%; height:90%"></div>
+                <div id="statsChart" style="width:50%; height:90%"></div>
               </td>
               <td width="50%">
-                <div id="mapChart"></div>
               </td>
             </tr>
           </table>
-        </div>
-        <div id="listChart" class="box tabbed chart <%= showDocs ? "activeTabbed" : "" %>">
-          <div style="margin: 1em">No matches.</div>
         </div>
       </div>
     </div>
