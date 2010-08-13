@@ -40,12 +40,18 @@ public class XmlSerializer {
     return format;
   }
 
+  /**
+   * Creates a MultiPartDocument from an InputStream of XML using the
+   * path to nodes as the field names.  The root node prefix is
+   * stripped from path names.
+   */
   public static MultiPartDocument docFromXml(final InputStream is) throws SAXException, IOException {
     final LinkedHashMap<String,String> fieldValues = new LinkedHashMap<String,String>();
     final Node root = fromXml(is, fieldValues, true);
     final MultiPartDocument doc = new MultiPartDocument(root.getLocalName());
-    for (final String fieldName : fieldValues.keySet()) {
+    for (String fieldName : fieldValues.keySet()) {
       final String value = fieldValues.get(fieldName);
+      fieldName = fieldName.substring(fieldName.indexOf("/", 1) + 1, fieldName.length());
       doc.fields.add(new DocumentField(fieldName, value));
     }
     return doc;
@@ -69,20 +75,26 @@ public class XmlSerializer {
     return root;
   }
 
-  // TODO(pmy): the method of constructing names from paths isn't
-  // great.
+  /**
+   * Depth-first recursive traversal of curElt to accumulate
+   * name/value fields where the name is the XML path.
+   */
   static void fromXml(final LinkedHashMap<String,String> fieldValues, final boolean includeValues,
                       final Element curElt, final String path) {
+    // TODO(pmy): the method of constructing names from paths isn't
+    // great.
     final NodeList childNodes = curElt.getChildNodes();
     final String curNodePath = path + curElt.getLocalName();
-    if (childNodes.getLength() == 0)
+    if (childNodes.getLength() == 0) {
       fieldValues.put(curNodePath, "");
+    }
     for (int i = 0; i < childNodes.getLength(); i++) {
       final Node n = childNodes.item(i);
       if (n.getNodeType() == Node.ELEMENT_NODE)
         fromXml(fieldValues, includeValues, (Element)n, curNodePath + "/");
       else if (n.getNodeType() == Node.TEXT_NODE) {
-        final String value = n.getNodeValue();
+        // TODO(pmy): newlines turning into lots of whitespace.  Trimming should be correct?
+        final String value = n.getNodeValue().trim();
         if (value.trim().length() > 0) {
           fieldValues.put(curNodePath, includeValues ? value : "");
         }
