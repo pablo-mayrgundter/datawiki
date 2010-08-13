@@ -22,6 +22,7 @@ class FormUpload {
       }
     };
 
+  @SuppressWarnings("unchecked")
   static List<FileItem> processFormData(final HttpServletRequest req) throws FileUploadException {
     if (!ServletFileUpload.isMultipartContent(req)) {
       throw new IllegalArgumentException("Must specify enctype=\"multipart/form-data\" in form definition."

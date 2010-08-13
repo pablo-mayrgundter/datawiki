@@ -49,4 +49,9 @@ public class MultiPartDocument extends AbstractDocument<MultiPartDocument> {
       fields = new ArrayList<DocumentField>();
     fields.add(field);
   }
+
+  public String toString() {
+    return String.format("MultiPartDocument@%d{format: %s, fields: %s}",
+                         System.identityHashCode(this), format, fields.toString());
+  }
 }

@@ -47,4 +47,9 @@ public class DocumentField {
   public void setValue(final String value) {
     this.value = value;
   }
+
+  public String toString() {
+    return String.format("DocumentField@%d{name: %s, value; %s}",
+                         System.identityHashCode(this), name, value);
+  }
 }

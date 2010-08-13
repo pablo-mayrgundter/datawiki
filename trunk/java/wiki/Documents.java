@@ -108,6 +108,26 @@ public class Documents extends PersistentList<MultiPartDocument> {
   }
 
   @POST
+  @Path("{formatTitle}")
+  @Consumes({"application/x-www-form-urlencoded"})
+  public Response postXmlDoc(@Context HttpServletRequest req,
+                             @Context HttpServletResponse rsp,
+                             @PathParam("formatTitle") String formatTitle,
+                             String content) throws Exception {
+    final Format format = Formats.lookupFormatByTitle(formatTitle);
+    if (format == null) {
+      return Formats.formatWithTitleNotFound(formatTitle, req, rsp);
+    }
+    final MultiPartDocument doc = XmlSerializer.docFromXml(new java.io.ByteArrayInputStream(content.getBytes()));
+    if (!doc.getFormat().equals(format.getName())) {
+      return Response.status(Response.Status.BAD_REQUEST).entity("The submitted XML does not match this format.").build();
+    }
+    System.out.println(doc);
+    save(doc);
+    return pageList(req, rsp, format);
+  }
+
+  @POST
   @Path("{format}/{id}")
   @Consumes({"multipart/form-data"})
   @Produces({"text/html"})

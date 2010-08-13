@@ -9,6 +9,7 @@ public class FormApp extends Application {
     final Set<Class<?>> s = new HashSet<Class<?>>();
     s.add(Documents.class);
     s.add(Formats.class);
+    s.add(Hub.class);
     return s;
   }
 }

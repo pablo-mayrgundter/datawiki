@@ -11,6 +11,9 @@
     <fileset dir=".">
       <include name="lib/*.jar"/>
     </fileset>
+    <fileset dir="${appengine.home}/lib">
+      <include name="user/*.jar"/>
+    </fileset>
   </path>
   <path id="datanucleus.classpath">
     <pathelement location="${classes}"/>

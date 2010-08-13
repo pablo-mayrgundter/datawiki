@@ -1,7 +1,6 @@
 package wiki;
 
 import java.io.IOException;
-import java.io.StringBufferInputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URLDecoder;
@@ -108,7 +107,7 @@ public class Formats extends PersistentList<Format> {
       final String fieldValue = new String(item.get());
       if (fieldName.equals("xml")) {
         try {
-          format = XmlSerializer.formatFromXml(new StringBufferInputStream(fieldValue));
+          format = XmlSerializer.formatFromXml(new java.io.ByteArrayInputStream(fieldValue.getBytes()));
         } catch (SAXException e) {
           req.setAttribute("reqXml", fieldValue);
           req.setAttribute("reqXmlException", e);
