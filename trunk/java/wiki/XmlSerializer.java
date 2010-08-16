@@ -26,10 +26,22 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
+/**
+ * The XmlSerializer class implements the XML-to-Format conversion
+ * operations described at:
+ *
+ *   http://code.google.com/p/datawiki/wiki/XMLSerialization
+ *
+ * @author "Pablo Mayrgundter" <pmy@google.com>
+ */
 public class XmlSerializer {
 
   static final Logger logger = Logger.getLogger(XmlSerializer.class.getName());
 
+  /**
+   * Creates a Format from the given XML template of a document in the
+   * taret format.
+   */
   public static Format formatFromXml(final InputStream is) throws SAXException, IOException {
     final LinkedHashMap<String,String> fieldValues = new LinkedHashMap<String,String>();
     final Node root = fromXml(is, fieldValues, false);
@@ -57,6 +69,10 @@ public class XmlSerializer {
     return doc;
   }
 
+  /**
+   * Intermediate helper for creating a MultiPartDocument from an
+   * InputStream of XML.  Called by #docFromXml(InputStream).
+   */
   static Node fromXml(final InputStream is,
                       final LinkedHashMap<String,String> fieldValues,
                       final boolean includeValues) throws SAXException, IOException {
@@ -102,13 +118,10 @@ public class XmlSerializer {
     }
   }
 
-  public static String toXml(final Format format) throws TransformerException {
-    final LinkedHashMap<String,String> fieldValues = new LinkedHashMap<String,String>();
-    for (final FormField field : format.getFields())
-      fieldValues.put(field.getName(), null);
-    return toXml(format.getName(), format.getNamespace(), fieldValues, false);
-  }
-
+  /**
+   * Converts the given MultiPartDocument of the given Format to an
+   * XML encoded string.
+   */
   public static String toXml(final MultiPartDocument doc, final Format format) throws TransformerException {
     final LinkedHashMap<String,String> fieldValues = new LinkedHashMap<String,String>();
     for (final DocumentField field : doc.fields) {
@@ -117,6 +130,21 @@ public class XmlSerializer {
     return toXml(format.getName(), format.getNamespace(), fieldValues, true);
   }
 
+  /**
+   * Converts the given Format to an XML encoded string.
+   */
+  public static String toXml(final Format format) throws TransformerException {
+    final LinkedHashMap<String,String> fieldValues = new LinkedHashMap<String,String>();
+    for (final FormField field : format.getFields()) {
+      fieldValues.put(field.getName(), null);
+    }
+    return toXml(format.getName(), format.getNamespace(), fieldValues, false);
+  }
+
+  /**
+   * Actual conversion method for both #toXml(MultiPartDocument,
+   * Format) and #toXml(Format).
+   */
   static String toXml(final String formatName, final String formatNamespace,
                       final LinkedHashMap<String,String> fieldValues, final boolean emitValues)
     throws TransformerException {
