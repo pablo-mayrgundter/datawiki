@@ -56,6 +56,18 @@
       <fileset dir="${classes}" includes="wiki/MultiPartDocument.class"/>
     </enhance>
   </target>
+  <target name="test" depends="enhance">
+    <junit fork="true" showoutput="true">
+      <classpath>
+        <path>
+          <path refid="classpath"/>
+          <pathelement location="${classes}"/>
+        </path>
+      </classpath>
+      <formatter type="brief" usefile="false"/>
+      <test name="wiki.AllTests"/>
+    </junit>
+  </target>
   <target name="jar" depends="enhance">
     <jar destfile="build/lib/${appname}.jar" basedir="build/classes">
       <manifest>
