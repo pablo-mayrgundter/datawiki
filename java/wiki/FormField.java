@@ -41,9 +41,6 @@ public class FormField implements Serializable {
    */
   public FormField(final String text, final String name, final String value, final Type type) {
     this.text = text;
-    if (!Util.safeForXmlTag(name)) {
-      throw new IllegalArgumentException(String.format("The given field name '%s' cannot be used.  It must use only these characters: %s", name, Util.XML_SAFE_CHARS));
-    }
     this.name = name;
     this.value = new Text(value);
     this.type = type;

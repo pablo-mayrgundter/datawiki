@@ -1,12 +1,12 @@
-<%@page import="wiki.Format,wiki.FormField"%>
+<%@page import="wiki.Format,wiki.FormField,wiki.Util"%>
 <%
   final String formatName = (String) request.getAttribute("formatName");
   final Format format = (Format) request.getAttribute("format");
-  final String formId = request.getParameter("jspFormId");
-  final String title = request.getParameter("jspFormTitle");
-  final String action = request.getParameter("jspFormAction");
-  final String method = request.getParameter("jspFormMethod");
-  final String activeClass = request.getParameter("jspFormActive") == null ? "activeTabbed" : "";
+  final String formId = Util.encodeForHTML(request.getParameter("jspFormId"));
+  final String title = Util.encodeForHTML(request.getParameter("jspFormTitle"));
+  final String action = Util.encodeForHTML(request.getParameter("jspFormAction"));
+  final String method = Util.encodeForHTML(request.getParameter("jspFormMethod"));
+  final String activeClass = Util.encodeForHTML(request.getParameter("jspFormActive") == null ? "activeTabbed" : "");
 %>
 <form id="<%= formId %>" class="tabbed <%= activeClass %>" action="<%= action %>" enctype="multipart/form-data" method="<%= method %>">
 <%
@@ -21,14 +21,18 @@
   if (format != null) {
     int fieldCount = 0;
     for (final FormField field : format.getFields()) {
+      final String name = Util.encodeForHTML(field.getName());
+      final String text = Util.encodeForHTML(field.getText());
       String value = field.getValue();
-      if (request.getParameter("q") != null && request.getParameter(field.getName()) != null)
-        value = request.getParameter(field.getName());
+      if (request.getParameter("q") != null && request.getParameter(name) != null) {
+        value = request.getParameter(name);
+      }
+      value = Util.encodeForHTML(value);
 %>
     <tr>
-      <td><label for="<%= field.getName() %>"><%= field.getText() %></label>:</td>
+      <td><label for="<%= name %>"><%= text %></label>:</td>
       <td>
-        <input id="<%= formId %>-input-<%= fieldCount++ %>" name="<%= field.getName() %>" value="<%= value %>">
+        <input id="<%= formId %>-input-<%= fieldCount++ %>" name="<%= name %>" value="<%= value %>">
         <div class="edit-buttons hover-reveal">
           <button class="button delete"><div></div>&nbsp;</button>
           <button class="button edit"><div></div>&nbsp;</button>

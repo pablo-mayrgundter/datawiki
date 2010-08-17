@@ -106,9 +106,9 @@ public class XmlSerializer {
     }
     for (int i = 0; i < childNodes.getLength(); i++) {
       final Node n = childNodes.item(i);
-      if (n.getNodeType() == Node.ELEMENT_NODE)
+      if (n.getNodeType() == Node.ELEMENT_NODE) {
         fromXml(fieldValues, includeValues, (Element)n, curNodePath + "/");
-      else if (n.getNodeType() == Node.TEXT_NODE) {
+      } else if (n.getNodeType() == Node.TEXT_NODE) {
         // TODO(pmy): newlines turning into lots of whitespace.  Trimming should be correct?
         final String value = n.getNodeValue().trim();
         if (value.trim().length() > 0) {

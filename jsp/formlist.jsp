@@ -11,11 +11,11 @@
     if (title == null || title.trim().equals("")) {
       title = format.getName().toUpperCase();
     }
-    title = "<a href=\"/wiki/"+ format.getURLTitle() +"\">"+ title +"</a>";
+    title = "<a href=\"/wiki/"+ Util.encodeForDoubleQuotedAttribute(format.getURLTitle()) +"\">"+ title +"</a>";
 %>
   <li>
     <h2><%= title %></h2>
-    <p><%= format.getDescription() %></p>
+    <p><%= Util.encodeForHTML(format.getDescription()) %></p>
   </li>
 <%
   }

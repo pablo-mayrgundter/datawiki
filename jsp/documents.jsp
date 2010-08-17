@@ -1,4 +1,4 @@
-<%@page import="wiki.Format"%>
+<%@page import="wiki.Format,wiki.Util"%>
 <%
   final String formatName = (String) request.getAttribute("formatName");
   final Format format = (Format) request.getAttribute("format");
@@ -19,7 +19,8 @@
       try {
         if (google != null) {
           google.load('visualization', '1', {'packages':['corechart','table','map']});
-          vizFormat = '<%= formatName %>'; // required for vizInit;
+          // TODO(pmy): Format name not encoded as it is cleaned on input.
+          vizFormat = '<%= formatName %>';
           google.setOnLoadCallback(vizQuery);
         }
       } catch(e) {
@@ -38,10 +39,10 @@
       <div id="formatBox" class="box tabbed activeTabbed">
         <div id="formatPanelLeft">
 <%
-  String header = format.getTitle() == null ? format.getName().toUpperCase() : format.getTitle();
+  String header = Util.encodeForHTML(format.getTitle() == null ? format.getName().toUpperCase() : format.getTitle());
 %>
-          <h2 id="title"><%= header %></h2>
-          <p><%= format.getDescription() %></p>
+          <h2 id="title"><%= Util.encodeForHTML(header) %></h2>
+          <p><%= Util.encodeForHTML(format.getDescription()) %></p>
         </div>
         <div id="formatPanelRight">
           <ul id="formTabs" class="tabs">
@@ -91,8 +92,8 @@
               <td width="50%" valign="top" class="statsLeft">
                 <h3>Format</h3>
                 <ul>
-                  <li>Created on: <%= format.getCreatedDate() %></li>
-                  <li>Namespace: <%= format.getNamespace() %></li>
+                  <li>Created on: <%= Util.encodeForHTML(format.getCreatedDate().toString()) %></li>
+                  <li>Namespace: <%= Util.encodeForHTML(format.getNamespace().toString()) %></li>
                 </ul>
                 <h3>Documents</h3>
                 <div id="statsChart" style="width:50%; height:90%"></div>

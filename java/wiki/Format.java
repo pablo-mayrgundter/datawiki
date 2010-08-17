@@ -36,15 +36,9 @@ public class Format extends AbstractDocument<Format> {
   }
 
   public Format(final String name, final String namespace, final String description, final String title) {
-    if (!Util.safeForXmlTag(name)) {
-      throw new IllegalArgumentException(String.format("The given format name '%s' cannot be used.  It must use only these characters: %s", name, Util.XML_SAFE_CHARS));
-    }
     this.name = name;
-    this.title = title;
-    this.namespace = namespace;
-    if (!Util.safeFormatNamespace(namespace)) {
-      throw new IllegalArgumentException(String.format("The given format namespace '%s' cannot be used.  It must be a valid URL.", namespace));
-    }
+    this.title = Util.validTitle(title);
+    this.namespace = Util.validNamepsace(namespace);
     this.description = new Text(description);
     fields = new ArrayList<FormField>();
   }

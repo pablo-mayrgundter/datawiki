@@ -27,12 +27,13 @@
 
             <h3>or use an existing XML template</h3>
             <form action="/wiki/formats" method="POST" enctype="multipart/form-data">
-              <textarea name="xml" cols="40" rows="20"><%= reqXml == null ? "" : reqXml %></textarea><br/>
+              <textarea name="xml" cols="40" rows="20"><%= reqXml == null ? "" : Util.encodeForHTML(reqXml) %></textarea>
+              <br/>
 <%
    if (reqXml != null && reqXmlException != null) {
 %>
      <em>The XML template cannot be parsed.  The parser generated the following exception:<br/>
-       <%= reqXmlException %></em><br/>
+       <%= Util.encodeForHTML(reqXmlException.toString()) %></em><br/>
 <%
    }
 %>
