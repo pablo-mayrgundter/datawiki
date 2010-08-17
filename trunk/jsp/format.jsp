@@ -28,7 +28,7 @@
     <jsp:include page="nav.jsp"/>
     <div class="mainPanel trans">
       <ul class="tabs">
-        <li><a href="/wiki/<%= format.getURLTitle() %>">Dataset</a></li>
+        <li><a href="/wiki/<%= Util.encodeForDoubleQuotedAttribute(format.getURLTitle()) %>">Dataset</a></li>
         <li class="activeTab">Format</li>
       </ul>
       <div id="formatBox" class="box">
@@ -39,8 +39,8 @@
     title = format.getName().toUpperCase();
   }
 %>
-          <h2 id="title"><%= title %></h2>
-          <p id="description"><%= format.getDescription() %></p>
+          <h2 id="title"><%= Util.encodeForHTML(title) %></h2>
+          <p id="description"><%= Util.encodeForHTML(format.getDescription()) %></p>
         </div>
         <div id="formatPanelRight">
           <ul id="formTabs" class="tabs">
@@ -79,7 +79,7 @@
           <p>Documents retrieved in XML format will have the following
           structure.</p>
 
-          <pre><%= XmlSerializer.toXml(format).replaceAll("<", "&lt;").replaceAll(">", "&gt;") %></pre>
+          <pre><%= Util.encodeForHTML(XmlSerializer.toXml(format)) %></pre>
 
           <h4>HTML Find and Create Forms</h4>
           <p>You can use forms for finding or creating documents in

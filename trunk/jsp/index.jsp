@@ -1,8 +1,3 @@
-<%
-  String siteName = request.getParameter("siteName");
-  if (siteName == null)
-    siteName = "ReliefHub";
-%>
 <html>
   <head>
     <script src="http://www.google.com/jsapi" type="text/javascript"></script>

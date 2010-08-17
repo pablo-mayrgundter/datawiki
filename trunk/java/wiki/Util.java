@@ -1,7 +1,7 @@
 package wiki;
 
-import java.net.MalformedURLException;
-import java.net.URL;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URLEncoder;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -11,6 +11,30 @@ import javax.ws.rs.core.Response;
 public class Util {
 
   public static final String XML_SAFE_CHARS = "a-zA-Z_-";
+  public static final String XML_SAFE_STRING = String.format("^[%s]+$", XML_SAFE_CHARS);
+
+  /**
+   * Implements ESAPI's Rule #1 escaping.
+   * TODO(pmy): replace with ESAPI.
+   */
+  public static String encodeForHTML(String s) {
+    s = s.replace("&", "&amp;");
+    s = s.replace("<", "&lt;");
+    s = s.replace(">", "&gt;");
+    s = s.replace("\"", "&quot;");
+    s = s.replace("'", "&#x27;");
+    s = s.replace("/", "&#x2F;");
+    return s;
+  }
+
+  /**
+   * Implements ESAPI's Rule #2 escaping for the quoted attribute
+   * case.  TODO(pmy): replace with ESAPI.
+   */
+  public static String encodeForDoubleQuotedAttribute(String s) {
+    s = s.replace("\"", "&quot;");
+    return s;
+  }
 
   public static String getParameter(final HttpServletRequest req, final String name, final String defaultValue) {
     final String value = req.getParameter(name);
@@ -29,16 +53,35 @@ public class Util {
     return url;
   }
 
-  static boolean safeForXmlTag(final String s) {
-    return s.matches(String.format("^[%s]+$", XML_SAFE_CHARS));
+  /**
+   * Checks if the given string is a valid title.
+   *
+   * @returns The given string if it is valid.
+   * @throws IllegalArgumentException If the given string is not
+   * valid to use as a title.
+   */
+  static String validTitle(final String s) {
+    if (!s.matches(XML_SAFE_CHARS)) {
+      throw new IllegalArgumentException(String.format("The given title '%s' cannot be used.  "
+                                                       + "It must match only these characters: "
+                                                       + XML_SAFE_CHARS));
+    }
+    return s;
   }
 
-  static boolean safeFormatNamespace(final String s) {
+  /**
+   * Checks if the given string is a valid URI namespace.
+   *
+   * @returns The given string if it is valid.
+   * @throws IllegalArgumentException If the given string is not
+   * valid to use as a namespace.
+   */
+  static String validNamepsace(final String s) {
     try {
-      new URL(s);
-      return true;
-    } catch (MalformedURLException e) {
-      return false;
+      new URI(s);
+      return s;
+    } catch (URISyntaxException e) {
+      throw new IllegalArgumentException(String.format("The given format namespace '%s' cannot be used.  It must be a valid URI.", s));
     }
   }
 
