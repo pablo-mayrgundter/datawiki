@@ -10,20 +10,14 @@
   <head>
     <script src="http://www.google.com/jsapi" type="text/javascript"></script>
     <link rel="stylesheet" href="/format.css" type="text/css"/>
-    <script src="/Util.js" type="text/javascript"></script>
-    <script src="/HTTP.js" type="text/javascript"></script>
+    <script src="/Wiki.js" type="text/javascript"></script>
     <script src="/Format.js" type="text/javascript"></script>
     <script src="/FormEditor.js" type="text/javascript"></script>
     <script src="/FormConverter.js" type="text/javascript"></script>
     <script src="/FieldEditor.js" type="text/javascript"></script>
     <script src="/Translate.js" type="text/javascript"></script>
-    <script>
-      function init() {
-        new Format(<%= startEdit %>);
-      }
-    </script>
   </head>
-  <body onload="init();translateInit('langSelect')">
+  <body onload="init(<%= startEdit %>);">
     <jsp:include page="onebar.jsp"/>
     <jsp:include page="nav.jsp"/>
     <div class="mainPanel trans">
@@ -59,7 +53,8 @@
           <h3>Developer Guide</h3>
           <h4>Web API</h4>
           <p>This dataset can be searched or retrieved in bulk using
-          a <a href="http://en.wikipedia.org/wiki/Representational_State_Transfer">RESTful</a> <a href="http://en.wikipedia.org/wiki/Web_service">Web
+          a <a href="http://en.wikipedia.org/wiki/Representational_State_Transfer">RESTful</a>
+            <a href="http://en.wikipedia.org/wiki/Web_service">Web
           Service</a> <a href="http://en.wikipedia.org/wiki/Application_programming_interface">API</a>.</p>
 
           <p>All documents may be retrieved in Atom format using this URL:</p>

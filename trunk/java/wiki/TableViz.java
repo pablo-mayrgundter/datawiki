@@ -11,6 +11,7 @@ import com.google.visualization.datasource.datatable.value.NumberValue;
 import com.google.visualization.datasource.datatable.value.DateTimeValue;
 import com.google.visualization.datasource.query.Query;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -26,11 +27,18 @@ import java.util.TreeMap;
 import java.util.logging.Logger;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 /** Adapted from Google Visualization SimpleExampleServlet. */
 public class TableViz extends DataSourceServlet {
 
   static final Logger logger = Logger.getLogger(TableViz.class.getName());
+
+  protected void doGet(final HttpServletRequest req, final HttpServletResponse rsp)
+    throws IOException {
+    super.doGet(req, rsp);
+    rsp.setHeader("Content-Type", "application/json");
+  }
 
   public DataTable generateDataTable(final Query query, final HttpServletRequest request) {
 

@@ -3,4 +3,9 @@ function Documents() {
            get('tabbedForms').getElementsByTagName('form'));
   new Tabs(get('chartTabs').getElementsByTagName('li'),
            [get('detailCharts'), get('statsCharts')]);
-}
+};
+
+function init() {
+  Documents();
+  translateInit('langSelect');
+};

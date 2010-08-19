@@ -64,7 +64,7 @@ public class Formats extends PersistentList<Format> {
   }
 
   @GET
-  @Produces({"text/html"})
+  @Produces({"text/html; charset=utf-8"})
   public Response get(@Context HttpServletRequest req,
                       @Context HttpServletResponse rsp) throws ServletException, IOException {
     req.getRequestDispatcher(JSP_COLLECTION).include(req, rsp);
@@ -73,7 +73,7 @@ public class Formats extends PersistentList<Format> {
 
   @GET
   @Path("{formatName}")
-  @Produces({"text/html"})
+  @Produces({"text/html; charset=utf-8"})
   public Response get(@PathParam("formatName") String formatName,
                       @Context HttpServletRequest req,
                       @Context HttpServletResponse rsp) throws ServletException, IOException {
@@ -95,7 +95,7 @@ public class Formats extends PersistentList<Format> {
 
   @POST
   @Consumes({"multipart/form-data"})
-  @Produces({"text/html"})
+  @Produces({"text/html; charset=utf-8"})
   public Response post(@Context HttpServletRequest req,
                        @Context HttpServletResponse rsp)
     throws IOException, ServletException, FileUploadException, URISyntaxException {
@@ -128,7 +128,7 @@ public class Formats extends PersistentList<Format> {
   @POST
   @Path("{formatName}")
   @Consumes({"multipart/form-data"})
-  @Produces({"text/html"})
+  @Produces({"text/html; charset=utf-8"})
   public Response post(@PathParam("formatName") String formatName,
                        @Context HttpServletRequest req,
                        @Context HttpServletResponse rsp) throws Exception {

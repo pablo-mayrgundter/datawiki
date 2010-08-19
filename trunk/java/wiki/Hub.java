@@ -62,7 +62,7 @@ public class Hub {
    */
   @GET
   @Path("/worker")
-  @Produces({"text/html"})
+  @Produces({"text/html; charset=utf-8"})
   public Response subscription(@Context final HttpServletRequest req,
                                @QueryParam("hub.topic") final String topic,
                                @QueryParam("hub.mode") final String mode) {
@@ -108,7 +108,7 @@ public class Hub {
 
   @GET
   @Path("/verify")
-  @Produces({"text/html"})
+  @Produces({"text/html; charset=utf-8"})
   public Response verify(@Context final HttpServletRequest req,
                          @QueryParam("hub.mode") final String mode,
                          @QueryParam("hub.topic") final String topic,
@@ -119,7 +119,7 @@ public class Hub {
 
   @GET
   @Path("/feed")
-  @Produces({"text/html"})
+  @Produces({"text/html; charset=utf-8"})
   public Response feed(@Context final HttpServletRequest req) {
     logger.info("Feed received.");
     return Response.ok().build();
