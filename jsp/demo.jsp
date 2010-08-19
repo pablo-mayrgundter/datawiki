@@ -8,10 +8,8 @@
   <head>
     <title>Dataset: <%= formatName %></title>
     <script src="http://www.google.com/jsapi" type="text/javascript"></script> 
-    <script src="<%= host %>/Util.js" type="text/javascript"></script> 
-    <script src="<%= host %>/StatsTable.js" type="text/javascript"></script> 
+    <script src="<%= host %>/Wiki.js" type="text/javascript"></script> 
     <script src="<%= host %>/Translate.js" type="text/javascript"></script>
-    <script src="<%= host %>/Viz.js" type="text/javascript"></script> 
     <script type="text/javascript">
       // Needs to be called before page loaded.
       try {

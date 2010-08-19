@@ -26,10 +26,10 @@
       <p>
         <a href="/wiki/<%= Util.encodeForDoubleQuotedAttribute(doc.getFormat()) %>">
           <%= Util.encodeForHTML(doc.getFormat()) %>
-        </a> &gt; <%= Util.encodeForHTML(doc.getId()) %>
+        </a> &gt; <%= Util.encodeForHTML(""+doc.getId()) %>
       <p>&nbsp;</p>
       <h2>Fields</h2>
-      <form action="/wiki/<%= Util.encodeForDoubleQuotedAttribute(doc.getFormat()) %>/<%= Util.encodeForHTML(doc.getId()) %>" method="POST" enctype="multipart/form-data">
+      <form action="/wiki/<%= Util.encodeForDoubleQuotedAttribute(doc.getFormat()) %>/<%= Util.encodeForHTML(doc.getId()+"") %>" method="POST" enctype="multipart/form-data">
         <table>
 <%
   for (final FormField formField : format.getFields()) {

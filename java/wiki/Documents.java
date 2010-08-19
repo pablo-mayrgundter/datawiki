@@ -49,7 +49,7 @@ public class Documents extends PersistentList<MultiPartDocument> {
   }
 
   @GET
-  @Produces({"text/html"})
+  @Produces({"text/html; charset=utf-8"})
   public Response getDocs(@Context HttpServletRequest req,
                           @Context HttpServletResponse rsp) {
     return Response.status(Response.Status.BAD_REQUEST).entity("Must specify a format.").build();
@@ -57,7 +57,7 @@ public class Documents extends PersistentList<MultiPartDocument> {
 
   @GET
   @Path("{formatTitle}")
-  @Produces({"text/html"})
+  @Produces({"text/html; charset=utf-8"})
   public Response getDocsForFormat(@Context HttpServletRequest req,
                                    @Context HttpServletResponse rsp,
                                    @PathParam("formatTitle") String formatTitle)
@@ -71,7 +71,7 @@ public class Documents extends PersistentList<MultiPartDocument> {
 
   @GET
   @Path("{format}/{id}")
-  @Produces({"text/html"})
+  @Produces({"text/html; charset=utf-8"})
   public Response getSingleDoc(@Context HttpServletRequest req,
                                @Context HttpServletResponse rsp,
                                @PathParam("id") String id)
@@ -84,7 +84,7 @@ public class Documents extends PersistentList<MultiPartDocument> {
   @POST
   @Path("{formatTitle}")
   @Consumes({"multipart/form-data"})
-  @Produces({"text/html"})
+  @Produces({"text/html; charset=utf-8"})
   public Response postDoc(@Context HttpServletRequest req,
                           @Context HttpServletResponse rsp,
                           @PathParam("formatTitle") String formatTitle) throws Exception {
@@ -130,7 +130,7 @@ public class Documents extends PersistentList<MultiPartDocument> {
   @POST
   @Path("{format}/{id}")
   @Consumes({"multipart/form-data"})
-  @Produces({"text/html"})
+  @Produces({"text/html; charset=utf-8"})
   public Response handlePost(@Context HttpServletRequest req,
                              @Context HttpServletResponse rsp,
                              @PathParam("format") String format,

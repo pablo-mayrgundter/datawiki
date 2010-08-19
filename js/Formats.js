@@ -8,3 +8,7 @@ function setTarget(elt) {
   }
   link.href = newHref;
 }
+
+function init() {
+  translateInit('langSelect');
+}

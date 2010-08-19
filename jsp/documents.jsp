@@ -7,12 +7,8 @@
   <head>
     <link href="/documents.css" rel="stylesheet" type="text/css"/>
     <script src="http://www.google.com/jsapi" type="text/javascript"></script>
-    <script src="/HTTP.js" type="text/javascript"></script>
-    <script src="/Util.js" type="text/javascript"></script>
-    <script src="/StatsTable.js" type="text/javascript"></script>
-    <script src="/Tabs.js" type="text/javascript"></script>
+    <script src="/Wiki.js" type="text/javascript"></script>
     <script src="/Translate.js" type="text/javascript"></script>
-    <script src="/Viz.js" type="text/javascript"></script>
     <script src="/Documents.js" type="text/javascript"></script>
     <script type="text/javascript">
       // Needs to be called before page loaded.
@@ -28,7 +24,7 @@
       }
     </script>
   </head>
-  <body onload="Documents();translateInit('langSelect')">
+  <body onload="init()">
     <jsp:include page="onebar.jsp"/>
     <jsp:include page="nav.jsp"/>
     <div class="mainPanel trans">

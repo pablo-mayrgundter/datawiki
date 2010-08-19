@@ -1,5 +1,5 @@
 /** Namespace, implemented as a global variable. */
-var viz = {};
+var wiki = {};
 
 /**
  * StatsTable class constructor.
@@ -7,16 +7,16 @@ var viz = {};
  * @param container The HTML element where the visualization will be
  * rendered in.
  */
-viz.StatsTable = function(container) {
+wiki.StatsTable = function(container) {
   // Stores the container HTML element.
   this.containerElement = container;
-}
+};
 
 /**
  * @param data The google.visualization.DataTable to display.
  * @param options name/value map of options. 
  */
-viz.StatsTable.prototype.draw = function(data, options) {
+wiki.StatsTable.prototype.draw = function(data, options) {
   // showLineNumber boolean option.
   var showLineNumber = options && options.showLineNumber;
   
@@ -36,9 +36,9 @@ viz.StatsTable.prototype.draw = function(data, options) {
   html.push('</ul>');
 
   this.containerElement.innerHTML = html.join('');
-}
+};
 
-viz.StatsTable.prototype.escapeHtml = function(text) {
+wiki.StatsTable.prototype.escapeHtml = function(text) {
   if (text == null) {
     return '';
   }
@@ -46,4 +46,4 @@ viz.StatsTable.prototype.escapeHtml = function(text) {
   replace(/</g, '<').
   replace(/>/g, '>').
   replace(/"/g, '"');
-}
+};
