@@ -293,7 +293,7 @@ function handleStatsResponse(response) {
 }
 
 function drawSummary(elt, data) {
-  var chart = new viz.StatsTable(elt, {width:'100%',height:'100%'});
+  var chart = new wiki.StatsTable(elt, {width:'100%',height:'100%'});
   chart.draw(data);
 }
 

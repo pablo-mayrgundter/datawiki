@@ -1,0 +1,45 @@
+body {
+  font-family: helvetica, arial, sans;
+  margin: 0;
+  padding: 0;
+}
+
+.header > h1 {
+  display: inline;
+  margin: 0.25em;
+}
+
+.onebar {
+  display: inline;
+  position: absolute;
+  right: 0;
+  padding: 0.5em;
+}
+
+.header * {
+  white-spac: nowrap;
+}
+
+#content {
+  position: absolute;
+  width: 100%;
+  height: 95%;
+  top: 5%;
+}
+
+#listChart, #mapChart {
+  width: 50%;
+  height: 100%;
+}
+
+#listChart {
+  left: 0;
+}
+
+#mapChart {
+  float: right;
+}
+
+input {
+  border: none;
+}
