@@ -11,7 +11,8 @@
     <script src="<%= host %>/Wiki.js" type="text/javascript"></script> 
     <script src="<%= host %>/Translate.js" type="text/javascript"></script>
     <script type="text/javascript">
-      // Needs to be called before page loaded.
+      // This block should be kept inline to ensure it is called
+      // before onload.
       try {
         if (google != null) {
           google.load('visualization', '1', {'packages':['corechart','table','map']});
@@ -22,45 +23,9 @@
         alert('This page requires resources from the internet that are currently unavailable.');
       }
     </script>
-    <style>
-      body {
-        font-family: helvetica, arial, sans;
-        margin: 0;
-        padding: 0;
-      }
-      .header > h1 {
-        display: inline;
-        margin: 0.25em;
-      }
-      .onebar {
-        display: inline;
-        position: absolute;
-        right: 0;
-        padding: 0.5em;
-      }
-      .header * {
-        white-spac: nowrap;
-      }
-      #content {
-        position: absolute;
-        width: 100%;
-        height: 95%;
-        top: 5%;
-      }
-      #listChart, #mapChart {
-        width: 50%;
-        height: 100%;
-      }
-      #listChart {
-        left: 0;
-      }
-      #mapChart {
-        float: right;
-      }
-      input {
-        border: none;
-      }
-    </style>
+    <script type="text/javascript">
+    </script>
+    <link rel="stylesheet" href="<%= host %>/demo.css" type="text/css"/>
   </head>
   <body onload="translateInit('langSelect')">
     <div class="header">
