@@ -10,13 +10,9 @@ import java.util.LinkedHashMap;
 import java.util.logging.Logger;
 
 class FormUpload {
-
-  static final Logger logger = Logger.getLogger(FormUpload.class.getName());
-
   static final FileItemFactory factory = new FileItemFactory() {
       public FileItem createItem(final String fieldName, final String contentType,
                                  final boolean isFormField, final String fileName) {
-        logger.info("Documents: handlePost: createItem: "+ fieldName);
         // TODO(pmy): clean up isFormField usage in related classes.
         return new DataStoreFileItem(contentType, fieldName, fileName, isFormField);
       }

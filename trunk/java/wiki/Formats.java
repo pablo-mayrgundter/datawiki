@@ -55,9 +55,11 @@ public class Formats extends PersistentList<Format> {
     return formats.get(0);
   }
 
-  static final String JSP_FORMAT_NOT_FOUND = "/formatNotFound.jsp";
   static final String JSP_COLLECTION = "/formats.jsp";
   static final String JSP_SINGLE = "/format.jsp";
+  static final String JSP_FORMAT_NOT_FOUND = "/formatNotFound.jsp";
+  static final String JSP_CREATE = "/formatCreate.jsp";
+  static final String JSP_CREATED = "/formatCreated.jsp";
 
   public Formats() {
     super(Format.class);
@@ -66,21 +68,27 @@ public class Formats extends PersistentList<Format> {
   @GET
   @Produces({"text/html; charset=utf-8"})
   public Response get(@Context HttpServletRequest req,
-                      @Context HttpServletResponse rsp) throws ServletException, IOException {
-    req.getRequestDispatcher(JSP_COLLECTION).include(req, rsp);
+                      @Context HttpServletResponse rsp,
+                      @QueryParam("action") String action) throws ServletException, IOException {
+    if (action != null && action.equals("new")) {
+      req.getRequestDispatcher(JSP_CREATE).include(req, rsp);
+    } else {
+      req.getRequestDispatcher(JSP_COLLECTION).include(req, rsp);
+    }
     return Response.ok().build();
   }
 
   @GET
   @Path("{formatName}")
   @Produces({"text/html; charset=utf-8"})
-  public Response get(@PathParam("formatName") String formatName,
-                      @Context HttpServletRequest req,
-                      @Context HttpServletResponse rsp) throws ServletException, IOException {
+  public Response get(@Context HttpServletRequest req,
+                      @Context HttpServletResponse rsp,
+                      @PathParam("formatName") String formatName,
+                      @QueryParam("action") String action) throws ServletException, IOException {
     Format format = null;
     final List<Format> formats = query(Format.gqlFilterForMatchingFormat(formatName));
     if (formats.size() == 0) {
-      if (req.getParameter("action") != null && req.getParameter("action").equals("edit")) {
+      if (action != null && action.equals("edit")) {
         format = new Format(formatName, makeFormatNamespace(req), "");
       } else {
         return formatNotFound(formatName, req, rsp);
@@ -93,31 +101,45 @@ public class Formats extends PersistentList<Format> {
     return Response.ok().build();
   }
 
+  /**
+   * Creates a format from XML.  If the XML cannot be parsed, the user
+   * may try again.  The root tag of the XML (without its namespace)
+   * is used as the name of the format and XPaths are used as field
+   * names.
+   */
   @POST
   @Consumes({"multipart/form-data"})
   @Produces({"text/html; charset=utf-8"})
-  public Response post(@Context HttpServletRequest req,
-                       @Context HttpServletResponse rsp)
+  public Response handlePost(@Context HttpServletRequest req,
+                             @Context HttpServletResponse rsp)
     throws IOException, ServletException, FileUploadException, URISyntaxException {
     final List<FileItem> items = FormUpload.processFormData(req);
-    final List<FormField> fields = new ArrayList<FormField>();
-    Format format = null;
+    String title = null;
+    String name = null;
     for (final FileItem item : items) {
       final String fieldName = item.getFieldName();
       final String fieldValue = new String(item.get());
-      if (fieldName.equals("xml")) {
-        try {
-          format = XmlSerializer.formatFromXml(new java.io.ByteArrayInputStream(fieldValue.getBytes()));
-        } catch (SAXException e) {
-          req.setAttribute("reqXml", fieldValue);
-          req.setAttribute("reqXmlException", e);
-          req.getRequestDispatcher(JSP_COLLECTION).include(req, rsp);
-          return Response.ok().build();
-        }
+      if (fieldName.equals("title")) {
+        title = fieldValue;
+      }
+      if (fieldName.equals("name")) {
+        name = fieldValue;
       }
     }
+    Format format = lookupFormat(name);
+    if (format != null) {
+      req.getRequestDispatcher(JSP_CREATE).include(req, rsp);
+      return Response.ok().build();
+    } else if (title == null || name == null) {
+      req.getRequestDispatcher(JSP_CREATE).include(req, rsp);
+      return Response.ok().build();
+    }
+    format = new Format(name, makeFormatNamespace(req, "/wiki/formats/"+ name), "", title);
     save(format);
-    showFormat(format, req, rsp);
+    req.setAttribute("format", format);
+    req.setAttribute("formatName", format.getName());
+    logger.info("Created: "+ format);
+    req.getRequestDispatcher(JSP_SINGLE).include(req, rsp);
     return Response.created(new URI("/wiki/formats/"+format.getName())).build();
   }
 
@@ -129,9 +151,9 @@ public class Formats extends PersistentList<Format> {
   @Path("{formatName}")
   @Consumes({"multipart/form-data"})
   @Produces({"text/html; charset=utf-8"})
-  public Response post(@PathParam("formatName") String formatName,
-                       @Context HttpServletRequest req,
-                       @Context HttpServletResponse rsp) throws Exception {
+  public Response handlePost(@PathParam("formatName") String formatName,
+                             @Context HttpServletRequest req,
+                             @Context HttpServletResponse rsp) throws Exception {
     final List<FileItem> items = FormUpload.processFormData(req);
     String description = null, title = "";
     // Used to track the largest fieldNdx for the reconstructed
@@ -142,7 +164,7 @@ public class Formats extends PersistentList<Format> {
     for (final FileItem item : items) {
       final String fieldName = item.getFieldName();
       final String reqAttrs = new String(item.get());
-      logger.warning("### Field name: "+ fieldName + ", value: "+ reqAttrs);
+      logger.info("field name: "+ fieldName + ", value: "+ reqAttrs);
       final Map<String,String> fieldAttrMap = new HashMap<String,String>();
       final String [] fieldAttrs = reqAttrs.split(";");
       for (final String fieldAttr : fieldAttrs) {
@@ -206,30 +228,21 @@ public class Formats extends PersistentList<Format> {
     if (description == null)
       description = "";
 
+    formatName = formatName.replaceAll("\\s+", "_");
     final List<Format> formats = query(Format.gqlFilterForMatchingFormat(formatName));
     Format format = null;
     if (formats.size() == 0) {
-      System.out.println("##### Formats: creating new format object.");
       format = new Format(formatName, makeFormatNamespace(req), description, title);
+      logger.info("Created: "+ format);
     } else {
-      System.out.println("##### Forms: reusing existing format object.");
       format = formats.get(0);
+      logger.info("Reusing: "+ format);
       format.setDescription(description);
       format.setTitle(title);
     }
     format.fields.clear();
     format.fields.addAll(newFields);
-    /*  
-    if (format.fields.isEmpty())
-      format.fields = newFields;
-    else
-      for (final FormField newField : newFields)
-        for (final FormField oldField : format.fields)
-          if (oldField.getName().equals(newField.getName()))
-            if (!oldField.getText().equals(newField.getText()))
-              oldField.setText(newField.getText());
-    */
-    System.out.printf("Saving format with %d fields.\n", newFields.size());
+    logger.info("Updated: "+ format);
     save(format);
 
     return Response.ok().build(); // TODO(pmy): change to 201 when this method is changed to POST.
@@ -256,11 +269,15 @@ public class Formats extends PersistentList<Format> {
                   final HttpServletRequest req,
                   final HttpServletResponse rsp) throws ServletException, IOException {
     req.setAttribute("format", format);
-    System.out.printf("Showing format with %d fields.\n", format.fields.size());
+    logger.info(format.toString());
     req.getRequestDispatcher(JSP_SINGLE).include(req, rsp);
   }
 
   String makeFormatNamespace(final HttpServletRequest req) {
-    return Util.getHostURL(req) + req.getRequestURI();
+    return makeFormatNamespace(req, req.getRequestURI());
+  }
+
+  String makeFormatNamespace(final HttpServletRequest req, final String uri) {
+    return Util.getHostURL(req) + uri;
   }
 }

@@ -1,6 +1,6 @@
 function Format(startEdit) {
   new FormEditor(startEdit);
-  //  new FormConverter(get('formEdit'), get('xmlCode'), 'test').toXml();
+  //new FormConverter(get('formEdit'), get('xmlCode'), 'test').toXml();
 };
 
 function init(startEdit) {

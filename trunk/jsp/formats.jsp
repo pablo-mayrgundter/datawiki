@@ -1,10 +1,8 @@
-<%@page import="wiki.Util" %><%
-  final String reqXml = (String) request.getAttribute("reqXml");
-  final Exception reqXmlException = (Exception) request.getAttribute("reqXmlException");
-%><html>
+<%@page import="java.util.List,wiki.Format,wiki.Formats,wiki.Util" %>
+<html>
   <head>
+    <title>Format Listing</title>
     <script src="http://www.google.com/jsapi" type="text/javascript"></script>
-    <script src="/Wiki.js" type="text/javascript"></script>
     <script src="/Translate.js" type="text/javascript"></script>
     <script src="/Formats.js" type="text/javascript"></script>
     <link rel="stylesheet" href="/formats.css" type="text/css"/>
@@ -13,34 +11,32 @@
     <jsp:include page="onebar.jsp"/>
     <jsp:include page="nav.jsp"/>
     <div class="mainPanel trans">
-      <table>
-        <tr>
-          <td class="featured">
-            <jsp:include page="featured.jsp"/>
-          </td>
-          <td class="createFormat">
-            <h3>Create a new dataset format from scratch...</h3>
-            Format Name: <input id="target" value=""/>
-            <a id="link" href="" onclick="setTarget(get('target'))">Go</a>
-            <span class="note">(Allowed characters: <%= Util.XML_SAFE_CHARS %>)</span>
-
-            <h3>or use an existing XML template</h3>
-            <form action="/wiki/formats" method="POST" enctype="multipart/form-data">
-              <textarea name="xml" cols="40" rows="20"><%= reqXml == null ? "" : Util.encodeForHTML(reqXml) %></textarea>
-              <br/>
+      <h2>Featured Datasets</h2>
+      <ul class="formats">
 <%
-   if (reqXml != null && reqXmlException != null) {
+  final List<Format> formats = new Formats().asList();
+  for (int i = formats.size() - 1; i >= 0; i--) {
+    final Format format = formats.get(i);
+    if (format == null) { // TODO(pmy): still required?
+      continue;
+    }
+    String title = format.getTitle();
+    if (title == null || title.trim().equals("")) {
+      title = format.getName().toUpperCase();
+    }
+    title = title.replaceAll("_", " ");
+    title = "<a href=\"/wiki/"+ Util.encodeForDoubleQuotedAttribute(format.getURLTitle()) +"\">"
+            + Util.encodeForHTML(title) +"</a>";
 %>
-     <em>The XML template cannot be parsed.  The parser generated the following exception:<br/>
-       <%= Util.encodeForHTML(reqXmlException.toString()) %></em><br/>
+        <li>
+          <h2><%= title %></h2>
+          <p><%= Util.encodeForHTML(format.getDescription()) %></p>
+        </li>
 <%
-   }
+  }
 %>
-              <input type="submit"/><input type="reset"/>
-            </form>
-          </td>
-        </tr>
-      </table>
+      </ul>
+      <a href="/wiki/formats?action=new"><button class="button plus text"><div></div>Create New</button></a>
     </div>
   </body>
 </html>

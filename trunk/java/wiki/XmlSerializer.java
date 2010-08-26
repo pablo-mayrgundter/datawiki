@@ -47,7 +47,7 @@ public class XmlSerializer {
     final Node root = fromXml(is, fieldValues, false);
     final Format format = new Format(root.getLocalName(), root.getNamespaceURI());
     for (final String fieldName : fieldValues.keySet()) {
-      format.fields.add(new FormField(pathToName(fieldName), fieldName, fieldValues.get(fieldName)));
+      format.fields.add(new FormField(fieldName, fieldName, fieldValues.get(fieldName)));
     }
     return format;
   }
@@ -247,19 +247,26 @@ public class XmlSerializer {
     return html;
   }
 
+  /**
+   * A path is converted to a field name by dropping the leading
+   * "/root/"... prefix.
+   */
   static String pathToName(final String path) {
-    if (path.length() <= 2 || path.indexOf('/') != 0 || path.indexOf('/', 1) <= 1)
-      throw new IllegalArgumentException("Path must begin with slash and contain a non-empty root element"
-                                         + "between two slash characters.");
-    return path.substring(path.indexOf("/", 1) + 1).replaceAll("/", "_");
+    if (path.length() <= 2 || path.indexOf('/') != 0 || path.indexOf('/', 1) <= 1) {
+      throw new IllegalArgumentException("Path must begin with slash and contain"
+                                         + " a non-empty root element name"
+                                         + " between two slash characters.");
+    }
+    return path.substring(path.indexOf("/", 1) + 1);
   }
 
   public static void main(final String [] args) throws Exception {
     ByteArrayOutputStream baos = new ByteArrayOutputStream();
     byte [] buf = new byte[10];
     int len;
-    while ((len = System.in.read(buf)) != -1)
+    while ((len = System.in.read(buf)) != -1) {
       baos.write(buf, 0, len);
+    }
     final Format format = formatFromXml(new ByteArrayInputStream(baos.toByteArray()));
     System.out.println(toXml(format));
 
