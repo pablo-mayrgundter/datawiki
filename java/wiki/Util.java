@@ -10,7 +10,7 @@ import javax.ws.rs.core.Response;
 
 public class Util {
 
-  public static final String XML_SAFE_CHARS = "a-zA-Z_-";
+  public static final String XML_SAFE_CHARS = "-a-zA-Z_";
   public static final String XML_SAFE_STRING = String.format("^[%s]+$", XML_SAFE_CHARS);
 
   /**
@@ -54,15 +54,15 @@ public class Util {
   }
 
   /**
-   * Checks if the given string is a valid title.
+   * Checks if the given string is a valid name.
    *
    * @returns The given string if it is valid.
    * @throws IllegalArgumentException If the given string is not
-   * valid to use as a title.
+   * valid to use as a name.
    */
-  static String validTitle(final String s) {
-    if (!s.matches(XML_SAFE_CHARS)) {
-      throw new IllegalArgumentException(String.format("The given title '%s' cannot be used.  "
+  static String validFormatName(final String s) {
+    if (!s.matches(XML_SAFE_STRING)) {
+      throw new IllegalArgumentException(String.format("The given name cannot be used."
                                                        + "It must match only these characters: "
                                                        + XML_SAFE_CHARS));
     }
@@ -76,7 +76,7 @@ public class Util {
    * @throws IllegalArgumentException If the given string is not
    * valid to use as a namespace.
    */
-  static String validNamepsace(final String s) {
+  static String validFormatNamepsace(final String s) {
     try {
       new URI(s);
       return s;

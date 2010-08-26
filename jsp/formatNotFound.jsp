@@ -1,7 +1,5 @@
 <%
   final String formatName = (String) request.getAttribute("formatName");
-//  final String hostURL = Util.getHostURL(request);
-//  final String self = hostURL + request.getRequestURI();
 %>
 <html>
   <head>
@@ -15,8 +13,10 @@
         <li class="activeTab">Format</li>
       </ul>
       <div id="formatBox" class="box">
-        <h2 id="title"><%= formatName %></h2>
-        <p id="description">DataWiki does not have a format with this name.  You can create it <a href="?action=edit">here</a>.</p>
+        <h2 id="title"><%= formatName.replaceAll("_", " ") %></h2>
+        <p id="description">DataWiki does not have a format with this
+        name.  You can create
+        it <a href="/wiki/formats/<%= formatName %>?action=edit">here</a>.</p>
       </div>
     </div>
   </body>

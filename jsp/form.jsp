@@ -3,7 +3,6 @@
   final String formatName = (String) request.getAttribute("formatName");
   final Format format = (Format) request.getAttribute("format");
   final String formId = Util.encodeForHTML(request.getParameter("jspFormId"));
-  final String title = Util.encodeForHTML(request.getParameter("jspFormTitle"));
   final String action = Util.encodeForHTML(request.getParameter("jspFormAction"));
   final String method = Util.encodeForHTML(request.getParameter("jspFormMethod"));
   final String activeClass = Util.encodeForHTML(request.getParameter("jspFormActive") == null ? "activeTabbed" : "");

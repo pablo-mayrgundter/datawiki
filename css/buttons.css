@@ -1,4 +1,4 @@
-.button, input[type~=submit], input[type~=reset] {
+.button {
   height: 2.4em;
   margin: 0;
   white-space: nowrap;

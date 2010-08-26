@@ -331,13 +331,6 @@ function get(id) {
   return document.getElementById(id);
 }
 
-function create(name, text) {
-  var e = document.createElement(name);
-  if (text)
-    e.innerHTML = text;
-  return e;
-}
-
 function editItem(elt, rowId, save) {
   var cell = elt.parentNode;
   var fields = []; // Used during save only.

@@ -13,17 +13,6 @@ div.mainPanel td.featured {
   width: 40%;
 }
 
-div.mainPanel td.createFormat {
-  width: 60%;
-  border-left: solid 1px #ccc;
-  background-color: #ffffe8;
-}
-
-td.createFormat > form > em {
-  font-weight: bold;
-  color: red;
-}
-
 ul.formats {
   padding-left: 1em;
 }

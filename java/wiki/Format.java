@@ -32,13 +32,13 @@ public class Format extends AbstractDocument<Format> {
   }
 
   public Format(final String name, final String namespace, final String description) {
-    this(name, namespace, description, "");
+    this(name, namespace, description, name.replaceAll("_", " "));
   }
 
   public Format(final String name, final String namespace, final String description, final String title) {
-    this.name = name;
-    this.title = Util.validTitle(title);
-    this.namespace = Util.validNamepsace(namespace);
+    this.name = Util.validFormatName(name);
+    this.title = title;
+    this.namespace = Util.validFormatNamepsace(namespace);
     this.description = new Text(description);
     fields = new ArrayList<FormField>();
   }

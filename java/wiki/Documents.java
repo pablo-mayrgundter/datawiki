@@ -26,10 +26,12 @@ import javax.ws.rs.core.Response;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileUploadException;
 
-// TODO(pmy): generalize this to AbstractDocument, or store documents
-// as XML and use objects for indices.  Also, the flow between
-// POST/GET and pageList could probably make better use of dispatchers
-// so that pageList is a real entry point and can be dispatched to.
+/**
+ * TODO(pmy): generalize this to AbstractDocument, or store documents
+ * as XML and use objects for indices.  Also, the flow between
+ * POST/GET and pageList could probably make better use of dispatchers
+ * so that pageList is a real entry point and can be dispatched to.
+ */
 @Path("/")
 public class Documents extends PersistentList<MultiPartDocument> {
 
@@ -85,9 +87,9 @@ public class Documents extends PersistentList<MultiPartDocument> {
   @Path("{formatTitle}")
   @Consumes({"multipart/form-data"})
   @Produces({"text/html; charset=utf-8"})
-  public Response postDoc(@Context HttpServletRequest req,
-                          @Context HttpServletResponse rsp,
-                          @PathParam("formatTitle") String formatTitle) throws Exception {
+  public Response handlePost(@Context HttpServletRequest req,
+                             @Context HttpServletResponse rsp,
+                             @PathParam("formatTitle") String formatTitle) throws Exception {
     List<FileItem> items = null;
     try {
       items = FormUpload.processFormData(req);
@@ -110,10 +112,10 @@ public class Documents extends PersistentList<MultiPartDocument> {
   @POST
   @Path("{formatTitle}")
   @Consumes({"application/x-www-form-urlencoded"})
-  public Response postXmlDoc(@Context HttpServletRequest req,
-                             @Context HttpServletResponse rsp,
-                             @PathParam("formatTitle") String formatTitle,
-                             String content) throws Exception {
+  public Response handlePostXml(@Context HttpServletRequest req,
+                                @Context HttpServletResponse rsp,
+                                @PathParam("formatTitle") String formatTitle,
+                                String content) throws Exception {
     final Format format = Formats.lookupFormatByTitle(formatTitle);
     if (format == null) {
       return Formats.formatWithTitleNotFound(formatTitle, req, rsp);
@@ -122,7 +124,7 @@ public class Documents extends PersistentList<MultiPartDocument> {
     if (!doc.getFormat().equals(format.getName())) {
       return Response.status(Response.Status.BAD_REQUEST).entity("The submitted XML does not match this format.").build();
     }
-    System.out.println(doc);
+    logger.info("Created: "+ doc);
     save(doc);
     return pageList(req, rsp, format);
   }
@@ -218,32 +220,37 @@ public class Documents extends PersistentList<MultiPartDocument> {
         continue;
       final String [] values = (String []) entry.getValue();
       // TODO(pmy): reconsider this. currently don't filter on attrs with empty values.
-      if (values == null || values.length == 0 || values[0].equals(""))
+      if (values == null || values.length == 0 || values[0].equals("")) {
         continue;
+      }
       if (values.length > 1) {
         logger.warning("Empty or multi-value filters not supported for key: "+ key);
         continue;
       }
       final String value = values[0];
       if (key.equals("format")) {
-        if (!query.equals(""))
+        if (!query.equals("")) {
           query += " && ";
+        }
         query += "format == '"+ value +"'";
         continue;
       }
-      if (!query.equals(""))
+      if (!query.equals("")) {
         query += " && ";
+      }
       query += String.format("fields.contains(%s) && %s.name == '%s' && %s.value == '%s'",
                              varName, varName, key, varName, value);
-      if (!varNames.equals(""))
+      if (!varNames.equals("")) {
         varNames += ",";
+      }
       varNames += varName;
       varName = "f"+(++varCount);
     }
     String varDecl = "";
     for (final String name : varNames.split(",")) {
-      if (!varDecl.equals(""))
+      if (!varDecl.equals("")) {
         varDecl += "; ";
+      }
       varDecl += DocumentField.class.getName() +" "+ name;
     }
     logger.info("queryWithVariables: "+ query + ", and var decl: "+ varDecl);
