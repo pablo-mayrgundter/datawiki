@@ -78,6 +78,17 @@
       </manifest>
     </jar>
   </target>
+  <!-- Standalone target for now to create shared common.jar for other .org projects. -->
+  <target name="common-jar">
+    <jar destfile="build/lib/common.jar" basedir="build/classes" includes="common/**">
+      <manifest>
+        <attribute name="Built-By" value="${user.name}"/>
+        <attribute name="Implementation-Vendor" value="ACME inc."/>
+        <attribute name="Implementation-Title" value="{$appname}"/>
+        <attribute name="Implementation-Version" value="0.1"/>
+      </manifest>
+    </jar>
+  </target>
   <target name="war" depends="jar">
     <mkdir dir="war"/>
     <mkdir dir="war/WEB-INF"/>
