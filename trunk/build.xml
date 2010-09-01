@@ -30,6 +30,7 @@
     <mkdir dir="build"/>
     <mkdir dir="build/classes"/>
     <mkdir dir="build/lib"/>
+    <mkdir dir="build/src"/>
   </target>
   <target name="clean">
     <delete dir="build"/>
@@ -72,18 +73,29 @@
     <jar destfile="build/lib/${appname}.jar" basedir="build/classes">
       <manifest>
         <attribute name="Built-By" value="${user.name}"/>
-        <attribute name="Implementation-Vendor" value="ACME inc."/>
+        <attribute name="Implementation-Vendor" value="Google"/>
         <attribute name="Implementation-Title" value="{$appname}"/>
         <attribute name="Implementation-Version" value="0.1"/>
       </manifest>
     </jar>
   </target>
   <!-- Standalone target for now to create shared common.jar for other .org projects. -->
-  <target name="common-jar" depends="compile">
+  <target name="common-src" depends="compile">
+    <jar destfile="build/src/common-src.jar" basedir="${srcDir}" includes="common/*.java">
+      <manifest>
+        <attribute name="Built-By" value="${user.name}"/>
+        <attribute name="Implementation-Vendor" value="Google"/>
+        <attribute name="Implementation-Title" value="{$appname}"/>
+        <attribute name="Implementation-Version" value="0.1"/>
+      </manifest>
+    </jar>
+  </target>
+  <!-- Standalone target for now to create shared common.jar for other .org projects. -->
+  <target name="common-jar" depends="common-src">
     <jar destfile="build/lib/common.jar" basedir="build/classes" includes="common/**">
       <manifest>
         <attribute name="Built-By" value="${user.name}"/>
-        <attribute name="Implementation-Vendor" value="ACME inc."/>
+        <attribute name="Implementation-Vendor" value="Google"/>
         <attribute name="Implementation-Title" value="{$appname}"/>
         <attribute name="Implementation-Version" value="0.1"/>
       </manifest>
