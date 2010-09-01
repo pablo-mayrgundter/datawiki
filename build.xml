@@ -79,7 +79,7 @@
     </jar>
   </target>
   <!-- Standalone target for now to create shared common.jar for other .org projects. -->
-  <target name="common-jar">
+  <target name="common-jar" depends="compile">
     <jar destfile="build/lib/common.jar" basedir="build/classes" includes="common/**">
       <manifest>
         <attribute name="Built-By" value="${user.name}"/>
