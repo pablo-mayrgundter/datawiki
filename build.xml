@@ -2,7 +2,7 @@
 <project basedir="." default="war">
   <property environment="env"/>
   <!-- Point this to GAE, and edit ant-macros.xml to do the same. -->
-  <property name="appengine.home" value="${env.APP_ENGINE_HOME}/"/>
+  <property name="appengine.home" value="${env.APP_ENGINE_HOME}"/>
   <property name="appname" value="datawiki"/>
   <property name="classes" value="build/classes"/>
   <property name="srcDir" value="${basedir}/java"/>
@@ -26,7 +26,7 @@
     <echo message="APP_ENGINE_HOME: ${appengine.home}"/>
     <fail message="Error: must set environment variable APP_ENGINE_HOME">
       <condition>
-        <equals arg1="${appengine.home}" arg2="${env.APP_ENGINE_HOME}/"/>
+        <equals arg1="${appengine.home}" arg2="${env.APP_ENGINE_HOME}"/>
       </condition>
     </fail>
   </target>
