@@ -1,0 +1,59 @@
+@import '/form.css';
+
+#formatBox {
+  clear: both;
+}
+
+#formatPanelLeft {
+  float: left;
+  width: 50%;
+}
+
+#title {
+  font-size: 1.2em;
+}
+
+#title {
+  margin: 0.5em 1em 2em 0;
+}
+
+#descEdit {
+  width: 90%;
+  height: 90%;
+  margin-top: 3px;
+}
+
+#title > label {
+  padding-right: 3px;
+  font-size: 0.9em;
+  font-weight: normal;
+}
+
+#formatPanelRight {
+  float: left;
+  width: 50%;
+}
+
+#formatPanelRight + div {
+  clear: both;
+}
+
+#tabbedForms, #tableFind, table.form {
+  width: 100%;
+}
+
+#formatBox.box {
+  border-bottom: solid 1px #a7d7f9;
+}
+
+#formTabs li.activeTab {
+  background-color: #ffffe8;
+  border-bottom-color: #ffffe8;
+}
+
+#button-form-edit {
+  float: right;
+  position: relative;
+  top: -17px;
+  right: -17px;
+}
