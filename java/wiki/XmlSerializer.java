@@ -124,7 +124,7 @@ public class XmlSerializer {
    */
   public static String toXml(final MultiPartDocument doc, final Format format) throws TransformerException {
     final LinkedHashMap<String,String> fieldValues = new LinkedHashMap<String,String>();
-    for (final DocumentField field : doc.fields) {
+    for (final DocumentField field : doc.getFields()) {
       fieldValues.put(field.getName(), field.getValue());
     }
     return toXml(format.getName(), format.getNamespace(), fieldValues, true);

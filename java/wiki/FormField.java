@@ -54,16 +54,16 @@ public class FormField implements Serializable {
     return name;
   }
 
-  public void setText(final String text) {
-    this.text = text;
-  }
-
   public String getValue() {
     return value.getValue();
   }
 
   public Type getType() {
     return type;
+  }
+
+  public void setText(final String text) {
+    this.text = text;
   }
 
   public String toString() {
