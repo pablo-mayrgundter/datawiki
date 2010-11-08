@@ -1,5 +1,6 @@
 package wiki;
 
+import common.PersistentList;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
