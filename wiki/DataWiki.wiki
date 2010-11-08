@@ -2,7 +2,9 @@
 
 =Motivation=
 
-TBD, but for now:
+The need for a data sharing platform and the concept for DataWiki was developed out of Google's experiences deveoping Person Finder for the Haiti earthquake, which itself was developed to accept missing person reports and to act as a hub for sharing of missing person data between other emerging sites.  More history on that later.
+
+More examples for now:
 
   * http://radar.oreilly.com/2010/03/truly-open-data.html
   * http://www.readwriteweb.com/archives/boom_tweets_maps_swarm_to_pinpoint_a_mysterious_ex.php
