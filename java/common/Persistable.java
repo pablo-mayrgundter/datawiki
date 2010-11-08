@@ -94,6 +94,8 @@ public interface Persistable<T> {
         pm.makePersistent(obj);
         tx.commit();
         return true;
+      } catch (Throwable t) {
+        return false;
       } finally {
         if (tx.isActive()) {
           logger.warning("Rolling back save transaction for object of type: "+ obj.getClass().getName());
@@ -101,7 +103,6 @@ public interface Persistable<T> {
         }
         pm.close();
       }
-      return false;
     }
   }
 }

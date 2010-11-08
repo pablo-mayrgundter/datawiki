@@ -2,6 +2,7 @@ package wiki;
 
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.Text;
+import common.Persistable;
 import java.io.StringWriter;
 import java.util.Date;
 import javax.jdo.annotations.IdGeneratorStrategy;
