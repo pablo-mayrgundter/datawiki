@@ -1,0 +1,34 @@
+#summary Instructions for getting started developing DataWiki.
+
+= Get =
+
+See the [http://code.google.com/p/datawiki/source/checkout Source] page.
+
+= Build =
+
+{{{
+cd <the code directory>
+export APP_ENGINE_HOME=<path to your appengine-java-sdk>
+ant
+}}}
+
+= Run =
+
+{{{
+ant server
+}}}
+
+
+= Develop =
+
+CLI building is easy:
+
+{{{
+ant classapth
+"... export CLASSPATH=..."
+<copy and paste that back in to set your classpath>
+cd wiki
+javac *.java
+}}}
+
+The [http://code.google.com/p/datawiki/issues/entry?show=review&former=sourcelist Request a Code Review] for submission.
