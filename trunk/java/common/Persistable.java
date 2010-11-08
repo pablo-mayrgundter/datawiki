@@ -85,13 +85,15 @@ public interface Persistable<T> {
       }
     }
 
-    public static final <T> void save(final T obj) {
+    /** @return True iff success. */
+    public static final <T> boolean save(final T obj) {
       final PersistenceManager pm = getPersistenceManager();
       final Transaction tx = pm.currentTransaction();
       tx.begin();
       try {
         pm.makePersistent(obj);
         tx.commit();
+        return true;
       } finally {
         if (tx.isActive()) {
           logger.warning("Rolling back save transaction for object of type: "+ obj.getClass().getName());
@@ -99,6 +101,7 @@ public interface Persistable<T> {
         }
         pm.close();
       }
+      return false;
     }
   }
 }
