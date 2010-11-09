@@ -1,0 +1,23 @@
+@import '/main.css';
+
+div.mainPanel > table {
+  width: 100%;
+}
+
+div.mainPanel td {
+  padding: 1em;
+  vertical-align: top;
+}
+
+div.mainPanel td.featured {
+  width: 40%;
+}
+
+ul.formats {
+  padding-left: 1em;
+}
+
+.formats h2 {
+  text-decoration: underline;
+}
+
