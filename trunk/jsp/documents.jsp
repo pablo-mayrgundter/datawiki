@@ -7,6 +7,7 @@
   <head>
     <link href="/documents.css" rel="stylesheet" type="text/css"/>
     <script src="http://www.google.com/jsapi" type="text/javascript"></script>
+    <script src="/StatsTable.js" type="text/javascript"></script>
     <script src="/Wiki.js" type="text/javascript"></script>
     <script src="/Translate.js" type="text/javascript"></script>
     <script src="/Documents.js" type="text/javascript"></script>
