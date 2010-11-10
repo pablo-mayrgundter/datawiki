@@ -120,7 +120,7 @@ FormEditor.prototype.wakeForm = function(button) {
   removeClass(this.form, 'editing');
 };
 
-FormEditor.prototype.getFields = function() {
+FormEditor.prototype.visitFields = function() {
   var form = get('formatBox');
   var fields = [];
   var nodes = [];
@@ -135,6 +135,7 @@ FormEditor.prototype.getFields = function() {
     var node = nodes[i];
     var attrs = node.attributes;
     var value = node.value ? node.value : null;
+    var parsedAttrs = {};
     if (node.nodeName == 'INPUT') {
       if (node.name == null)
         continue;
@@ -147,7 +148,6 @@ FormEditor.prototype.getFields = function() {
             continue;
       }
       var label = findLabelForControl(node.name, form);
-      var parsedAttrs = {};
       if (label)
         parsedAttrs['help_text'] = label.innerHTML;
       if (node.name == 'title')
@@ -157,15 +157,23 @@ FormEditor.prototype.getFields = function() {
         // also had order, server will consider it a form field.
         parsedAttrs['order'] = fieldCount++;
       }
-      fields[node.name] = encodeFieldAttrs(parsedAttrs);
-    } else if (node.nodeName == 'TEXTAREA') {
-      fields[node.name] = encodeFieldAttrs({'value':node.value});
+    } else if (node.nodeName == 'TEXTAREA') {  // Description.
+      parsedAttrs = {'value':node.value};
     }
+    fields.push({'name': node.name, 'attrs': parsedAttrs});
   }
-  for (var fieldName in fields)
-    d(fieldName +'='+ fields[fieldName])
   return fields;
 };
+
+FormEditor.prototype.getFields = function() {
+  var arrIn = this.visitFields();
+  var mapOut = {};
+  for (var idx in arrIn) {
+    var field = arrIn[idx];
+    mapOut[field.name] = encodeFieldAttrs(field.attrs);
+  }
+  return mapOut;
+}
 
 /**
  * @param attrs An map of name:value attributes.
