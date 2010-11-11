@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Stack;
 import java.util.LinkedHashMap;
 import java.util.logging.Logger;
+import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.OutputKeys;
@@ -25,6 +26,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
+import org.xml.sax.SAXParseException;
 
 /**
  * The XmlSerializer class implements the XML-to-Format conversion
@@ -40,32 +42,33 @@ public class XmlSerializer {
 
   /**
    * Creates a Format from the given XML template of a document in the
-   * taret format.
+   * target format.
+   *
+   * @TODO(pmy): Use only the schema instead of the template.
    */
-  public static Format formatFromXml(final InputStream is) throws SAXException, IOException {
+  public static Format formatFromXml(final String name, final String schemaXml) throws SAXException, IOException {
     final LinkedHashMap<String,String> fieldValues = new LinkedHashMap<String,String>();
-    final Node root = fromXml(is, fieldValues, false);
-    final Format format = new Format(root.getLocalName(), root.getNamespaceURI());
-    for (final String fieldName : fieldValues.keySet()) {
-      format.fields.add(new FormField(fieldName, fieldName, fieldValues.get(fieldName)));
-    }
+    final Element root = fromXml(schemaXml, null, fieldValues, false);
+    final Format format = new Format(name, root.getAttribute("targetNamespace"));
+    format.setSchema(schemaXml);
     return format;
   }
 
   /**
-   * Creates a MultiPartDocument from an InputStream of XML using the
-   * path to nodes as the field names.  The root node prefix is
-   * stripped from path names.
+   * Creates a MultiPartDocument from an XML string using the path to
+   * nodes as the field names.  The root node prefix is stripped from
+   * path names.
    */
-  public static MultiPartDocument docFromXml(final InputStream is) throws SAXException, IOException {
+  public static MultiPartDocument docFromXml(final String xml, final String schema) throws SAXException, IOException {
     final LinkedHashMap<String,String> fieldValues = new LinkedHashMap<String,String>();
-    final Node root = fromXml(is, fieldValues, true);
+    final Node root = fromXml(xml, schema, fieldValues, true);
     final MultiPartDocument doc = new MultiPartDocument(root.getLocalName());
     for (String fieldName : fieldValues.keySet()) {
       final String value = fieldValues.get(fieldName);
       fieldName = fieldName.substring(fieldName.indexOf("/", 1) + 1, fieldName.length());
       doc.fields.add(new DocumentField(fieldName, value));
     }
+    doc.setXml(xml);
     return doc;
   }
 
@@ -73,21 +76,13 @@ public class XmlSerializer {
    * Intermediate helper for creating a MultiPartDocument from an
    * InputStream of XML.  Called by #docFromXml(InputStream).
    */
-  static Node fromXml(final InputStream is,
-                      final LinkedHashMap<String,String> fieldValues,
-                      final boolean includeValues) throws SAXException, IOException {
-    Document doc;
-    try {
-      final DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-      factory.setNamespaceAware(true);
-      doc = factory.newDocumentBuilder().parse(is);
-    } catch (ParserConfigurationException e) {
-      // Shouldn't happen.
-      logger.severe("Can't get XML DocumentBuilder: "+ e);
-      throw new RuntimeException("Cannot initialize XML subsystem.");
-    }
-    final Node root = doc.getDocumentElement();
-    fromXml(fieldValues, includeValues, doc.getDocumentElement(), "/");
+  static Element fromXml(final String xml,
+                         final String schema,
+                         final LinkedHashMap<String,String> fieldValues,
+                         final boolean includeValues) throws SAXParseException, SAXException, IOException {
+    final Document doc = getBuilder(schema).parse(new java.io.ByteArrayInputStream(xml.getBytes()));
+    final Element root = doc.getDocumentElement();
+    fromXml(fieldValues, includeValues, root, "/");
     return root;
   }
 
@@ -127,7 +122,7 @@ public class XmlSerializer {
     for (final DocumentField field : doc.getFields()) {
       fieldValues.put(field.getName(), field.getValue());
     }
-    return toXml(format.getName(), format.getNamespace(), fieldValues, true);
+    return toXml(format, format.getName(), format.getNamespace(), fieldValues, true);
   }
 
   /**
@@ -138,26 +133,18 @@ public class XmlSerializer {
     for (final FormField field : format.getFields()) {
       fieldValues.put(field.getName(), null);
     }
-    return toXml(format.getName(), format.getNamespace(), fieldValues, false);
+    return toXml(format, format.getName(), format.getNamespace(), fieldValues, false);
   }
 
   /**
    * Actual conversion method for both #toXml(MultiPartDocument,
    * Format) and #toXml(Format).
    */
-  static String toXml(final String formatName, final String formatNamespace,
+  static String toXml(final Format format, final String formatName, final String formatNamespace,
                       final LinkedHashMap<String,String> fieldValues, final boolean emitValues)
     throws TransformerException {
-    Document doc;
-    try {
-      final DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-      factory.setNamespaceAware(true);
-      doc = factory.newDocumentBuilder().getDOMImplementation().createDocument(formatNamespace, formatName, null);
-    } catch (ParserConfigurationException e) {
-      // Shouldn't happen.
-      logger.severe("Can't get XML DocumentBuilder: "+ e);
-      throw new RuntimeException("Cannot initialize XML subsystem.");
-    }
+    final Document doc = getBuilder(emitValues ? format.getSchema() : null).getDOMImplementation().createDocument(formatNamespace,
+                                                                                                                  formatName, null);
 
     final Stack<Node> nodeStack = new Stack<Node>();
     nodeStack.push(doc.getDocumentElement());
@@ -198,7 +185,10 @@ public class XmlSerializer {
       if (emitValues && elt != null && value != null)
         elt.appendChild(doc.createTextNode(value));
     }
+    return toXml(doc);
+  }
 
+  static String toXml(final Document doc) throws TransformerException {
     final StringWriter outputWriter = new StringWriter();
     try {
       // http://forums.sun.com/thread.jspa?forumID=34&threadID=562510
@@ -260,6 +250,27 @@ public class XmlSerializer {
     return path.substring(path.indexOf("/", 1) + 1);
   }
 
+  static DocumentBuilder getBuilder() {
+    return getBuilder(null);
+  }
+
+  static DocumentBuilder getBuilder(final String schema) {
+    final DocumentBuilderFactory factory =  DocumentBuilderFactory.newInstance();
+    factory.setNamespaceAware(true);
+    if (schema != null) {
+      factory.setValidating(true);
+      factory.setAttribute("http://java.sun.com/xml/jaxp/properties/schemaLanguage",
+                           "http://www.w3.org/2001/XMLSchema");
+      factory.setAttribute("http://java.sun.com/xml/jaxp/properties/schemaSource",
+                           new java.io.ByteArrayInputStream(schema.getBytes()));
+    }
+    try {
+      return factory.newDocumentBuilder();
+    } catch(ParserConfigurationException e) {
+      throw new Error("Cannot configure XML document builder: "+ e);
+    }
+  }
+  /*
   public static void main(final String [] args) throws Exception {
     ByteArrayOutputStream baos = new ByteArrayOutputStream();
     byte [] buf = new byte[10];
@@ -267,10 +278,11 @@ public class XmlSerializer {
     while ((len = System.in.read(buf)) != -1) {
       baos.write(buf, 0, len);
     }
-    final Format format = formatFromXml(new ByteArrayInputStream(baos.toByteArray()));
+    final Format format = formatFromXml(new String(baos.toByteArray()));
     System.out.println(toXml(format));
 
-    final MultiPartDocument doc = docFromXml(new ByteArrayInputStream(baos.toByteArray()));
+    final MultiPartDocument doc = docFromXml(new String(baos.toByteArray()));
     System.out.println(toXml(doc, format));
   }
+  */
 }
