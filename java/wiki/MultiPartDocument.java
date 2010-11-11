@@ -1,5 +1,6 @@
 package wiki;
 
+import com.google.appengine.api.datastore.Text;
 import java.util.ArrayList;
 import java.util.List;
 import javax.jdo.annotations.Element;
@@ -27,6 +28,9 @@ public class MultiPartDocument extends AbstractDocument<MultiPartDocument> {
   @Element(dependent = "true")
   List<DocumentField> fields;
 
+  @Persistent
+  Text xml;
+
   public MultiPartDocument() {
     fields = new ArrayList<DocumentField>();
   }
@@ -38,6 +42,14 @@ public class MultiPartDocument extends AbstractDocument<MultiPartDocument> {
 
   public String getFormat() {
     return format;
+  }
+
+  public void setXml(final String xml) {
+    this.xml = new Text(xml);
+  }
+
+  public String getXml() {
+    return xml.getValue();
   }
 
   public List<DocumentField> getFields() {

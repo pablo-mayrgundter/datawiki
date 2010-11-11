@@ -1,6 +1,9 @@
 package wiki;
 
 import com.google.appengine.api.datastore.Text;
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import javax.jdo.annotations.Element;
@@ -27,6 +30,9 @@ public class Format extends AbstractDocument<Format> {
   @Persistent(serialized="true",defaultFetchGroup="true")
   List<FormField> fields;
 
+  @Persistent
+  Text schema;
+
   public Format(final String name, final String namespace) {
     this(name, namespace, "");
   }
@@ -41,6 +47,16 @@ public class Format extends AbstractDocument<Format> {
     this.namespace = Util.validFormatNamepsace(namespace);
     this.description = new Text(description);
     fields = new ArrayList<FormField>();
+  }
+
+  void setSchema(final String schema) {
+    this.schema = new Text(schema);
+  }
+
+  String getSchema() {
+    if (schema == null)
+      return null; // TODO(pmy): temporary until schema always present.
+    return schema.getValue();
   }
 
   public String getName() {

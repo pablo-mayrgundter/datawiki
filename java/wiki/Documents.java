@@ -2,6 +2,7 @@ package wiki;
 
 import common.PersistentList;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.LinkedHashMap;
@@ -26,6 +27,8 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileUploadException;
+import org.xml.sax.SAXException;
+import org.xml.sax.SAXParseException;
 
 /**
  * TODO(pmy): generalize this to AbstractDocument, or store documents
@@ -51,13 +54,11 @@ public class Documents extends PersistentList<MultiPartDocument> {
     return query(MultiPartDocument.gqlFilterForMatchingFormat(format));
   }
 
-  @GET
-  @Produces({"text/html; charset=utf-8"})
-  public Response getDocs(@Context HttpServletRequest req,
-                          @Context HttpServletResponse rsp) {
-    return Response.status(Response.Status.BAD_REQUEST).entity("Must specify a format.").build();
-  }
+  // Methods grouped below by HTTP verb.
 
+  // GET methods follow.
+
+  /** Overview for documents in a given format. */
   @GET
   @Path("{formatTitle}")
   @Produces({"text/html; charset=utf-8"})
@@ -72,6 +73,7 @@ public class Documents extends PersistentList<MultiPartDocument> {
     return pageList(req, rsp, format);
   }
 
+  /** Show doc. */
   @GET
   @Path("{format}/{id}")
   @Produces({"text/html; charset=utf-8"})
@@ -84,6 +86,37 @@ public class Documents extends PersistentList<MultiPartDocument> {
     return Response.ok().build();
   }
 
+  /** Get doc as xml. */
+  @GET
+  @Path("{format}/{id}")
+  @Produces({"text/xml; charset=utf-8"})
+  public Response getSingleDocAsXml(@Context HttpServletRequest req,
+                                    @Context HttpServletResponse rsp,
+                                    @PathParam("id") String id)
+    throws ServletException, IOException {
+    final MultiPartDocument doc = get(Integer.parseInt(id) - 1);
+    rsp.getOutputStream().write(doc.xml.getValue().getBytes());
+    return Response.ok().build();
+  }
+
+  /**
+   * Currently a request without a format or doc id returns 400.
+   * Could return a browse interface.
+   */
+  @GET
+  @Produces({"text/html; charset=utf-8"})
+  public Response getDocs(@Context HttpServletRequest req,
+                          @Context HttpServletResponse rsp) {
+    return Response.status(Response.Status.BAD_REQUEST).entity("Must specify a format.").build();
+  }
+
+
+  // POST methods follow.  If the user submits from a form, they are
+  // returned to the dataset page since this is where the forms are.
+
+  /**
+   * Create doc from form post.
+   */
   @POST
   @Path("{formatTitle}")
   @Consumes({"multipart/form-data"})
@@ -97,39 +130,54 @@ public class Documents extends PersistentList<MultiPartDocument> {
     } catch (FileUploadException e) {
       return Response.status(Response.Status.BAD_REQUEST).entity("Submission could not be parsed: "+ e).build();
     }
-    final LinkedHashMap<String,DocumentField> fields = fileItemsToDocumentFields(items);
     final Format format = Formats.lookupFormatByTitle(formatTitle);
     if (format == null) {
       return Formats.formatWithTitleNotFound(formatTitle, req, rsp);
     }
+    final LinkedHashMap<String,DocumentField> fields = fileItemsToDocumentFields(items);
     final MultiPartDocument doc = new MultiPartDocument(format.getName());
     for (final String fieldName : fields.keySet()) {
       doc.addField(fields.get(fieldName));
     }
+
+    // TODO(pmy): pass in XML from client as well?
+    final String xml = XmlSerializer.toXml(doc, format);
+    doc.setXml(xml);
     save(doc);
+
     return pageList(req, rsp, format);
   }
 
+  /** Create doc from XML. */
   @POST
   @Path("{formatTitle}")
   @Consumes({"application/x-www-form-urlencoded"})
   public Response handlePostXml(@Context HttpServletRequest req,
                                 @Context HttpServletResponse rsp,
                                 @PathParam("formatTitle") String formatTitle,
-                                String content) throws Exception {
+                                String xml) throws Exception {
     final Format format = Formats.lookupFormatByTitle(formatTitle);
     if (format == null) {
       return Formats.formatWithTitleNotFound(formatTitle, req, rsp);
     }
-    final MultiPartDocument doc = XmlSerializer.docFromXml(new java.io.ByteArrayInputStream(content.getBytes()));
-    if (!doc.getFormat().equals(format.getName())) {
-      return Response.status(Response.Status.BAD_REQUEST).entity("The submitted XML does not match this format.").build();
+
+    MultiPartDocument doc;
+    try {
+      doc = XmlSerializer.docFromXml(xml, format.getSchema());
+    } catch (SAXParseException schemaException) {
+      return Response.status(Response.Status.BAD_REQUEST).entity("The submitted XML does not match this format: "
+                                                                 + schemaException).build();
+    } catch (SAXException encodingException) {
+      return Response.status(Response.Status.BAD_REQUEST).entity("The submitted document is not valid XML: "
+                                                                 + encodingException).build();
     }
-    logger.info("Created: "+ doc);
+
     save(doc);
+
     return pageList(req, rsp, format);
   }
 
+  /** Update doc from form post. */
   @POST
   @Path("{format}/{id}")
   @Consumes({"multipart/form-data"})
@@ -159,6 +207,9 @@ public class Documents extends PersistentList<MultiPartDocument> {
     req.getRequestDispatcher(JSP_SINGLE).include(req, rsp);
     return Response.ok().build();
   }
+
+
+  // Helpers.
 
   static LinkedHashMap<String,DocumentField> fileItemsToDocumentFields(final List<FileItem> items) {
     final LinkedHashMap<String,DocumentField> fields = new LinkedHashMap<String,DocumentField>();
