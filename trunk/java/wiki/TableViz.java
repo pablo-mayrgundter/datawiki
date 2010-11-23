@@ -182,7 +182,7 @@ public class TableViz extends DataSourceServlet {
         if (val == null) {
           val = "N/A"; // TODO(pmy): i18n
         }
-        row.addCell(val);
+        row.addCell(Util.encodeForHTML(val));
         summary += String.format("  <tr><td>%s:</td><td>%s</td></tr>\n", col.getId(), val);
       }
       summary += "</table>\n";
