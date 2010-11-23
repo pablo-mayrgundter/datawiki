@@ -175,6 +175,42 @@ FormEditor.prototype.getFields = function() {
   return mapOut;
 }
 
+FormEditor.prototype.getXsd = function() {
+  var arrIn = this.visitFields();
+  var arrOut = [];
+  var title = "";
+  for (idx in arrIn) {
+    var field = arrIn[idx];
+    // TODO(pmy): Why is this filtering necessary?
+    if (field.name === undefined ||
+	field.name === 'item') {
+      continue;
+    } else if (field.name === 'title') {
+      title = field.attrs.value;
+      continue;
+    } else if (field.name === 'description') {
+      // TODO(pmy): where does description go?
+      continue;
+    }
+    arrOut.push(field);
+  }
+
+  var xsd = '<?xml version="1.0" encoding="utf-8"?>\n';
+  xsd += '<xs:schema elementFormDefault="unqualified" xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="http://datawiki/wiki/format/' + title + '">\n';
+  xsd += '  <xs:element name="' + title + '">\n';
+  xsd += '    <xs:complexType>\n';
+  xsd += '      <xs:sequence>\n';
+  for (var idx in arrOut) {
+    var field = arrOut[idx];
+    xsd += '        <xs:element name="' + field.name + '" type="xs:string" />\n';
+  }
+  xsd += '      </xs:sequence>\n';
+  xsd += '    </xs:complexType>\n';
+  xsd += '  </xs:element>\n';
+  xsd += '</xs:schema>\n';
+
+  return xsd;
+}
 /**
  * @param attrs An map of name:value attributes.
  * @return "field1Attr1Name,field1Attr1Value;field1Attr2Name,field1Attr2Value;..."
