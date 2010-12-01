@@ -1,3 +1,7 @@
+/**
+ * The FormEditor provides UI actions for adding, deleting and
+ * modifying form fields.
+ */
 function FormEditor(startEdit) {
   this.form = get('formEdit');
   this.init();
@@ -37,7 +41,7 @@ FormEditor.prototype.editForm = function(button) {
   addClass(get('formEdit-table'), 'editing');
 
   // Deactivate buttons.
-  this.form.onsubmit = stopHandler;
+  this.form.onsubmit = function(){ return false; };
   get('formEdit-buttons').style.display = 'none';
 
   // Deactivate input elements.

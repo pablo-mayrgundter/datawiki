@@ -25,6 +25,10 @@ button[class='button edit'], button[class='button plus'], button[class='button d
   width: 2.75em;
 }
 
+.search > div {
+  background-position: -87px -25px;
+}
+
 .edit > div {
   background-position: -55px -61px;
 }

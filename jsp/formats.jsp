@@ -7,7 +7,7 @@
     <script src="/Formats.js" type="text/javascript"></script>
     <link rel="stylesheet" href="/formats.css" type="text/css"/>
   </head>
-  <body onload="init()">
+  <body onload="Formats()">
     <jsp:include page="onebar.jsp"/>
     <jsp:include page="nav.jsp"/>
     <div class="mainPanel trans">

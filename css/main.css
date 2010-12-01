@@ -1,8 +1,9 @@
 @import '/buttons.css';
 @import '/tabs.css';
 
+/* General */
+
 body {
-  font-size: 16px;
   font-family: Arial,sans-serif;
 /*  background: no-repeat url(/ears.png); */
 /*  background-position: 300px -10px; */
@@ -38,21 +39,7 @@ input[readonly] {
   border: none;
 }
 
-.onebar {
-  position: absolute;
-  top: 0;
-  right: 0; 
-  padding: 0.5em;
-  white-space: nowrap;
-}
-
-.onebar * {
-  white-space: nowrap;
-}
-
-.onebar > .langControl {
-  margin-right: 1em;
-}
+/* Styles */
 
 .removed {
   display: none;
@@ -62,42 +49,87 @@ input[readonly] {
   visibility: hidden;
 }
 
+/* Elements */
+
 .logoBody {
-  visibility: hidden;
+  /* visibility: hidden; */
   padding: 1em;
-  padding-left: 1.5em;
 }
 
-.sidePanel, .mainPanel {
+/* Onebar */
+
+#onebar {
   position: absolute;
+  top: 0;
+  right: 2em;
+  padding: 35px 0 0 0;
+  white-space: nowrap;
+}
+
+#onebar * {
+  white-space: nowrap;
+}
+
+#langControl {
+  margin-right: 1em;
+}
+
+#langSelect {
+  margin-left: 5px;
+}
+
+#searchForm {
+  padding: 0;
+  margin: 0;
+}
+
+#searchForm input {
+  height: 2em;
+  border: solid 1px #ccc;
+  padding: 0 3px;
+  margin: 0 5px 0 0;
+}
+
+#searchForm button {
+  height: 2em;
+  border: none;
+}
+
+/* The next two together put the nav text and the main tab level, and
+   then margin-top for .mainPanel moves it up to align the text. */
+.sidePanel, .mainPanel {
+  position: absolute; top: 100px;
+}
+
+.mainPanel {
+  margin-top: -10px;
+}
+
+.mainPanel > h2 {
+  margin-top: 0;
+}
+
+.mainPanel {
+  min-width: 400px;
+  right: 1em;
+  left: 113px;
+  padding: 1em;
 }
 
 .sidePanel {
-  top: 135px;
-}
-
-.sidePanel {
-  width: 80px; /* make the same as .mainPanel.left */
-  padding: 1em 0.8em;
+  width: 5%; /* make larger than .mainPanel.left */
+  min-width: 100px;
+  padding: 1em 0.5em 1em 1em;
+  margin: 0;
 }
 
 .sidePanel li {
   list-style-type: none;
   margin-bottom: 5px;
-  margin-left: 10px;
-}
-
-.mainPanel {
-  top: 85px;
-  min-width: 400px;
-  right: 3em;
-  left: 100px;
-  padding: 1em 0 1em 2em;
 }
 
 .box {
   padding: 1em;
   border: solid 1px #a7d7f9;
   background-color: white;
-  border-radius: 0 3px 0 0;
 }

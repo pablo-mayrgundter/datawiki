@@ -156,6 +156,13 @@ public class Formats extends PersistentList<Format> {
                              @Context HttpServletRequest req,
                              @Context HttpServletResponse rsp) throws Exception {
     final List<FileItem> items = FormUpload.processFormData(req);
+    for (final FileItem item : items) {
+      if (item.getFieldName().equals("xsd")) {
+        final String xsd = new String(item.get());
+        final Format format = XmlSerializer.formatFromXml(formatName, xsd);
+        return Response.ok(format.toString()).build();
+      }
+    }
     String description = null, title = "";
     // Used to track the largest fieldNdx for the reconstructed
     // ordering.  This will be compared with the number of fields to

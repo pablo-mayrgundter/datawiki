@@ -4,8 +4,3 @@ function Documents() {
   new Tabs(get('chartTabs').getElementsByTagName('li'),
            [get('detailCharts'), get('statsCharts')]);
 };
-
-function init() {
-  Documents();
-  translateInit('langSelect');
-};

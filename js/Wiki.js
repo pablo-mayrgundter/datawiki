@@ -1,42 +1,12 @@
-
-function include(file) {
-  var head = document.getElementsByTagName('head')[0];
-  var script = document.createElement('script');
-  script.src = file;
-  script.type = 'text/javascript';
-  head.appendChild(script);
-}
-
-// http://ejohn.org/blog/flexible-javascript-events
-function addEvent( obj, type, fn ) {
-  if ( obj.attachEvent ) {
-    obj['e'+type+fn] = fn;
-    obj[type+fn] = function(){obj['e'+type+fn]( window.event );}
-    obj.attachEvent( 'on'+type, obj[type+fn] );
-  } else
-    obj.addEventListener( type, fn, false );
-}
-function removeEvent( obj, type, fn ) {
-  if ( obj.detachEvent ) {
-    obj.detachEvent( 'on'+type, obj[type+fn] );
-    obj[type+fn] = null;
-  } else
-    obj.removeEventListener( type, fn, false );
-}
-
-function func(obj, handler, args) {
-  if (!args)
-    args = [];
-  return function() { handler.apply(obj, args); };
-}
+//// DOM Utils.
 
 function get(id) {
   return document.getElementById(id);
-}
+};
 
 function elts(name) {
   return document.getElementsByTagName(name);
-}
+};
 
 function eltsByIdPrefix(prefix, node)  {
   if (!node)
@@ -48,41 +18,21 @@ function eltsByIdPrefix(prefix, node)  {
     if (re.test(subNodes[i].id))
       elts[subNodes[i].id] = subNodes[i];
   return elts;
-}
-
-var serial = 0;
-function loadTemplate(parent, tplId) {
-  var prefix = tplId +'_'+ (serial++) +'-';
-  return [prefix, loadTemplateWithPrefix(prefix, parent, tplId)];
-}
-
-function loadTemplateWithPrefix(prefix, parent, tplId) {
-  var tpl = document.getElementById('template-'+ tplId).innerHTML;
-  parent.innerHTML = tpl;
-  var elts = eltsByIdPrefix('template-', parent);
-  var objsByNewId = {};
-  for (var id in elts) {
-    var elt = elts[id];
-    var newId = prefix + id.substring('template-'.length, id.length);
-    elt['id'] = newId;
-    objsByNewId[newId] = elt;
-  }
-  return objsByNewId;
-}
+};
 
 function add(parent, name, attrs, text) {
   var e = create(name, attrs, text);
   parent.appendChild(e);
   return e;
-}
+};
 
 function remove(node) {
   node.parentNode.removeChild(node);
-}
+};
 
 function before(newElt, node) {
   node.parentNode.insertBefore(newElt, node);
-}
+};
 
 function after(newElt, node) {
   if (!node.nextSibling) {
@@ -90,17 +40,7 @@ function after(newElt, node) {
   } else {
     node.parentNode.insertBefore(newElt, node.nextSibling);
   }
-}
-
-var debugElt;
-function d(msg) {
-  if (null == debugElt) {
-    debugElt = get('debug');
-    if (null == debugElt)
-      return;
-  }
-  debugElt.innerHTML += msg + '<br/>';
-}
+};
 
 /**
  * @param attrs A map of attribute names to objects, which may include
@@ -112,8 +52,7 @@ function d(msg) {
  */
 function create(name, attrs, inner) {
   var elt = document.createElement(name);
-  d('elt: '+ elt);
-  if (attrs)
+  if (attrs) {
     for (var attr in attrs) {
       var val = attrs[attr];
       if (val.constructor == String)
@@ -121,10 +60,11 @@ function create(name, attrs, inner) {
       else
         elt[attr] = val;
     }
-  if (inner)
+  }
+  if (inner) {
     if (!(inner instanceof Array)) {
       elt.innerHTML = inner;
-    } else
+    } else {
       for (var i = 0; i < inner.length; i++) {
         var e = inner[i];
         if (!(e instanceof Array)) {
@@ -141,27 +81,25 @@ function create(name, attrs, inner) {
         else if (e.length == 3)
           elt.appendChild(create(e[0], e[1], e[2]));
       }
+    }
+  }
   return elt;
-}
-
-function stopHandler(e) {
-  return false;
-}
+};
 
 function checkClass(obj, clazz) {
   return new RegExp('\\b'+ clazz +'\\b').test(obj.className);
-}
+};
 
 function removeClass(obj, clazz) {
   var rep = obj.className.match(' '+ clazz) ? ' '+ clazz:clazz;
   obj.className = obj.className.replace(rep, '');
-}
+};
 
 function addClass(obj, clazz) {
   if (!checkClass(obj, clazz)) {
     obj.className += obj.className ? ' '+ clazz:clazz;
   }
-}
+};
 
 function findLabelForControl(name, startAt) {
   if (!startAt)
@@ -173,9 +111,44 @@ function findLabelForControl(name, startAt) {
       return label;
   }
   return null;
-}
+};
 
-/** BEGIN AJAX CODE */
+//// JS utils.
+
+function d(msg) {
+  console.log(msg);
+};
+
+function func(obj, handler, args) {
+  if (!args)
+    args = [];
+  return function() { handler.apply(obj, args); };
+};
+
+//// Templates.
+
+var serial = 0;
+function loadTemplate(parent, tplId) {
+  var prefix = tplId +'_'+ (serial++) +'-';
+  return [prefix, loadTemplateWithPrefix(prefix, parent, tplId)];
+};
+
+function loadTemplateWithPrefix(prefix, parent, tplId) {
+  var tpl = document.getElementById('template-'+ tplId).innerHTML;
+  parent.innerHTML = tpl;
+  var elts = eltsByIdPrefix('template-', parent);
+  var objsByNewId = {};
+  for (var id in elts) {
+    var elt = elts[id];
+    var newId = prefix + id.substring('template-'.length, id.length);
+    elt['id'] = newId;
+    objsByNewId[newId] = elt;
+  }
+  return objsByNewId;
+};
+
+//// AJAX.
+
 // From: http://www.captain.at/howto-ajax-form-post-request.php
 var http_request = false;
 var callback = null;
@@ -190,7 +163,7 @@ function formEncode(params) {
     encoded += part;
   }
   return encoded;
-}
+};
 
 var boundary = 'AaB03xbleh42';
 
@@ -201,11 +174,11 @@ function multipartEncode(params) {
     body += '\r\nContent-Disposition: form-data; name="'+ name +'"\r\n\r\n'+ params[name] +'\r\n--'+ boundary;
   }
   return body + '--';
-}
+};
 
 function makePOSTRequest(url, params, cb) {
   httpRequest(url, multipartEncode(params), cb, 'POST', "multipart/form-data; boundary="+ boundary);
-}
+};
 
 function httpRequest(url, encodedParams, cb, verb, contentType) {
   http_request = false;
@@ -230,7 +203,7 @@ function httpRequest(url, encodedParams, cb, verb, contentType) {
   http_request.open(verb, url, true);
   http_request.setRequestHeader("Content-Type", contentType);
   http_request.send(encodedParams);
-}
+};
 
 function alertContents() {
   if (http_request.readyState == 4) {
@@ -243,11 +216,9 @@ function alertContents() {
       alert('There was a problem with this request.  '+ http_request.responseText);
     }
   }
-}
+};
 
-/** END AJAX CODE */
-
-/** BEGIN VIZ CODE */
+//// Google Charts.
 
 var itemCharts = new Array();
 
@@ -259,7 +230,7 @@ function vizQuery() {
   }
   new google.visualization.Query(queryStr).send(handleDetailResponse);
   new google.visualization.Query(queryStr + '&summary').send(handleStatsResponse);
-}
+};
 
 function handleDetailResponse(response) {
   if (response.isError()) {
@@ -278,7 +249,7 @@ function handleDetailResponse(response) {
   } else {
     drawDetailTable(elt, data);
   }
-}
+};
 
 function handleStatsResponse(response) {
   if (response.isError()) {
@@ -290,12 +261,12 @@ function handleStatsResponse(response) {
   if (!chartElt)
     return;
   drawSummary(chartElt, data);
-}
+};
 
 function drawSummary(elt, data) {
   var chart = new wiki.StatsTable(elt, {width:'100%',height:'100%'});
   chart.draw(data);
-}
+};
 
 function drawMap(elt, data) {
   var chart = new google.visualization.Map(elt);
@@ -304,7 +275,7 @@ function drawMap(elt, data) {
   chart.draw(data, {showTip: true, mapType: 'hybrid', useMapTypeControl: true});
   itemCharts.push(chart);
   google.visualization.events.addListener(chart, 'select', function() { selectHandler(chart); });
-}
+};
 
 var detailData;
 
@@ -319,17 +290,13 @@ function drawDetailTable(elt, data) {
   tableChart.draw(data, options);
   itemCharts.push(tableChart);
   google.visualization.events.addListener(tableChart, 'select', function() { selectHandler(tableChart); });
-}
+};
 
 function selectHandler(chart) {
   var selection = chart.getSelection();
   for (var chart in itemCharts)
     itemCharts[chart].setSelection(selection);
-}
-
-function get(id) {
-  return document.getElementById(id);
-}
+};
 
 function editItem(elt, rowId, save) {
   var cell = elt.parentNode;
@@ -373,13 +340,11 @@ function editItem(elt, rowId, save) {
     var docId = detailData.getValue(rowId, 0);
     makePOSTRequest(location.href +'/'+ docId, fields, function(){alert('sent!');});
   }
-}
-/** BEGIN VIZ CODE */
+};
 
-/** BEGIN TABS CODE */
+//// Tabs.
 
 function Tabs(tabElts, contentElts) {
-  d('tabElts: '+ tabElts);
   if (tabElts.length != contentElts.length)
     throw 'tab and content arrays must be equal';
   this.tabEltPairs = new Array();
@@ -395,13 +360,11 @@ function Tabs(tabElts, contentElts) {
     var tabEltPair = this.tabEltPairs[i];
     var tab = tabEltPair[0];
     var elt = tabEltPair[1];
-    d('adding onclick to tab: '+ tab +' for content elt: '+ elt);
     tab.onclick = func(this, this.handleClick, [i]);
   }
 };
 
 Tabs.prototype.handleClick = function(ndx) {
-  d('click on ndx: '+ ndx);
   var tab = this.tabEltPairs[ndx][0];
   if (this.activeTab == tab)
     return;
@@ -414,5 +377,3 @@ Tabs.prototype.handleClick = function(ndx) {
   addClass(this.activeElt, 'activeTabbed');
   return false;
 };
-
-/** END TABS CODE */

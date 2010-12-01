@@ -1,1 +1,21 @@
 @import '/main.css';
+
+.activeTab {
+  font-weight: bold;
+  color: green;
+}
+
+#featured {
+  padding: 1em;
+  background-color: #ffffe8;
+  border: solid 1px #a7d7f9;
+  border-radius: 3px 3px 0 0;
+}
+
+#featured h2 {
+  text-decoration: underline;
+}
+
+#featured > ul {
+  padding-left: 1em;
+}

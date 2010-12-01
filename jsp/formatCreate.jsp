@@ -4,10 +4,11 @@
     <title>Create a new Format</title>
     <script src="http://www.google.com/jsapi" type="text/javascript"></script>
     <script src="/Translate.js" type="text/javascript"></script>
-    <script src="/Formats.js" type="text/javascript"></script>
+    <script src="/Wiki.js" type="text/javascript"></script>
+    <script src="/FormatCreator.js" type="text/javascript"></script>
     <link rel="stylesheet" href="/formatCreate.css" type="text/css"/>
   </head>
-  <body onload="init()">
+  <body onload="creator = new FormatCreator();">
     <jsp:include page="onebar.jsp"/>
     <jsp:include page="nav.jsp"/>
     <div class="mainPanel trans">
@@ -22,13 +23,13 @@
       </div>
 
       <h1>Create Format</h1>
-      <form action="/wiki/formats" method="POST" enctype="multipart/form-data">
+      <form action="/wiki/formats" method="POST" enctype="multipart/form-data" id="createForm">
         <p>Title:<br/>
-          <input name="title" value="" onchange="checkTitle(this)"/><em class="warning"></em>
+          <input id="newFormatTitle" name="title" value="" onchange="creator.checkValid()"/><em class="warning"></em>
         </p>
 
         <p>Short name:<br/>
-          <input name="name" value="" onchange="checkShortName(this)"/><em class="warning"></em>
+          <input id="newFormatName" name="name" value="" onchange="creator.checkValid()"/><em class="warning"></em>
         </p>
         <input id="createButton" type="submit" value="Create Format"/>
       </form>
