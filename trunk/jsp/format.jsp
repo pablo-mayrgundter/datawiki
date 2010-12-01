@@ -17,13 +17,14 @@
     <script src="/FieldEditor.js" type="text/javascript"></script>
     <script src="/Translate.js" type="text/javascript"></script>
   </head>
-  <body onload="init(<%= startEdit %>);">
+  <body onload="Format(<%= startEdit %>);">
     <jsp:include page="onebar.jsp"/>
     <jsp:include page="nav.jsp"/>
     <div class="mainPanel trans">
       <ul class="tabs">
         <li><a href="/wiki/<%= Util.encodeForDoubleQuotedAttribute(format.getURLTitle()) %>">Dataset</a></li>
         <li class="activeTab">Format</li>
+        <jsp:include page="search.jsp"/>
       </ul>
       <div id="formatBox" class="box">
         <div id="formatPanelLeft">

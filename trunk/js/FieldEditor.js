@@ -1,3 +1,6 @@
+/**
+ * The FieldEditor provides controls for editing a row of a form.
+ */
 function FieldEditor(form, row) {
   var oldHelpText = null;
   var oldFieldName = null;
@@ -31,6 +34,9 @@ FieldEditor.prototype.remove = function() {
 };
 
 FieldEditor.prototype.done = function(editorRow, form) {
-  if (form.newField(editorRow, this.myElt('text').value, this.myElt('name').value, this.myElt('required').checked))
+  if (form.newField(editorRow,
+                    this.myElt('text').value,
+                    this.myElt('name').value,
+                    this.myElt('required').checked))
     this.remove();
 };

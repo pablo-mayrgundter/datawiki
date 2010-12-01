@@ -58,6 +58,23 @@ public class Documents extends PersistentList<MultiPartDocument> {
 
   // GET methods follow.
 
+  /** Search */
+  @GET
+  @Produces({"text/html; charset=utf-8"})
+  public Response searchDatasets(@Context HttpServletRequest req,
+                                 @Context HttpServletResponse rsp)
+    throws ServletException, IOException {
+    final String reqQuery = req.getParameter("q");
+    if (reqQuery == null && reqQuery.length() == 0) {
+      return Response.status(Response.Status.BAD_REQUEST).entity("Must specify a format.").build();
+    }
+    final Format format = Formats.lookupFormatByTitle(reqQuery);
+    if (format == null) {
+      return Formats.formatWithTitleNotFound(reqQuery, req, rsp);
+    }
+    return pageList(req, rsp, format);
+  }
+
   /** Overview for documents in a given format. */
   @GET
   @Path("{formatTitle}")
@@ -98,18 +115,6 @@ public class Documents extends PersistentList<MultiPartDocument> {
     rsp.getOutputStream().write(doc.xml.getValue().getBytes());
     return Response.ok().build();
   }
-
-  /**
-   * Currently a request without a format or doc id returns 400.
-   * Could return a browse interface.
-   */
-  @GET
-  @Produces({"text/html; charset=utf-8"})
-  public Response getDocs(@Context HttpServletRequest req,
-                          @Context HttpServletResponse rsp) {
-    return Response.status(Response.Status.BAD_REQUEST).entity("Must specify a format.").build();
-  }
-
 
   // POST methods follow.  If the user submits from a form, they are
   // returned to the dataset page since this is where the forms are.

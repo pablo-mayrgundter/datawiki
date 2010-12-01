@@ -25,13 +25,14 @@
       }
     </script>
   </head>
-  <body onload="init()">
+  <body onload="Documents()">
     <jsp:include page="onebar.jsp"/>
     <jsp:include page="nav.jsp"/>
     <div class="mainPanel trans">
       <ul class="tabs">
         <li class="activeTab">Dataset</li>
         <li><a href="/wiki/formats/<%= formatName %>">Format</a></li>
+        <jsp:include page="search.jsp"/>
       </ul>
       <div id="formatBox" class="box tabbed activeTabbed">
         <div id="formatPanelLeft">

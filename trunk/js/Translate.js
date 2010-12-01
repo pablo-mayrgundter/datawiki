@@ -1,6 +1,17 @@
-google.load("language", "1");
+var translateLoaded = false;
+try {
+  google.load('language', '1');
+  translateLoaded = true;
+} catch(e) {
+  console.log('Could not load translate library: '+ e);
+}
 
-function translateInit(eltId) {
+window.onload = function() { translateInit(); }
+
+function translateInit() {
+  if (!translateLoaded)
+    return;
+  var eltId = 'langSelect';
   var curLang = 'en';
   if (document.cookie) {
     var langParam = document.cookie.match(/lang=[^;]+/);
@@ -11,10 +22,10 @@ function translateInit(eltId) {
   languageSelector(curLang);
   if (curLang != 'en') {
     document.getElementById('transProgress').style.visibility = 'visible';
-    setTimeout('translate(\''+ curLang + '\')', 1000);
     setTimeout('failsafeProgressHide()', 3000);
+    setTimeout('translate(\''+ curLang + '\')', 1000);
   }
-}
+};
 
 function languageSelector(curLang) {
   var elt = document.getElementById('langSelect')
@@ -40,7 +51,7 @@ function languageSelector(curLang) {
   img.style.visibility = 'hidden';
   img.src = '/loader.gif';
   elt.appendChild(img);
-}
+};
 
 function translate(toLang) {
   var translateHandler = 'translateDone';
@@ -81,10 +92,9 @@ function translate(toLang) {
   source += '&langpair=|'+ toLang;
 
   newScript.src = source;
-
   // When we add this script to the head, the request is sent off.
   document.getElementsByTagName('head')[0].appendChild(newScript);
-}
+};
 
 function translateDone(response) {
   var responseData = response['responseData'];
@@ -114,13 +124,13 @@ function translateDone(response) {
     alert('Cannot translate page.');
   }
   document.getElementById('transProgress').style.visibility = 'hidden';
-}
+};
 
 function eltsToTranslate() {
   var withText = [];
   eltsWithText(eltsByClass('trans'), withText);
   return withText;
-}
+};
 
 function eltsWithText(elts, withText) {
   for (var i = 0; i < elts.length; i++) {
@@ -134,7 +144,7 @@ function eltsWithText(elts, withText) {
       eltsWithText(childNodes, withText);
     }
   }
-}
+};
 
 var textRegex = new RegExp('[ "\'a-zA-Z0-9!()]+');
 function hasText(elt) {
@@ -146,7 +156,7 @@ function hasText(elt) {
     return true;
   }
   return false;
-}
+};
 
 function eltsByClass(className) {
   var elts = [];
@@ -159,15 +169,15 @@ function eltsByClass(className) {
     }
   }
   return elts;
-}
+};
 
 function setLangCookie(lang) {
   document.cookie = 'lang='+ lang +'; path=/';
   // TODO(pmy): Rethink this.
   // Need the timeout so cookie can register before refresh.
   setTimeout('location.href = location.href', 10);
-}
+};
 
 function failsafeProgressHide() {
   document.getElementById('transProgress').style.visibility = 'hidden';
-}
+};

@@ -2,8 +2,7 @@
 <%
   final LinkedHashMap<String,String> links = new LinkedHashMap();
   links.put("Home", "/");
-  links.put("Datasets", "/wiki/formats/");
-  links.put("Bugs!", "http://code.google.com/p/datawiki/issues/list");
+  links.put("Project", "http://code.google.com/p/datawiki/");
 %><!-- nav -->
 <div class="logoBody">
   <a href="/"><img src="/logo.png" alt="Google Public Data Wiki Home"></a>
