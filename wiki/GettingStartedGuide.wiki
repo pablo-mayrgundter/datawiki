@@ -24,7 +24,7 @@ ant server
 CLI building is easy:
 
 {{{
-ant classapth
+ant classpath
 "... export CLASSPATH=..."
 <copy and paste that back in to set your classpath>
 cd wiki
