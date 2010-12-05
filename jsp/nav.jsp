@@ -5,7 +5,7 @@
   links.put("Project", "http://code.google.com/p/datawiki/");
 %><!-- nav -->
 <div class="logoBody">
-  <a href="/"><img src="/logo.png" alt="Google Public Data Wiki Home"></a>
+  <a href="/"><img src="/logo.png" alt="Google Data Wiki"></a>
 </div>
 <span class="sidePanel trans">
 <%
