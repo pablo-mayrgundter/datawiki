@@ -218,7 +218,6 @@ public class XmlSerializer {
     }
     html += "  <input type=\"Submit\"><input type=\"Reset\">\n";
     html += "  <input name=\"q\" type=\"hidden\">\n";
-    html += "  <input name=\"format\" value=\""+ format.getName() +"\" type=\"hidden\">\n";
     html += "</form>\n";
     return html;
   }
@@ -232,7 +231,6 @@ public class XmlSerializer {
                             field.getText(), field.getName());
     }
     html += "  <input type=\"Submit\"><input type=\"Reset\">\n";
-    html += "  <input name=\"format\" value=\""+ format.getName() +"\" type=\"hidden\">\n";
     html += "</form>\n";
     return html;
   }
