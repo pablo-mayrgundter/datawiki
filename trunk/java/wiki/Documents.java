@@ -179,7 +179,7 @@ public class Documents extends PersistentList<MultiPartDocument> {
 
     save(doc);
 
-    return pageList(req, rsp, format);
+    return Response.ok("Document created.").build();
   }
 
   /** Update doc from form post. */
