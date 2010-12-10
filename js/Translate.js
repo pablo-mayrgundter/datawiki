@@ -40,7 +40,7 @@ function languageSelector(curLang) {
       option.value = langCode;
       option.innerHTML = lang.substring(0,1) + lang.substring(1).toLowerCase();
       if (langCode == curLang) {
-        option.setAttribute('selected');
+        option.setAttribute('selected', 'selected');
       }
       select.appendChild(option);
     }
