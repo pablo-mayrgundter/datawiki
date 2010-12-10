@@ -65,7 +65,7 @@ public class Documents extends PersistentList<MultiPartDocument> {
                                  @Context HttpServletResponse rsp)
     throws ServletException, IOException {
     final String reqQuery = req.getParameter("q");
-    if (reqQuery == null && reqQuery.length() == 0) {
+    if (reqQuery == null || reqQuery.length() == 0) {
       return Response.status(Response.Status.BAD_REQUEST).entity("Must specify a format.").build();
     }
     final Format format = Formats.lookupFormatByTitle(reqQuery);
