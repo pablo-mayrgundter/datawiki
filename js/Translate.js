@@ -21,7 +21,7 @@ function translateInit() {
   }
   languageSelector(curLang);
   if (curLang != 'en') {
-    document.getElementById('transProgress').style.visibility = 'visible';
+    document.getElementById('transProgress').style.display = 'block';
     setTimeout('failsafeProgressHide()', 3000);
     setTimeout('translate(\''+ curLang + '\')', 1000);
   }
@@ -48,7 +48,7 @@ function languageSelector(curLang) {
   elt.appendChild(select);
   var img = document.createElement('img');
   img.id = 'transProgress';
-  img.style.visibility = 'hidden';
+  img.style.display = 'none';
   img.src = '/loader.gif';
   elt.appendChild(img);
 };
@@ -123,7 +123,7 @@ function translateDone(response) {
   } else {
     alert('Cannot translate page.');
   }
-  document.getElementById('transProgress').style.visibility = 'hidden';
+  document.getElementById('transProgress').style.display = 'none';
 };
 
 function eltsToTranslate() {
@@ -179,5 +179,5 @@ function setLangCookie(lang) {
 };
 
 function failsafeProgressHide() {
-  document.getElementById('transProgress').style.visibility = 'hidden';
+  document.getElementById('transProgress').style.display = 'none';
 };

@@ -46,7 +46,7 @@
               <jsp:param name="jspFormId" value="formEdit"/>
               <jsp:param name="jspFormTitle" value="Edit"/>
               <jsp:param name="jspFormMethod" value="GET"/>
-              <jsp:param name="jspFormAction" value="<%= "/wiki/"+ format.getURLTitle() %>"/>
+              <jsp:param name="jspFormAction" value="<%= \"/wiki/\"+ format.getURLTitle() %>"/>
             </jsp:include>
           </div>
         </div>

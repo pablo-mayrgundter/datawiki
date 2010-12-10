@@ -1,2 +1,3 @@
 function Formats() {
+  translateInit();
 };

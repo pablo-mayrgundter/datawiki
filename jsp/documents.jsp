@@ -52,13 +52,13 @@
               <jsp:param name="jspFormId" value="formFind"/>
               <jsp:param name="jspFormTitle" value="Find"/>
               <jsp:param name="jspFormMethod" value="GET"/>
-              <jsp:param name="jspFormAction" value="<%= "/wiki/"+ format.getURLTitle() %>"/>
+              <jsp:param name="jspFormAction" value="<%= \"/wiki/\"+ format.getURLTitle() %>"/>
             </jsp:include>
             <jsp:include page="form.jsp">
               <jsp:param name="jspFormId" value="formCreate"/>
               <jsp:param name="jspFormTitle" value="Create"/>
               <jsp:param name="jspFormMethod" value="POST"/>
-              <jsp:param name="jspFormAction" value="<%= "/wiki/"+ format.getURLTitle() %>"/>
+              <jsp:param name="jspFormAction" value="<%= \"/wiki/\"+ format.getURLTitle() %>"/>
               <jsp:param name="jspFormActive" value="false"/>
             </jsp:include>
           </div>
