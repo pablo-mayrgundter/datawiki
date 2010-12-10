@@ -8,7 +8,7 @@
       <p>DataWiki failed :(</p>
       <ul>
         <li>Please report the bug, including the reason below, <a href="http://code.google.com/p/datawiki/issues/entry">here</a>!</li>
-        <li>And please enjoy the fail animals.</li>
+        <li>In the meantime, you might enjoy <a href="http://www.google.com/images?q=fail+animals&um=1&ie=UTF-8&source=og&sa=N&hl=en&tab=wi&biw=1270&bih=680">fail animals on Google Image Search</a>.</li>
       </ul>
       <%
          final String uri = (String)request.getAttribute("javax.servlet.error.request_uri");

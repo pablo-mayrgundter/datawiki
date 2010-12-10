@@ -6,7 +6,4 @@
     loginContinuePage += "?"+ request.getQueryString();
   }
   %>
-  <jsp:include page="signin.jsp">
-    <jsp:param name="uri" value="<%= loginContinuePage %>"/>
-  </jsp:include>
 </div>
