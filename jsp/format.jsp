@@ -75,7 +75,17 @@
           <p>Documents retrieved in XML format will have the following
           structure.</p>
 
-          <pre><%= Util.encodeForHTML(XmlSerializer.toXml(format)) %></pre>
+<%
+ String formatXmlStr = "";
+ try {
+   formatXmlStr = XmlSerializer.toXml(format);
+ } catch (Exception e) {
+%>
+ <!-- format: <%= format %> -->
+<%
+ }
+%>
+          <pre><%= Util.encodeForHTML(formatXmlStr) %></pre>
 
           <h4>HTML Find and Create Forms</h4>
           <p>You can use forms for finding or creating documents in
