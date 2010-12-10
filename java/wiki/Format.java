@@ -10,6 +10,7 @@ import javax.jdo.annotations.Element;
 import javax.jdo.annotations.Inheritance;
 import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.Extension;
 
 @PersistenceCapable(detachable = "true")
 @Inheritance(customStrategy = "complete-table")
@@ -32,6 +33,10 @@ public class Format extends AbstractDocument<Format> {
 
   @Persistent
   Text schema;
+
+  /** Used to store administrative flags. */
+  @Persistent
+  public String flags = null;
 
   public Format(final String name, final String namespace) {
     this(name, namespace, "");
@@ -68,6 +73,8 @@ public class Format extends AbstractDocument<Format> {
   }
 
   public String getURLTitle() {
+    if (title == null)
+      return "";
     return title.replaceAll(" ", "_");
   }
 

@@ -23,31 +23,11 @@
         <div id="featured">
           <!--<div id="createButton"><a href="/wiki/formats?action=new"><button class="button plus text"><div></div>Create New</button></a></div>-->
           <h2>Featured Datasets</h2>
-          <ul class="formats">
-<%
-  final List<Format> formats = new Formats().asList();
-  for (int i = formats.size() - 1; i >= 0; i--) {
-    final Format format = formats.get(i);
-    if (format == null) { // TODO(pmy): still required?
-      continue;
-    }
-    String title = format.getTitle();
-    if (title == null || title.trim().equals("")) {
-      title = format.getName().toUpperCase();
-    }
-    title = title.replaceAll("_", " ");
-    title = "<a href=\"/wiki/"+ Util.encodeForDoubleQuotedAttribute(format.getURLTitle()) +"\">"
-            + Util.encodeForHTML(title) +"</a>";
-%>
-            <li>
-              <%= title %>
-              <p><%= Util.encodeForHTML(format.getDescription()) %></p>
-            </li>
-<%
-  }
-%>
-          </ul>
-          
+          <jsp:include page="formats.jsp">
+            <jsp:param name="showFeatured" value="true"/>
+          </jsp:include>
+          <h2>Recent Datasets</h2>
+          <jsp:include page="formats.jsp"/>
         </div>
       </div>
     </div>
