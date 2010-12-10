@@ -96,9 +96,13 @@ public class Documents extends PersistentList<MultiPartDocument> {
   @Produces({"text/html; charset=utf-8"})
   public Response getSingleDoc(@Context HttpServletRequest req,
                                @Context HttpServletResponse rsp,
-                               @PathParam("id") String id)
+                               @PathParam("id") int id)
     throws ServletException, IOException {
-    req.setAttribute("doc", get(Integer.parseInt(id) - 1));
+    final MultiPartDocument doc = get(id - 1);
+    if (doc == null) {
+      return Response.status(Response.Status.NOT_FOUND).build();
+    }
+    req.setAttribute("doc", doc);
     req.getRequestDispatcher(JSP_SINGLE).include(req, rsp);
     return Response.ok().build();
   }
@@ -109,9 +113,12 @@ public class Documents extends PersistentList<MultiPartDocument> {
   @Produces({"text/xml; charset=utf-8"})
   public Response getSingleDocAsXml(@Context HttpServletRequest req,
                                     @Context HttpServletResponse rsp,
-                                    @PathParam("id") String id)
+                                    @PathParam("id") int id)
     throws ServletException, IOException {
-    final MultiPartDocument doc = get(Integer.parseInt(id) - 1);
+    final MultiPartDocument doc = get(id - 1);
+    if (doc == null) {
+      return Response.status(Response.Status.NOT_FOUND).build();
+    }
     rsp.getOutputStream().write(doc.xml.getValue().getBytes());
     return Response.ok().build();
   }
@@ -190,9 +197,8 @@ public class Documents extends PersistentList<MultiPartDocument> {
   public Response handlePost(@Context HttpServletRequest req,
                              @Context HttpServletResponse rsp,
                              @PathParam("format") String format,
-                             @PathParam("id") String reqId) throws Exception {
-    final int id = Integer.parseInt(reqId) - 1;
-    final MultiPartDocument doc = get(id);
+                             @PathParam("id") int id) throws Exception {
+    final MultiPartDocument doc = get(id - 1);
     if (doc == null) {
       return Response.status(Response.Status.NOT_FOUND).build();
     }
