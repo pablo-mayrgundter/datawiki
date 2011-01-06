@@ -29,12 +29,14 @@
       <div id="formatBox" class="box">
         <div id="formatPanelLeft">
 <%
-  String title = format.getTitle();
-  if (title == null || title.equals("")) {
-    title = format.getName().toUpperCase();
+  String unsafeTitle = format.getTitle();
+  if (unsafeTitle == null || unsafeTitle.equals("")) {
+    unsafeTitle = format.getName().toUpperCase();
   }
+  final String safeTitle = Util.encodeForHTML(unsafeTitle);
+  final String safeUrlTitle = Util.encodeForHTML(format.getURLTitle());
 %>
-          <h2 id="title"><%= Util.encodeForHTML(title) %></h2>
+          <h2 id="title"><%= safeTitle %></h2>
           <p id="description"><%= Util.encodeForHTML(format.getDescription()) %></p>
         </div>
         <div id="formatPanelRight">
@@ -59,7 +61,7 @@
           Service</a> <a href="http://en.wikipedia.org/wiki/Application_programming_interface">API</a>.</p>
 
           <p>All documents may be retrieved in Atom format using this URL:</p>
-          <pre><%= hostURL %>/wiki/<%= format.getURLTitle() %>?output=xml</pre>
+          <pre><%= hostURL %>/wiki/<%= safeUrlTitle %>?output=xml</pre>
 
           <p>A search for documents matching some criteria may be
           specified by setting the <code>q</code> request parameter
@@ -69,7 +71,7 @@
           the value of the name attribute used in the HTML form input
           for the associated field, as desribed in the "HTML Find and
           Create Forms" section below.</p>
-          <pre><%= hostURL %>/wiki/<%= format.getURLTitle() %>?q&amp;output=xml&amp;/Item/ID=1</pre>
+          <pre><%= hostURL %>/wiki/<%= safeUrlTitle %>?q&amp;output=xml&amp;/Item/ID=1</pre>
 
           <h4>XML Template</h4>
           <p>Documents retrieved in XML format will have the following
