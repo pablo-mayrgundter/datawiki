@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project basedir="." default="war">
+<project name="datawiki" basedir="." default="war">
   <property environment="env"/>
   <fail message="Error: must set environment variable GAE_HOME" unless="env.GAE_HOME"/>
   <property name="appengine.home" value="${env.GAE_HOME}"/>
@@ -18,6 +18,7 @@
       </fileset>
       <fileset dir="${appengine.home}/lib/shared">
         <include name="**/*.jar"/>
+        <exclude name="**/jsp/**"/>
       </fileset>
       <fileset dir="${appengine.home}/lib/user">
         <include name="**/*.jar"/>
@@ -34,19 +35,19 @@
     <fileset dir="build/lib">
       <include name="*.jar"/>
     </fileset>
-    <fileset dir="${appengine.home}/lib">
-      <include name="user/*.jar"/>
+    <fileset dir="${appengine.home}/lib/user">
+      <include name="*.jar"/>
     </fileset>
   </path>
 
-  <target name="classpath.print">
+  <target name="classpath.print" depends="init">
     <property name="cp" refid="classpath"/>
     <echo message="export CLASSPATH=${cp}:${srcDir}"></echo>
   </target>
 
   <target name="compile" depends="init">
     <javac debug="on" memoryMaximumSize="256m" memoryInitialSize="256m"
-           fork="true" destdir="${classes}">
+           fork="true" destdir="${classes}" includeantruntime="false">
       <!--<compilerarg value="-Xlint"/>-->
       <classpath refid="classpath"/>
       <src path="java"/>
@@ -60,7 +61,7 @@
       <classpath>
         <path refid="classpath"/>
         <pathelement location="build/classes"/>
-        <pathelement path="${appengine.home}/lib/appengine-tools-api.jar"/>
+        <pathelement path="${appengine.tools.classpath}"/>
       </classpath>
       <fileset dir="${classes}" includes="wiki/AbstractDocument.class"/>
       <fileset dir="${classes}" includes="wiki/DocumentField.class"/>

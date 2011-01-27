@@ -41,7 +41,7 @@
         </div>
         <div id="formatPanelRight">
           <ul id="formTabs" class="tabs">
-            <li class="activeTab"><a>Edit</a></li>
+            <li class="activeTab"><a>Form Editor</a></li>
           </ul>
           <div id="tabbedForms">
             <jsp:include page="form.jsp">
