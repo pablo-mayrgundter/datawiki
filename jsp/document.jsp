@@ -1,4 +1,4 @@
-<%@page import="wiki.*,java.net.URLEncoder,java.util.HashMap,java.util.Map"%>
+<%@page import="wiki.*,java.net.URLEncoder,java.util.*,org.xml.sax.SAXParseException"%>
 <%
   final MultiPartDocument doc = (MultiPartDocument) request.getAttribute("doc");
   if (doc == null) {
@@ -23,34 +23,47 @@
     <jsp:include page="onebar.jsp"/>
     <jsp:include page="nav.jsp"/>
     <div class="mainPanel trans">
-      <p>
-        <a href="/wiki/<%= Util.encodeForDoubleQuotedAttribute(doc.getFormat()) %>">
-          <%= Util.encodeForHTML(doc.getFormat()) %>
-        </a> &gt; <%= Util.encodeForHTML(""+doc.getId()) %>
-      <p>&nbsp;</p>
-      <h2>Fields</h2>
-      <form action="/wiki/<%= Util.encodeForDoubleQuotedAttribute(doc.getFormat()) %>/<%= Util.encodeForHTML(doc.getId()+"") %>" method="POST" enctype="multipart/form-data">
-        <table>
+      <ul class="tabs">
+        <li class="activeTab">Document</li>
+        <jsp:include page="search.jsp"/>
+      </ul>
+      <div id="formatBox" class="box tabbed activeTabbed">
+        <img src="http://chart.apis.google.com/chart?chs=150x150&cht=qr&chl=<%= URLEncoder.encode(request.getRequestURL().toString(), "UTF-8") %>&choe=UTF-8" style="float: right">
+        <p><a href="/wiki/<%= Util.encodeForDoubleQuotedAttribute(doc.getFormat()) %>">
+          « Return to dataset
+        </a></p>
+        <h2>Fields</h2>
+        <div style="width: 50%">
+          <form action="/wiki/<%= Util.encodeForDoubleQuotedAttribute(doc.getFormat()) %>/<%= Util.encodeForHTML(doc.getId()+"") %>" method="POST" enctype="multipart/form-data">
+            <table class="form">
 <%
   for (final FormField formField : format.getFields()) {
     final DocumentField docField = docFields.get(formField.getName());
+    final String fieldName = Util.encodeForHTML(formField.getName());
+    final String fieldText = Util.encodeForHTML(formField.getText());
+    final String fieldValue = Util.encodeForHTML(docField == null ? "" : docField.getValue());
 %>
-          <tr>
-            <td><%= Util.encodeForHTML(formField.getText()) %>:</td>
-            <td><input name="<%= Util.encodeForHTML(formField.getName()) %>" value="<%= Util.encodeForHTML(docField == null ? "" : docField.getValue()) %>"/></td>
-          </tr>
+              <tr>
+                <td><label for="<%= fieldName %>"><%= fieldText %></label>:</td>
+                <td><input name="<%= fieldName %>" value="<%= fieldValue %>"/></td>
+              </tr>
 <%
   }
 %>
-        </table>
-        <div class="buttons">
-          <input type="submit" value="Save"/>
-          <input type="reset" value="Clear"/>
+              <tr>
+                <td colspan="2">
+                  <div class="buttons formButtons">
+                    <input type="submit" value="Save"/>
+                    <input type="reset" value="Reset"/>
+                  </div>
+                </td>
+              </tr>
+            </table>
+          </form>
         </div>
-      </form>
-      <p>&nbsp;</p>
-      <h2>Scannable Link To This Page</h2>
-      <img src="http://chart.apis.google.com/chart?chs=150x150&cht=qr&chl=<%= URLEncoder.encode(request.getRequestURL().toString(), "UTF-8") %>&choe=UTF-8">
+        <h2>XML</h2>
+        <pre><%= Util.encodeForHTML(XmlSerializer.toXml(doc, format)) %></pre>
+      </div>
     </div>
   </body>
 </html>
