@@ -2,49 +2,56 @@ package wiki;
 
 import common.PersistentList;
 import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
-import javax.jdo.PersistenceManager;
-import javax.jdo.Query;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
-import javax.ws.rs.FormParam;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
+import javax.ws.rs.Consumes;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
-import javax.ws.rs.Consumes;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Variant;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileUploadException;
-import org.xml.sax.SAXException;
-import org.xml.sax.SAXParseException;
 
-/**
- * TODO(pmy): generalize this to AbstractDocument, or store documents
- * as XML and use objects for indices.  Also, the flow between
- * POST/GET and pageList could probably make better use of dispatchers
- * so that pageList is a real entry point and can be dispatched to.
- */
-@Path("/")
+@Path("/docs")
 public class Documents extends PersistentList<MultiPartDocument> {
 
   static final Logger logger = Logger.getLogger(Documents.class.getName());
-
   static final String JSP_SINGLE = "/document.jsp";
-  static final String JSP_COLLECTION = "/documents.jsp";
-  static final String JSP_COLLECTION_XML = "/documentsXml.jsp";
-  static final String JSP_UNKNOWN = "/unknown.jsp";
+
+  /** Helper for maybe querying if a query is present, or returning all docs otherwise. */
+  public static List<MultiPartDocument> queryOrAll(final HttpServletRequest request,
+                                                   final String reqFormatName,
+                                                   final Format format) {
+    // TODO(pmy): consider use query instead of direct access to request attributes.
+    // Create a data table.
+    final Documents allDocs = new Documents();
+    // TODO(pmy): pick one or the other way to propagate this.
+    List<MultiPartDocument> matchingDocs;
+    if (request.getParameter("q") == null)
+      matchingDocs = allDocs.matchingFormat(reqFormatName);
+    else {
+      try {
+        matchingDocs = allDocs.search(request, format);
+      } catch (Exception e) {
+        e.printStackTrace();
+        throw new IllegalStateException("Internal search failed: "+ e);
+      }
+    }
+    return matchingDocs;
+  }
 
   public Documents() {
     super(MultiPartDocument.class);
@@ -54,45 +61,9 @@ public class Documents extends PersistentList<MultiPartDocument> {
     return query(MultiPartDocument.gqlFilterForMatchingFormat(format));
   }
 
-  // Methods grouped below by HTTP verb.
-
-  // GET methods follow.
-
-  /** Search */
-  @GET
-  @Produces({"text/html; charset=utf-8"})
-  public Response searchDatasets(@Context HttpServletRequest req,
-                                 @Context HttpServletResponse rsp)
-    throws ServletException, IOException {
-    final String reqQuery = req.getParameter("q");
-    if (reqQuery == null || reqQuery.length() == 0) {
-      return Response.status(Response.Status.BAD_REQUEST).entity("Must specify a format.").build();
-    }
-    final Format format = Formats.lookupFormatByTitle(reqQuery);
-    if (format == null) {
-      return Formats.formatWithTitleNotFound(reqQuery, req, rsp);
-    }
-    return pageList(req, rsp, format);
-  }
-
-  /** Overview for documents in a given format. */
-  @GET
-  @Path("{formatTitle}")
-  @Produces({"text/html; charset=utf-8"})
-  public Response getDocsForFormat(@Context HttpServletRequest req,
-                                   @Context HttpServletResponse rsp,
-                                   @PathParam("formatTitle") String formatTitle)
-    throws ServletException, IOException {
-    final Format format = Formats.lookupFormatByTitle(formatTitle);
-    if (format == null) {
-      return Formats.formatWithTitleNotFound(formatTitle, req, rsp);
-    }
-    return pageList(req, rsp, format);
-  }
-
   /** Show doc. */
   @GET
-  @Path("{format}/{id}")
+  @Path("{id}")
   @Produces({"text/html; charset=utf-8"})
   public Response getSingleDoc(@Context HttpServletRequest req,
                                @Context HttpServletResponse rsp,
@@ -109,7 +80,7 @@ public class Documents extends PersistentList<MultiPartDocument> {
 
   /** Get doc as xml. */
   @GET
-  @Path("{format}/{id}")
+  @Path("{id}")
   @Produces({"text/xml; charset=utf-8"})
   public Response getSingleDocAsXml(@Context HttpServletRequest req,
                                     @Context HttpServletResponse rsp,
@@ -123,80 +94,13 @@ public class Documents extends PersistentList<MultiPartDocument> {
     return Response.ok().build();
   }
 
-  // POST methods follow.  If the user submits from a form, they are
-  // returned to the dataset page since this is where the forms are.
-
-  /**
-   * Create doc from form post.
-   */
-  @POST
-  @Path("{formatTitle}")
-  @Consumes({"multipart/form-data"})
-  @Produces({"text/html; charset=utf-8"})
-  public Response handlePost(@Context HttpServletRequest req,
-                             @Context HttpServletResponse rsp,
-                             @PathParam("formatTitle") String formatTitle) throws Exception {
-    List<FileItem> items = null;
-    try {
-      items = FormUpload.processFormData(req);
-    } catch (FileUploadException e) {
-      return Response.status(Response.Status.BAD_REQUEST).entity("Submission could not be parsed: "+ e).build();
-    }
-    final Format format = Formats.lookupFormatByTitle(formatTitle);
-    if (format == null) {
-      return Formats.formatWithTitleNotFound(formatTitle, req, rsp);
-    }
-    final LinkedHashMap<String,DocumentField> fields = fileItemsToDocumentFields(items);
-    final MultiPartDocument doc = new MultiPartDocument(format.getName());
-    for (final String fieldName : fields.keySet()) {
-      doc.addField(fields.get(fieldName));
-    }
-
-    // TODO(pmy): pass in XML from client as well?
-    final String xml = XmlSerializer.toXml(doc, format);
-    doc.setXml(xml);
-    save(doc);
-
-    return pageList(req, rsp, format);
-  }
-
-  /** Create doc from XML. */
-  @POST
-  @Path("{formatTitle}")
-  @Consumes({"application/x-www-form-urlencoded"})
-  public Response handlePostXml(@Context HttpServletRequest req,
-                                @Context HttpServletResponse rsp,
-                                @PathParam("formatTitle") String formatTitle,
-                                String xml) throws Exception {
-    final Format format = Formats.lookupFormatByTitle(formatTitle);
-    if (format == null) {
-      return Formats.formatWithTitleNotFound(formatTitle, req, rsp);
-    }
-
-    MultiPartDocument doc;
-    try {
-      doc = XmlSerializer.docFromXml(xml, format.getSchema());
-    } catch (SAXParseException schemaException) {
-      return Response.status(Response.Status.BAD_REQUEST).entity("The submitted XML does not match this format: "
-                                                                 + schemaException).build();
-    } catch (SAXException encodingException) {
-      return Response.status(Response.Status.BAD_REQUEST).entity("The submitted document is not valid XML: "
-                                                                 + encodingException).build();
-    }
-
-    save(doc);
-
-    return Response.ok("Document created.").build();
-  }
-
   /** Update doc from form post. */
   @POST
-  @Path("{format}/{id}")
+  @Path("{id}")
   @Consumes({"multipart/form-data"})
   @Produces({"text/html; charset=utf-8"})
   public Response handlePost(@Context HttpServletRequest req,
                              @Context HttpServletResponse rsp,
-                             @PathParam("format") String format,
                              @PathParam("id") int id) throws Exception {
     final MultiPartDocument doc = get(id - 1);
     if (doc == null) {
@@ -219,8 +123,7 @@ public class Documents extends PersistentList<MultiPartDocument> {
     return Response.ok().build();
   }
 
-
-  // Helpers.
+  // HELPERS
 
   static LinkedHashMap<String,DocumentField> fileItemsToDocumentFields(final List<FileItem> items) {
     final LinkedHashMap<String,DocumentField> fields = new LinkedHashMap<String,DocumentField>();
@@ -231,41 +134,6 @@ public class Documents extends PersistentList<MultiPartDocument> {
       fields.put(fieldName, new DocumentField(fieldName, fieldValue));
     }
     return fields;
-  }
-
-  Response pageList(final HttpServletRequest req, final HttpServletResponse rsp, final Format format)
-    throws ServletException, IOException {
-    req.setAttribute("formatName", format.getName());
-    req.setAttribute("format", format);
-    // TODO(pmy): hack for craig, move this to @Produces control.
-    final String output = req.getParameter("output");
-    if (output != null && output.equals("xml"))
-      req.getRequestDispatcher(JSP_COLLECTION_XML).include(req, rsp);
-    else
-      req.getRequestDispatcher(JSP_COLLECTION).include(req, rsp);
-    return Response.ok().build();
-  }
-
-  /** Helper for maybe querying if a query is present, or returning all docs otherwise. */
-  public static List<MultiPartDocument> queryOrAll(final HttpServletRequest request,
-                                                   final String reqFormatName,
-                                                   final Format format) {
-    // TODO(pmy): consider use query instead of direct access to request attributes.
-    // Create a data table.
-    final Documents allDocs = new Documents();
-    // TODO(pmy): pick one or the other way to propagate this.
-    List<MultiPartDocument> matchingDocs;
-    if (request.getParameter("q") == null)
-      matchingDocs = allDocs.matchingFormat(reqFormatName);
-    else {
-      try {
-        matchingDocs = allDocs.search(request, format);
-      } catch (Exception e) {
-        e.printStackTrace();
-        throw new IllegalStateException("Internal search failed: "+ e);
-      }
-    }
-    return matchingDocs;
   }
 
   public List<MultiPartDocument> search(final HttpServletRequest req, final Format format)

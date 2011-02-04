@@ -17,12 +17,19 @@ import org.w3c.dom.NodeList;
 @Inheritance(customStrategy = "complete-table")
 public class MultiPartDocument extends AbstractDocument<MultiPartDocument> {
 
-  public static String gqlFilterForMatchingFormat(final String otherFormatName) {
-    return String.format("format == '%s'", otherFormatName);
+  public static String gqlFilterForMatchingFormat(final String formatName) {
+    return String.format("format == '%s'", formatName);
+  }
+
+  public static String gqlFilterForMatchingDataset(final String datasetName) {
+    return String.format("dataset == '%s'", datasetName);
   }
 
   @Persistent
   String format;
+
+  @Persistent
+  String dataset;
 
   @Persistent(defaultFetchGroup = "true")
   @Element(dependent = "true")
@@ -31,13 +38,24 @@ public class MultiPartDocument extends AbstractDocument<MultiPartDocument> {
   @Persistent
   Text xml;
 
+  // TODO(pmy): why public?
   public MultiPartDocument() {
     fields = new ArrayList<DocumentField>();
   }
 
+  /** Equivalent to MultiPartDocument(format, format). */
   public MultiPartDocument(final String format) {
+    this(format, format);
+  }
+
+  public MultiPartDocument(final String format, final String dataset) {
     this();
     this.format = format;
+    this.dataset = dataset;
+  }
+
+  public String getDataset() {
+    return dataset;
   }
 
   public String getFormat() {
@@ -63,7 +81,9 @@ public class MultiPartDocument extends AbstractDocument<MultiPartDocument> {
   }
 
   public String toString() {
-    return String.format("MultiPartDocument@%d{format: %s, fields: %s}",
-                         System.identityHashCode(this), format, fields.toString());
+    return String.format("MultiPartDocument@%d{format: %s, dataset: %s, fields: %s}",
+                         System.identityHashCode(this),
+			 format, dataset,
+			 fields.toString());
   }
 }

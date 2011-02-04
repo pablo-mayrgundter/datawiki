@@ -64,8 +64,10 @@
         <pathelement path="${appengine.tools.classpath}"/>
       </classpath>
       <fileset dir="${classes}" includes="wiki/AbstractDocument.class"/>
+      <fileset dir="${classes}" includes="wiki/Dataset.class"/>
       <fileset dir="${classes}" includes="wiki/DocumentField.class"/>
       <fileset dir="${classes}" includes="wiki/Format.class"/>
+      <fileset dir="${classes}" includes="wiki/MetaDocument.class"/>
       <fileset dir="${classes}" includes="wiki/MultiPartDocument.class"/>
     </enhance>
   </target>

@@ -1,5 +1,9 @@
 package common;
 
+import com.google.appengine.api.datastore.DatastoreServiceFactory;
+import com.google.appengine.api.datastore.Entity;
+import com.google.appengine.api.datastore.FetchOptions;
+import com.google.appengine.api.datastore.PreparedQuery;
 import java.util.AbstractList;
 import java.util.List;
 import javax.jdo.PersistenceManager;
@@ -26,7 +30,9 @@ public class PersistentList<T> extends AbstractList<T> implements Persistable<T>
   
   @Override
   public int size() {
-    return asList().size();
+    return DatastoreServiceFactory.getDatastoreService().prepare(
+        new com.google.appengine.api.datastore.Query(clazz.getSimpleName())
+      ).countEntities(FetchOptions.Builder.withDefaults());
   }
 
   // List
