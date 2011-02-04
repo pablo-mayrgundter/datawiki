@@ -21,17 +21,12 @@
         continue;
       }
     }
-    String title = format.getTitle();
-    if (title == null || title.trim().equals("")) {
-      title = format.getName().toUpperCase();
-    }
-    title = title.replaceAll("_", " ");
-    title = "<a href=\"/wiki/"+ Util.encodeForDoubleQuotedAttribute(format.getURLTitle()) +"\">"
-            + Util.encodeForHTML(title) +"</a>";
+    request.setAttribute("format", format);
 %>
   <li>
-    <%= title %>
-    <p><%= Util.encodeForHTML(format.getDescription()) %></p>
+    <jsp:include page="formatSummary.jsp">
+      <jsp:param name="includeHref" value="true"/>
+    </jsp:include>
   </li>
 <%
   }

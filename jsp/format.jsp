@@ -5,6 +5,7 @@
   final boolean startEdit = format.getFields().isEmpty();
   final String hostURL = Util.getHostURL(request);
   final String self = hostURL + request.getRequestURI();
+  final String safeUrlTitle = Util.encodeForHTML(format.getURLTitle());
 %>
 <html>
   <head>
@@ -28,16 +29,7 @@
       </ul>
       <div id="formatBox" class="box">
         <div id="formatPanelLeft">
-<%
-  String unsafeTitle = format.getTitle();
-  if (unsafeTitle == null || unsafeTitle.equals("")) {
-    unsafeTitle = format.getName().toUpperCase();
-  }
-  final String safeTitle = Util.encodeForHTML(unsafeTitle);
-  final String safeUrlTitle = Util.encodeForHTML(format.getURLTitle());
-%>
-          <h2 id="title"><%= safeTitle %></h2>
-          <p id="description"><%= Util.encodeForHTML(format.getDescription()) %></p>
+          <jsp:include page="formatSummary.jsp"/>
         </div>
         <div id="formatPanelRight">
           <ul id="formTabs" class="tabs">

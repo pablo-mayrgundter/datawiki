@@ -1,9 +1,6 @@
 package wiki;
 
 import com.google.appengine.api.datastore.Text;
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import javax.jdo.annotations.Element;
@@ -14,19 +11,14 @@ import javax.jdo.annotations.Extension;
 
 @PersistenceCapable(detachable = "true")
 @Inheritance(customStrategy = "complete-table")
-public class Format extends AbstractDocument<Format> {
+public class Format extends MetaDocument<Format> {
 
-  @Persistent
-  String name;
-
-  @Persistent
-  String title;
+  public static String gqlFilterForMatchingFormat(final String otherFormatName) {
+    return String.format("name == '%s'", otherFormatName);
+  }
 
   @Persistent
   String namespace;
-
-  @Persistent
-  Text description;
 
   @Persistent(serialized="true",defaultFetchGroup="true")
   List<FormField> fields;
@@ -47,67 +39,31 @@ public class Format extends AbstractDocument<Format> {
   }
 
   public Format(final String name, final String namespace, final String description, final String title) {
-    this.name = Util.validFormatName(name);
-    this.title = title;
+    super(name, title, description);
     this.namespace = Util.validFormatNamepsace(namespace);
-    this.description = new Text(description);
     fields = new ArrayList<FormField>();
   }
 
-  void setSchema(final String schema) {
-    this.schema = new Text(schema);
-  }
-
-  String getSchema() {
-    if (schema == null)
-      return null; // TODO(pmy): temporary until schema always present.
-    return schema.getValue();
-  }
-
-  public String getName() {
-    return name;
-  }
-
-  public String getTitle() {
-    return title;
-  }
-
-  public String getURLTitle() {
-    if (title == null)
-      return "";
-    return title.replaceAll(" ", "_");
+  public List<FormField> getFields() {
+    return fields;
   }
 
   public String getNamespace() {
     return namespace;
   }
 
-  public String getDescription() {
-    return description.getValue();
-  }
-
-  public void setTitle(final String title) {
-    this.title = title;
-  }
-
   public void setNamespace(final String namespace) {
     this.namespace = namespace;
   }
 
-  public void setDescription(final String description) {
-    this.description = new Text(description);
+  public String getSchema() {
+    if (schema == null)
+      return null; // TODO(pmy): temporary until schema always present.
+    return schema.getValue();
   }
 
-  public static String gqlFilterForMatchingFormat(final String otherFormatName) {
-    return String.format("name == '%s'", otherFormatName);
-  }
-
-  public static String gqlFilterForMatchingFormatTitle(final String otherFormatTitle) {
-    return String.format("title == '%s'", otherFormatTitle);
-  }
-
-  public List<FormField> getFields() {
-    return fields;
+  public void setSchema(final String schema) {
+    this.schema = new Text(schema);
   }
 
   public String toString() {
