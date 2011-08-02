@@ -1,4 +1,4 @@
-package wiki;
+package common;
 
 import junit.framework.TestSuite;
 
@@ -16,18 +16,14 @@ public class AllTests {
    */
   public static TestSuite suite() {
     final TestSuite suite = new TestSuite();
-    // TODO(pmy): suite.addTestSuite(MappedListIteratorTest.class);
-    // TODO(pmy): suite.addTestSuite(PropertiesTest.class);
-    suite.addTestSuite(PolygonTest.class);
-    suite.addTestSuite(UtilTest.class);
-    suite.addTestSuite(XmlSerializerTest.class);
+    suite.addTestSuite(PersistentListTest.class);
     return suite;
   }
 
   /**
    * Runnable as:
    *
-   *   java wiki.AllTests
+   *   java common.AllTests
    */
   public static void main(final String [] args) {
     junit.textui.TestRunner.run(suite());

@@ -41,6 +41,15 @@ public class Util {
     return value == null ? defaultValue : value;
   }
 
+  public static int getParameter(final HttpServletRequest req, final String name, final int defaultValue) {
+    final String reqVal = req.getParameter(name);
+    try {
+      return Integer.parseInt(reqVal);
+    } catch (NumberFormatException e) {
+      return defaultValue;
+    }
+  }
+
   /**
    * @return String of the form http://host.com or http://host.com:port
    * if the port != 80.
@@ -48,8 +57,9 @@ public class Util {
   public static String getHostURL(final HttpServletRequest req) {
     String url = req.getScheme() +"://"+ req.getServerName();
     int port = req.getServerPort();
-    if (port != 80)
+    if (port != 80) {
       url += ":" + port;
+    }
     return url;
   }
 
@@ -119,7 +129,7 @@ public class Util {
   }
 
   static void logWarning(final String errMsg, final Logger logger) {
-      logger.log(Level.WARNING, errMsg);
+    logger.log(Level.WARNING, errMsg);
   }
 
   static void logException(final String errMsg, final Logger logger, final Exception e) {

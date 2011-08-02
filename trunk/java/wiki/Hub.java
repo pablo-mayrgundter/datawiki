@@ -1,9 +1,9 @@
 package wiki;
 
-import com.google.appengine.api.labs.taskqueue.Queue;
-import com.google.appengine.api.labs.taskqueue.QueueFactory;
-import com.google.appengine.api.labs.taskqueue.TaskOptions;
-import static com.google.appengine.api.labs.taskqueue.TaskOptions.Builder.*;
+//import com.google.appengine.api.labs.taskqueue.Queue;
+//import com.google.appengine.api.labs.taskqueue.QueueFactory;
+//import com.google.appengine.api.labs.taskqueue.TaskOptions;
+//import static com.google.appengine.api.labs.taskqueue.TaskOptions.Builder.*;
 import java.io.PrintWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -142,12 +142,13 @@ public class Hub {
     if (mode == null || !mode.equals("subscribe") || !mode.equals("unsubscribe")) {
       throw new IllegalArgumentException("mode must be subscribe or unsubscribe.");
     }
-
+    /* commenting for deprecation and not using currently.
     final Queue queue = QueueFactory.getDefaultQueue();
     TaskOptions task = url(SUBSCRIPTION_WORKER);
     task.param("hub.topic", topic);
     task.param("hub.mode", mode);
     queue.add(task);
     logger.info("Subscription enqueued.");
+    */
   }
 }

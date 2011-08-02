@@ -14,7 +14,7 @@ public interface Persistable<T> {
 
   static final Logger logger = Logger.getLogger("Persitable<T>");
 
-  static final PersistenceManagerFactory pmf =
+  public static final PersistenceManagerFactory pmf =
     JDOHelper.getPersistenceManagerFactory("transactions");
 
   static final Persistence persister = new Persistence();

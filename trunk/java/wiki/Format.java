@@ -48,6 +48,16 @@ public class Format extends MetaDocument<Format> {
     return fields;
   }
 
+  public boolean hasGeoData() {
+    for (final FormField field : getFields()) {
+      if (field.getType() == FormField.Type.Latitude || field.getName().equals("latitude")
+          || field.getType() == FormField.Type.Longitude || field.getName().equals("longitude")) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   public String getNamespace() {
     return namespace;
   }

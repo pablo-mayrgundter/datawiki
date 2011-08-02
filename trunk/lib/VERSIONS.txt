@@ -1,0 +1,1 @@
+zxing-core.jar, head version Jun 25 2010, Apache 2.0 License

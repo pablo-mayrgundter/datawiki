@@ -211,7 +211,7 @@ public class XmlSerializer {
   // TODO(pmy): it may be possible to have a jsp output escaped HTML.
   public static String toFindForm(final Format format, final String hostName, final List<FormField> fields)
     throws TransformerException {
-    String html = String.format("<form action=\"%s/wiki/%s\" method=\"GET\">\n", hostName, format.getURLTitle());
+    String html = String.format("<form action=\"%s/wiki/%s\" method=\"GET\">\n", hostName, format.getName());
     for (final FormField field : fields) {
       html += String.format("  %s: <input name=\"%s\"><br/>\n",
                             field.getText(), field.getName());
@@ -225,7 +225,7 @@ public class XmlSerializer {
   public static String toCreateForm(final Format format, final String hostName, final List<FormField> fields)
     throws TransformerException {
     String html = String.format("<form action=\"%s/wiki/%s\" method=\"POST\" enctype=\"multipart/form-data\">\n",
-                                hostName, format.getURLTitle());
+                                hostName, format.getName());
     for (final FormField field : fields) {
       html += String.format("  %s: <input name=\"%s\"><br/>\n",
                             field.getText(), field.getName());

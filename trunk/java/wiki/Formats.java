@@ -41,20 +41,22 @@ public class Formats extends PersistentList<Format> {
   static final Logger logger = Logger.getLogger(Formats.class.getName());
 
   /** @return The format or null if not found. */
-  public static Format lookupFormat(final String name) {
-    final List<Format> formats = new Formats().query(Format.gqlFilterForMatchingFormat(name));
+  public Format withName(final String name) {
+    final List<Format> formats = query(Format.gqlFilterForMatchingFormat(name));
     if (formats.size() == 0)
       return null;
     return formats.get(0);
   }
 
   /** @return The format or null if not found. */
-  public static Format lookupFormatByTitle(final String title) {
-    final List<Format> formats = new Formats().query(Format.gqlFilterForMatchingFormatTitle(title.replaceAll("_", " ")));
+  /*
+  public Format lookupFormatByTitle(final String title) {
+    final List<Format> formats =
+      query(Format.gqlFilterForMatchingFormatTitle(title.replaceAll("_", " ")));
     if (formats.size() == 0)
       return null;
     return formats.get(0);
-  }
+    }*/
 
   static final String JSP_COLLECTION = "/formats.jsp";
   static final String JSP_SINGLE = "/format.jsp";
@@ -127,7 +129,7 @@ public class Formats extends PersistentList<Format> {
         name = fieldValue;
       }
     }
-    Format format = lookupFormat(name);
+    Format format = withName(name);
     if (format != null) {
       req.getRequestDispatcher(JSP_CREATE).include(req, rsp);
       return Response.ok().build();

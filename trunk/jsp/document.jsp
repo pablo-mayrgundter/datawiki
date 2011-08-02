@@ -4,7 +4,7 @@
   if (doc == null) {
      throw new IllegalStateException("req.getAttribute('doc') == null");
   }
-  final Format format = Formats.lookupFormat(doc.getFormat());
+  final Format format = new Formats().withName(doc.getFormat());
   if (format == null) {
     throw new IllegalStateException("Document format not known: "+ doc.getFormat());
   }
@@ -12,6 +12,8 @@
   for (final DocumentField field : doc.getFields()) {
     docFields.put(field.getName(), field);
   }
+  final String hostURL = Util.getHostURL(request);
+  final String selfURL = hostURL + request.getRequestURI();
 %>
 <html>
   <head>
@@ -28,13 +30,16 @@
         <jsp:include page="search.jsp"/>
       </ul>
       <div id="formatBox" class="box tabbed activeTabbed">
-        <img src="http://chart.apis.google.com/chart?chs=150x150&cht=qr&chl=<%= URLEncoder.encode(request.getRequestURL().toString(), "UTF-8") %>&choe=UTF-8" style="float: right">
+        <div style="float: right; text-align: center">
+          <img alt="<%= selfURL %>/qrcode" src="<%= selfURL %>/qrcode" style="margin-bottom: 1em"/><br/>
+          Scannable link to this page
+        </div>
         <p><a href="/wiki/<%= Util.encodeForDoubleQuotedAttribute(doc.getFormat()) %>">
           « Return to dataset
         </a></p>
         <h2>Fields</h2>
         <div style="width: 50%">
-          <form action="/wiki/<%= Util.encodeForDoubleQuotedAttribute(doc.getFormat()) %>/<%= Util.encodeForHTML(doc.getId()+"") %>" method="POST" enctype="multipart/form-data">
+          <form action="/wiki/docs/<%= Util.encodeForHTML(doc.getId()+"") %>" method="POST" enctype="multipart/form-data">
             <table class="form">
 <%
   for (final FormField formField : format.getFields()) {
@@ -45,7 +50,17 @@
 %>
               <tr>
                 <td><label for="<%= fieldName %>"><%= fieldText %></label>:</td>
-                <td><input name="<%= fieldName %>" value="<%= fieldValue %>"/></td>
+                <td>
+<%
+   if (fieldName.equals("shape") && fieldValue.length() != 0) {
+%>
+                  <img src="/wiki/docs/<%= doc.getId() %>/<%= fieldName%>/tile"/>
+                  <!--<textarea name="<%= fieldName %>" cols=30 rows=10><%= fieldValue %></textarea>-->
+<%
+   }
+%>
+                  <input name="<%= fieldName %>" value="<%= fieldValue %>"/>
+                </td>
               </tr>
 <%
   }
@@ -61,8 +76,10 @@
             </table>
           </form>
         </div>
-        <h2>XML</h2>
+        <h2 style="clear: right">XML</h2>
         <pre><%= Util.encodeForHTML(XmlSerializer.toXml(doc, format)) %></pre>
+        or:<br/>
+        <a href="<%= hostURL + request.getRequestURI() %>?output=xml"><%= hostURL + request.getRequestURI() %>?output=xml</a>
       </div>
     </div>
   </body>

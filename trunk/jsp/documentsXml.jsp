@@ -1,18 +1,16 @@
 <%@page import="wiki.*, java.text.DateFormat, java.text.SimpleDateFormat, java.util.*"%><%
-  final String formatName = (String) request.getAttribute("formatName");
   final Format format = (Format) request.getAttribute("format");
+  final String formatName = format.getName();
   final Boolean reqShowDocs = (Boolean) request.getAttribute("showDocs");
   final boolean showDocs = reqShowDocs == null ? false : true;
   String host = request.getScheme() +"://"+ request.getServerName();
   int port = request.getServerPort();
-  if (port != 80)
+  if (port != 80) {
     host += ":" + port;
+  }
   final String self = host + request.getRequestURI();
   final String wikiPage = self;
-
-  final List<MultiPartDocument> matchingDocs =
-    Documents.queryOrAll(request, formatName, format);
-
+  final List<MultiPartDocument> matchingDocs = Documents.queryOrAll(request, formatName);
   final DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
 
   // TODO(pmy): now unless we have docs.

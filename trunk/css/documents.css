@@ -12,3 +12,21 @@
   padding: 0;
   border-spacing: 0;
 }
+
+#doclist tr, #doclist th, #doclist td {
+  margin: 0;
+  padding: 0;
+  border-spacing: 0;
+}
+
+#doclist th {
+  background-color: #f7f7f7;
+}
+
+#doclist td {
+  border-bottom: solid 1px #ccc;
+}
+
+#doclist tr:last-child td {
+  border-bottom: none;
+}

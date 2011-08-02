@@ -1,6 +1,8 @@
 package wiki;
 
 import junit.framework.TestCase;
+import javax.servlet.http.HttpServletRequest;
+import static org.easymock.EasyMock.*;
 
 public class UtilTest extends TestCase {
 
@@ -29,6 +31,14 @@ public class UtilTest extends TestCase {
         // Expected.
       }
     }
+  }
+
+  public void testGetParameterInt() {
+    final HttpServletRequest req = createMock(HttpServletRequest.class);
+    expect(req.getParameter("foo")).andReturn("1");
+    replay(req);
+    assertEquals("Expecting ", 1, Util.getParameter(req, "foo", 1));
+    verify(req);
   }
 
   public static void main(final String [] args) {

@@ -59,11 +59,6 @@ pre {
 
 /* Elements */
 
-.logoBody {
-  /* visibility: hidden; */
-  padding: 1em;
-}
-
 /* Onebar */
 
 #onebar {
@@ -105,35 +100,28 @@ pre {
 
 /* The next two together put the nav text and the main tab level, and
    then margin-top for .mainPanel moves it up to align the text. */
-.sidePanel, .mainPanel {
-  position: absolute; top: 100px;
-}
-
-.mainPanel {
-  margin-top: -10px;
-}
-
-.mainPanel > h2 {
-  margin-top: 0;
-}
-
-.mainPanel {
-  min-width: 400px;
-  right: 1em;
-  left: 113px;
-  padding: 1em;
-}
-
 .sidePanel {
-  width: 5%; /* make larger than .mainPanel.left */
-  min-width: 100px;
-  padding: 1em 0.5em 1em 1em;
-  margin: 0;
+  position: absolute;
+  left: 0;
+  width: 60px;
+  padding: 26px 0.5em 1em 1em;
 }
 
 .sidePanel li {
   list-style-type: none;
   margin-bottom: 5px;
+}
+
+.mainPanel {
+  position: absolute;
+  left: 80px;
+  min-width: 400px;
+  right: 1em;
+  padding: 1em;
+}
+
+.mainPanel > h2 {
+  margin-top: 0;
 }
 
 .box {

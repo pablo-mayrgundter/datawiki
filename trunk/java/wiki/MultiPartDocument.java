@@ -74,6 +74,20 @@ public class MultiPartDocument extends AbstractDocument<MultiPartDocument> {
     return fields;
   }
 
+  /**
+   * This method performs a linear search of fields for the first
+   * field whose name matches the given name parameter, or null if no
+   * match is found.
+   *
+   * TODO(pmy): less than O(n), XPath.
+   */
+  public DocumentField findField(final String name) {
+    for (final DocumentField field : fields)
+      if (field.getName().equals(name))
+        return field;
+    return null;
+  }
+
   public void addField(final DocumentField field) {
     if (fields == null)
       fields = new ArrayList<DocumentField>();
