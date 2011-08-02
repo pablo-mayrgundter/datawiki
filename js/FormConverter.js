@@ -1,3 +1,9 @@
+/**
+ * The FormConverter class converts an HTML form to an XML
+ * representation.
+ *
+ * @author "Pablo Mayrgundter" <pmy@google.com>
+ */
 function FormConverter(form, xml, format) {
   this.form = form;
   this.xml = xml;

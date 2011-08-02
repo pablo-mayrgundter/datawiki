@@ -48,10 +48,4 @@ public class MetaDocument<T> extends AbstractDocument<T> {
   public void setTitle(final String title) {
     this.title = title;
   }
-
-  public String getURLTitle() {
-    if (title == null)
-      return "";
-    return title.replaceAll(" ", "_");
-  }
 }

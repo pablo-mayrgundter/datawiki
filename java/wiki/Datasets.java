@@ -39,7 +39,7 @@ public class Datasets extends PersistentList<Dataset> {
   static final Logger logger = Logger.getLogger(Datasets.class.getName());
 
   static final String JSP_COLLECTION = "/dataset.jsp";
-  static final String JSP_COLLECTION_XML = "/datasetsXml.jsp";
+  static final String JSP_COLLECTION_XML = "/documentsXml.jsp";
   static final String JSP_UNKNOWN = "/unknown.jsp";
 
   public Datasets() {
@@ -60,7 +60,7 @@ public class Datasets extends PersistentList<Dataset> {
     if (reqQuery == null || reqQuery.length() == 0) {
       return Response.status(Response.Status.BAD_REQUEST).entity("Must specify a format.").build();
     }
-    final Format format = Formats.lookupFormatByTitle(reqQuery);
+    final Format format = new Formats().withName(reqQuery);
     if (format == null) {
       return Formats.formatWithTitleNotFound(reqQuery, req, rsp);
     }
@@ -77,7 +77,7 @@ public class Datasets extends PersistentList<Dataset> {
     throws ServletException, IOException {
     Dataset dataset = withName(datasetName);
     if (dataset == null) {
-      final Format format = Formats.lookupFormatByTitle(datasetName);
+      final Format format = new Formats().withName(datasetName);
       if (format == null) {
 	return Formats.formatWithTitleNotFound(datasetName, req, rsp);
       }
@@ -113,7 +113,7 @@ public class Datasets extends PersistentList<Dataset> {
     } catch (FileUploadException e) {
       return Response.status(Response.Status.BAD_REQUEST).entity("Submission could not be parsed: "+ e).build();
     }
-    final Format format = Formats.lookupFormatByTitle(datasetName);
+    final Format format = new Formats().withName(datasetName);
     if (format == null) {
       return Formats.formatWithTitleNotFound(datasetName, req, rsp);
     }
@@ -139,7 +139,7 @@ public class Datasets extends PersistentList<Dataset> {
                                 @Context HttpServletResponse rsp,
                                 @PathParam("dataset") String datasetName,
                                 String xml) throws Exception {
-    final Format format = Formats.lookupFormatByTitle(datasetName);
+    final Format format = new Formats().withName(datasetName);
     if (format == null) {
       return Formats.formatWithTitleNotFound(datasetName, req, rsp);
     }
@@ -164,15 +164,15 @@ public class Datasets extends PersistentList<Dataset> {
 
   Response pageList(final HttpServletRequest req, final HttpServletResponse rsp, final Dataset dataset)
     throws ServletException, IOException {
-    req.setAttribute("formatName", dataset.getFormat());
-    req.setAttribute("format", Formats.lookupFormat(dataset.getFormat()));
     req.setAttribute("dataset", dataset);
+    req.setAttribute("format", new Formats().withName(dataset.getFormat()));
     // TODO(pmy): hack for craig, move this to @Produces control.
     final String output = req.getParameter("output");
-    if (output != null && output.equals("xml"))
+    if (output != null && output.equals("xml")) {
       req.getRequestDispatcher(JSP_COLLECTION_XML).include(req, rsp);
-    else
+    } else {
       req.getRequestDispatcher(JSP_COLLECTION).include(req, rsp);
+    }
     return Response.ok().build();
   }
 }

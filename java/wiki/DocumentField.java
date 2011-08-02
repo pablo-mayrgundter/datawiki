@@ -49,7 +49,7 @@ public class DocumentField {
   }
 
   public String toString() {
-    return String.format("DocumentField@%d{name: %s, value; %s}",
+    return String.format("DocumentField@%d{name: \"%s\", value; \"%s\"}",
                          System.identityHashCode(this), name, value);
   }
 }

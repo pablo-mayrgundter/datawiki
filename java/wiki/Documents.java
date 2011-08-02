@@ -10,7 +10,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
-import javax.ws.rs.core.Context;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Consumes;
@@ -33,18 +32,16 @@ public class Documents extends PersistentList<MultiPartDocument> {
 
   /** Helper for maybe querying if a query is present, or returning all docs otherwise. */
   public static List<MultiPartDocument> queryOrAll(final HttpServletRequest request,
-                                                   final String reqFormatName,
-                                                   final Format format) {
+                                                   final String formatName) {
     // TODO(pmy): consider use query instead of direct access to request attributes.
     // Create a data table.
     final Documents allDocs = new Documents();
-    // TODO(pmy): pick one or the other way to propagate this.
     List<MultiPartDocument> matchingDocs;
-    if (request.getParameter("q") == null)
-      matchingDocs = allDocs.matchingFormat(reqFormatName);
-    else {
+    if (request.getParameter("q") == null) {
+      matchingDocs = allDocs.matchingFormat(formatName);
+    } else {
       try {
-        matchingDocs = allDocs.search(request, format);
+        matchingDocs = allDocs.search(request);
       } catch (Exception e) {
         e.printStackTrace();
         throw new IllegalStateException("Internal search failed: "+ e);
@@ -69,6 +66,9 @@ public class Documents extends PersistentList<MultiPartDocument> {
                                @Context HttpServletResponse rsp,
                                @PathParam("id") int id)
     throws ServletException, IOException {
+    if (req.getParameter("output") != null && req.getParameter("output").equals("xml")) {
+      return getSingleDocAsXml(req, rsp, id);
+    }
     final MultiPartDocument doc = get(id - 1);
     if (doc == null) {
       return Response.status(Response.Status.NOT_FOUND).build();
@@ -90,7 +90,60 @@ public class Documents extends PersistentList<MultiPartDocument> {
     if (doc == null) {
       return Response.status(Response.Status.NOT_FOUND).build();
     }
-    rsp.getOutputStream().write(doc.xml.getValue().getBytes());
+    final Format format = new Formats().withName(doc.getFormat());
+    if (format == null) {
+      return Response.status(Response.Status.NOT_FOUND).entity("Document has missing format: "+ doc.getFormat()).build();
+    }
+    String xml;
+    try {
+      xml = XmlSerializer.toXml(doc, format);
+    } catch (javax.xml.transform.TransformerException e) {
+      return Response.status(Response.Status.BAD_REQUEST).entity("Document could not be converted to XML: "+ e).build();
+    }
+    rsp.getOutputStream().write("<?xml version=\"1.0\" encoding=\"utf-8\"?>\n".getBytes());
+    rsp.getOutputStream().write(xml.getBytes());
+    return Response.ok().build();
+  }
+
+  @GET
+  @Path("{id}/qrcode")
+  @Produces({"image/png; charset=utf-8"})
+  public Response getQRCode(@Context HttpServletRequest req,
+                            @Context HttpServletResponse rsp,
+                            @PathParam("id") int id)
+    throws ServletException, IOException {
+    final String hostURL = Util.getHostURL(req);
+    final String selfURL = hostURL + req.getRequestURI();
+    try {
+      final QR qr = new QR(selfURL);
+      qr.draw();
+      qr.write(rsp.getOutputStream());
+    } catch (Exception e) {
+      return Response.status(Response.Status.BAD_REQUEST).entity("Path could not be encoded: "+ e).build();
+    }
+    return Response.ok().build();
+  }
+
+  @GET
+  @Path("{id}/shape/tile")
+  @Produces({"image/png; charset=utf-8"})
+  public Response getTile(@Context HttpServletRequest req,
+                          @Context HttpServletResponse rsp,
+                          @PathParam("id") int id)
+    throws ServletException, IOException {
+    final MultiPartDocument doc = get(id - 1);
+    if (doc == null) {
+      return Response.status(Response.Status.NOT_FOUND).build();
+    }
+    final DocumentField shapeField = doc.findField("shape");
+    if (shapeField == null) {
+      return Response.status(Response.Status.NOT_FOUND).entity("Given document has no shape field.").build();
+    }
+    try {
+      new Polygon(shapeField.getValue()).write(rsp.getOutputStream());
+    } catch (Exception e) {
+      return Response.status(Response.Status.BAD_REQUEST).entity("Shape could not be drawn: "+ e).build();
+    }
     return Response.ok().build();
   }
 
@@ -115,8 +168,11 @@ public class Documents extends PersistentList<MultiPartDocument> {
     final LinkedHashMap<String,DocumentField> fields = fileItemsToDocumentFields(items);
     doc.fields.clear();
     for (final String fieldName : fields.keySet()) {
-      doc.addField(fields.get(fieldName));
+      final DocumentField field = fields.get(fieldName);
+      doc.addField(field);
+      System.out.println("field: "+ field);
     }
+    System.out.println("saving: "+ doc);
     save(doc);
     req.setAttribute("doc", doc);
     req.getRequestDispatcher(JSP_SINGLE).include(req, rsp);
@@ -136,7 +192,8 @@ public class Documents extends PersistentList<MultiPartDocument> {
     return fields;
   }
 
-  public List<MultiPartDocument> search(final HttpServletRequest req, final Format format)
+  // TODO(pmy): fix, very ugly.
+  public List<MultiPartDocument> search(final HttpServletRequest req)
     throws ServletException, IOException {
     final Map params = req.getParameterMap();
     String query = "";
@@ -147,8 +204,10 @@ public class Documents extends PersistentList<MultiPartDocument> {
       final Map.Entry entry = ((Map.Entry)entryObj);
       final String key = (String) entry.getKey();
       // TODO(pmy): hack.
-      if (key.equals("tqx") || key.equals("q") || key.equals("summary"))
+      if (key.equals("tqx") || key.equals("q") || key.equals("summary") 
+          || key.equals("dataset") || key.equals("output")) {
         continue;
+      }
       final String [] values = (String []) entry.getValue();
       // TODO(pmy): reconsider this. currently don't filter on attrs with empty values.
       if (values == null || values.length == 0 || values[0].equals("")) {
@@ -169,7 +228,7 @@ public class Documents extends PersistentList<MultiPartDocument> {
       if (!query.equals("")) {
         query += " && ";
       }
-      query += String.format("fields.contains(%s) && %s.name == '%s' && %s.value == '%s'",
+      query += String.format("(fields.contains(%s) && %s.name == '%s' && %s.value == '%s')",
                              varName, varName, key, varName, value);
       if (!varNames.equals("")) {
         varNames += ",";
@@ -183,6 +242,10 @@ public class Documents extends PersistentList<MultiPartDocument> {
         varDecl += "; ";
       }
       varDecl += DocumentField.class.getName() +" "+ name;
+    }
+    // hack.
+    if (query.equals("")) {
+      return new java.util.ArrayList<MultiPartDocument>();
     }
     logger.info("queryWithVariables: "+ query + ", and var decl: "+ varDecl);
     return queryWithVariables(query, varDecl);

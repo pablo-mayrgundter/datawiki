@@ -10,7 +10,7 @@ public class FormApp extends Application {
     s.add(Datasets.class);
     s.add(Documents.class);
     s.add(Formats.class);
-    s.add(Hub.class);
+    //s.add(Hub.class);
     return s;
   }
 }

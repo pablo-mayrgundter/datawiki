@@ -16,8 +16,9 @@ public class XmlSerializerTest extends TestCase {
   static final String FORMAT_NS = "http://datawiki.googlelabs.com/wiki/test";
 
   static String makeTestSchema() {
-    final Document schema = XmlSerializer.getBuilder().getDOMImplementation().createDocument("http://www.w3.org/2001/XMLSchema",
-                                                                                             "schema", null);
+    final Document schema =
+      XmlSerializer.getBuilder().getDOMImplementation().createDocument("http://www.w3.org/2001/XMLSchema",
+                                                                       "schema", null);
     final Element root = schema.getDocumentElement();
     root.setAttribute("targetNamespace", FORMAT_NS);
     final Element elt = schema.createElement("element");

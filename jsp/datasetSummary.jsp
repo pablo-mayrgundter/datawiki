@@ -9,7 +9,7 @@
   if (request.getParameter("includeHref") != null
       && request.getParameter("includeHref").equalsIgnoreCase("true")) {
     title =
-      "<a href=\"/wiki/"+ Util.encodeForDoubleQuotedAttribute(dataset.getURLTitle()) +"\">"
+      "<a href=\"/wiki/"+ Util.encodeForDoubleQuotedAttribute(dataset.getName()) +"\">"
       + title +"</a>";
   }
 %>

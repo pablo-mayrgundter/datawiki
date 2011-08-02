@@ -1,29 +1,31 @@
-<%@page import="wiki.*"%>
+<%@page import="wiki.Format,
+                wiki.Properties,
+                wiki.Util,
+                wiki.XmlSerializer"%>
 <%
   final String formatName = (String) request.getAttribute("formatName");
   final Format format = (Format) request.getAttribute("format");
   final boolean startEdit = format.getFields().isEmpty();
   final String hostURL = Util.getHostURL(request);
   final String self = hostURL + request.getRequestURI();
-  final String safeUrlTitle = Util.encodeForHTML(format.getURLTitle());
+  final String safeName = Util.encodeForHTML(format.getName());
+  final boolean online = Properties.getBoolean("online");
 %>
 <html>
   <head>
-    <script src="http://www.google.com/jsapi" type="text/javascript"></script>
-    <link rel="stylesheet" href="/format.css" type="text/css"/>
-    <script src="/Wiki.js" type="text/javascript"></script>
+    <jsp:include page="header.jsp"/>
     <script src="/Format.js" type="text/javascript"></script>
     <script src="/FormEditor.js" type="text/javascript"></script>
     <script src="/FormConverter.js" type="text/javascript"></script>
     <script src="/FieldEditor.js" type="text/javascript"></script>
-    <script src="/Translate.js" type="text/javascript"></script>
+    <link rel="stylesheet" href="/format.css" type="text/css"/>
   </head>
   <body onload="Format(<%= startEdit %>);">
     <jsp:include page="onebar.jsp"/>
     <jsp:include page="nav.jsp"/>
     <div class="mainPanel trans">
       <ul class="tabs">
-        <li><a href="/wiki/<%= Util.encodeForDoubleQuotedAttribute(format.getURLTitle()) %>">Dataset</a></li>
+        <li><a href="/wiki/<%= safeName %>">Dataset</a></li>
         <li class="activeTab">Format</li>
         <jsp:include page="search.jsp"/>
       </ul>
@@ -33,14 +35,14 @@
         </div>
         <div id="formatPanelRight">
           <ul id="formTabs" class="tabs">
-            <li class="activeTab"><a>Form Editor</a></li>
+            <li class="activeTab"><a>Sample form</a></li>
           </ul>
           <div id="tabbedForms">
             <jsp:include page="form.jsp">
               <jsp:param name="jspFormId" value="formEdit"/>
               <jsp:param name="jspFormTitle" value="Edit"/>
               <jsp:param name="jspFormMethod" value="GET"/>
-              <jsp:param name="jspFormAction" value="<%= \"/wiki/\"+ format.getURLTitle() %>"/>
+              <jsp:param name="jspFormAction" value="<%= \"/wiki/\"+ safeName %>"/>
             </jsp:include>
           </div>
         </div>
@@ -53,7 +55,7 @@
           Service</a> <a href="http://en.wikipedia.org/wiki/Application_programming_interface">API</a>.</p>
 
           <p>All documents may be retrieved in Atom format using this URL:</p>
-          <pre><%= hostURL %>/wiki/<%= safeUrlTitle %>?output=xml</pre>
+          <pre><%= hostURL %>/wiki/<%= safeName %>?output=xml</pre>
 
           <p>A search for documents matching some criteria may be
           specified by setting the <code>q</code> request parameter
@@ -63,7 +65,7 @@
           the value of the name attribute used in the HTML form input
           for the associated field, as desribed in the "HTML Find and
           Create Forms" section below.</p>
-          <pre><%= hostURL %>/wiki/<%= safeUrlTitle %>?q&amp;output=xml&amp;/Item/ID=1</pre>
+          <pre><%= hostURL %>/wiki/<%= safeName %>?q&amp;output=xml&amp;example=value</pre>
 
           <h4>XML Template</h4>
           <p>Documents retrieved in XML format will have the following

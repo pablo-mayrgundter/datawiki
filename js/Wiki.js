@@ -9,14 +9,17 @@ function elts(name) {
 };
 
 function eltsByIdPrefix(prefix, node)  {
-  if (!node)
+  if (!node) {
     node = document.getElementsByTagName("body")[0];
+  }
   var elts = {};
   var re = new RegExp('^'+ prefix);
   var subNodes = node.getElementsByTagName("*");
-  for (var i = 0; i < subNodes.length; i++)
-    if (re.test(subNodes[i].id))
+  for (var i = 0; i < subNodes.length; i++) {
+    if (re.test(subNodes[i].id)) {
       elts[subNodes[i].id] = subNodes[i];
+    }
+  }
   return elts;
 };
 
@@ -55,10 +58,11 @@ function create(name, attrs, inner) {
   if (attrs) {
     for (var attr in attrs) {
       var val = attrs[attr];
-      if (val.constructor == String)
+      if (val.constructor == String) {
         elt.setAttribute(attr, val);
-      else
+      } else {
         elt[attr] = val;
+      }
     }
   }
   if (inner) {
@@ -70,16 +74,17 @@ function create(name, attrs, inner) {
         if (!(e instanceof Array)) {
           alert('Attempt to create node: '+ name +' with non-array node list.');
           return;
-        } if (e.length == 0) {
+        }
+        if (e.length == 0) {
           alert('Attempt to create node: '+ name +' with empty inner node list.');
           return;
-        }
-        else if (e.length == 1)
+        } else if (e.length == 1) {
           elt.appendChild(create(e[0]));
-        else if (e.length == 2)
+        } else if (e.length == 2) {
           elt.appendChild(create(e[0], e[1]));
-        else if (e.length == 3)
+        } else if (e.length == 3) {
           elt.appendChild(create(e[0], e[1], e[2]));
+        }
       }
     }
   }
@@ -102,13 +107,15 @@ function addClass(obj, clazz) {
 };
 
 function findLabelForControl(name, startAt) {
-  if (!startAt)
+  if (!startAt) {
     var startAt = document;
+  }
   var labels = startAt.getElementsByTagName('label');
   for (var i = 0; i < labels.length; i++) {
     var label = labels[i];
-    if (label.htmlFor == name)
+    if (label.htmlFor == name) {
       return label;
+    }
   }
   return null;
 };
@@ -120,8 +127,9 @@ function d(msg) {
 };
 
 function func(obj, handler, args) {
-  if (!args)
+  if (!args) {
     args = [];
+  }
   return function() { handler.apply(obj, args); };
 };
 
@@ -210,8 +218,9 @@ function alertContents() {
     if (http_request.status == 200) {
       //result = http_request.responseText;
       //document.getElementById('myspan').innerHTML = result;
-      if (callback)
+      if (callback) {
         callback.call();
+      }
     } else {
       alert('There was a problem with this request.  '+ http_request.responseText);
     }
@@ -224,7 +233,7 @@ var itemCharts = new Array();
 
 function vizQuery() {
   var activeQuery = window.location.search;
-  var queryStr = '/chart?format='+ vizFormat;
+  var queryStr = '/chart?dataset='+ vizDataset;
   if (activeQuery != null) {
     queryStr += '&' + activeQuery.substring(1);
   }
@@ -242,12 +251,13 @@ function handleDetailResponse(response) {
   if (data.getTableProperty('hasMap')) {
     var dataWithoutMapSummaryColumn = data.clone();
     dataWithoutMapSummaryColumn.removeColumns(0,3);
-    drawDetailTable(elt, dataWithoutMapSummaryColumn);
-    var mapElt = document.getElementById('mapChart');
-    if (mapElt)
+    //drawDetailTable(elt, dataWithoutMapSummaryColumn);
+    var mapElt = document.getElementById('map');
+    if (mapElt) {
       drawMap(mapElt, data.clone());
+    }
   } else {
-    drawDetailTable(elt, data);
+    //drawDetailTable(elt, data);
   }
 };
 
@@ -258,8 +268,9 @@ function handleStatsResponse(response) {
   }
   var data = response.getDataTable();
   var chartElt = document.getElementById('statsChart');
-  if (!chartElt)
+  if (!chartElt) {
     return;
+  }
   drawSummary(chartElt, data);
 };
 
@@ -270,8 +281,9 @@ function drawSummary(elt, data) {
 
 function drawMap(elt, data) {
   var chart = new google.visualization.Map(elt);
-  if (data.getNumberOfColumns() > 3)
+  if (data.getNumberOfColumns() > 3) {
     data.removeColumns(3, data.getNumberOfColumns());
+  }
   chart.draw(data, {showTip: true, mapType: 'hybrid', useMapTypeControl: true});
   itemCharts.push(chart);
   google.visualization.events.addListener(chart, 'select', function() { selectHandler(chart); });
@@ -294,8 +306,9 @@ function drawDetailTable(elt, data) {
 
 function selectHandler(chart) {
   var selection = chart.getSelection();
-  for (var chart in itemCharts)
+  for (var chart in itemCharts) {
     itemCharts[chart].setSelection(selection);
+  }
 };
 
 function editItem(elt, rowId, save) {
@@ -345,14 +358,16 @@ function editItem(elt, rowId, save) {
 //// Tabs.
 
 function Tabs(tabElts, contentElts) {
-  if (tabElts.length != contentElts.length)
+  if (tabElts.length != contentElts.length) {
     throw 'tab and content arrays must be equal';
+  }
   this.tabEltPairs = new Array();
   var activeNdx = 0;
   for (var i = 0; i < tabElts.length; i++) {
     this.tabEltPairs[i] = [tabElts[i],contentElts[i]];
-    if (checkClass(tabElts[i], 'activeTab'))
+    if (checkClass(tabElts[i], 'activeTab')) {
       activeNdx = i;
+    }
   }
   this.activeTab = this.tabEltPairs[activeNdx][0];
   this.activeElt = this.tabEltPairs[activeNdx][1];
@@ -360,14 +375,25 @@ function Tabs(tabElts, contentElts) {
     var tabEltPair = this.tabEltPairs[i];
     var tab = tabEltPair[0];
     var elt = tabEltPair[1];
+    var me = this;
+    tab.onkeydown = func(this, this.handleKey, [i]);
     tab.onclick = func(this, this.handleClick, [i]);
+  }
+};
+
+Tabs.prototype.handleKey = function(ndx) {
+  var ev = window.event;
+  if (ev.keyCode == 13) {
+    // TODO(pmy): method is called, but doesn't switch tab.
+    this.handleClick(ndx);
   }
 };
 
 Tabs.prototype.handleClick = function(ndx) {
   var tab = this.tabEltPairs[ndx][0];
-  if (this.activeTab == tab)
+  if (this.activeTab == tab) {
     return;
+  }
   var elt = this.tabEltPairs[ndx][1];
   removeClass(this.activeTab, 'activeTab');
   removeClass(this.activeElt, 'activeTabbed');
@@ -376,4 +402,19 @@ Tabs.prototype.handleClick = function(ndx) {
   addClass(this.activeTab, 'activeTab');
   addClass(this.activeElt, 'activeTabbed');
   return false;
+};
+
+// Forms.
+
+function clearForm(formId) {
+  var formElt = get(formId);
+  var inputElts = formElt.getElementsByTagName('input');
+  for (var eltNdx in inputElts) {
+    var e = inputElts[eltNdx];
+    if (e.tagName == 'INPUT' ) {
+      if (e.id.indexOf(formId + '-input') != -1) {
+        e.setAttribute('value', '');
+      }
+    }
+  }
 };

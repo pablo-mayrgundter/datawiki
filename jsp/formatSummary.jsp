@@ -9,7 +9,7 @@
   if (request.getParameter("includeHref") != null
       && request.getParameter("includeHref").equalsIgnoreCase("true")) {
     title =
-      "<a href=\"/wiki/"+ Util.encodeForDoubleQuotedAttribute(format.getURLTitle()) +"\">"
+      "<a href=\"/wiki/"+ Util.encodeForDoubleQuotedAttribute(format.getName()) +"\">"
       + title +"</a>";
   }
 %>

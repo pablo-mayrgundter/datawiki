@@ -1,5 +1,6 @@
 package common;
 
+import com.google.appengine.api.datastore.Cursor;
 import com.google.appengine.api.datastore.DatastoreServiceFactory;
 import com.google.appengine.api.datastore.Entity;
 import com.google.appengine.api.datastore.FetchOptions;
@@ -12,6 +13,7 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import org.datanucleus.store.appengine.query.JDOCursorHelper;
 
 public class PersistentList<T> extends AbstractList<T> implements Persistable<T> {
 

@@ -42,22 +42,21 @@ public class TableViz extends DataSourceServlet {
 
   public DataTable generateDataTable(final Query query, final HttpServletRequest request) {
 
-    // TODO(pmy): choose either attribute or parameter passing.
-    final String reqFormatName = request.getParameter("format");
-    if (reqFormatName == null)
-      throw new IllegalStateException("Missing format name");
+    final String reqDataset = request.getParameter("dataset");
+    if (reqDataset == null)
+      throw new IllegalStateException("Missing dataset name");
 
-    final Format format = Formats.lookupFormat(reqFormatName);
+    final Format format = new Formats().withName(reqDataset);
     if (format == null)
-      throw new IllegalArgumentException("Format not found");
+      throw new IllegalArgumentException("Dataset not found");
 
     final List<MultiPartDocument> matchingDocs =
-      Documents.queryOrAll(request, reqFormatName, format);
+      Documents.queryOrAll(request, reqDataset);
 
     if (request.getParameter("summary") != null) {
       return summaryTable(matchingDocs);
     } else {
-      return detailTable(matchingDocs, format);
+      return detailTable(matchingDocs, new Formats().withName(format.getName()));
     }
   }
 

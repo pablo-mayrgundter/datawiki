@@ -22,7 +22,7 @@
     for (final FormField field : format.getFields()) {
       final String name = Util.encodeForHTML(field.getName());
       final String text = Util.encodeForHTML(field.getText());
-      String value = field.getValue();
+      String value = field.getValue(); // i.e. default value.
       if (request.getParameter("q") != null && request.getParameter(name) != null) {
         value = request.getParameter(name);
       }
@@ -46,7 +46,7 @@
       <td colspan="2">
         <div id="<%= formId %>-buttons" class="buttons formButtons">
           <input type="submit" value="Submit"/>
-          <input type="reset" value="Clear"/>
+          <input type="reset" value="Clear" onclick="clearForm('<%= formId %>')"/>
         </div>
       </td>
     </tr>
