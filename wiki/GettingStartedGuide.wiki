@@ -31,4 +31,4 @@ cd wiki
 javac *.java
 }}}
 
-The [http://code.google.com/p/datawiki/issues/entry?show=review&former=sourcelist Request a Code Review] for submission.
+Then [http://code.google.com/p/datawiki/issues/entry?show=review&former=sourcelist Request a Code Review] for submission.
