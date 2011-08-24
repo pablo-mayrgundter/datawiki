@@ -1,3 +1,5 @@
+#summary The DataWiki system presents a wiki for structured data, a federated approach to users interacting in complex organizational roles and a flexible architecture for online, mobile and offline use.
+
 =Overview=
 The DataWiki system presents a wiki for structured data, a federated approach to users interacting in complex organizational roles and a flexible architecture for online, mobile and offline use.
 
