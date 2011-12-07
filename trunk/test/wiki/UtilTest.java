@@ -1,8 +1,8 @@
 package wiki;
 
-import junit.framework.TestCase;
-import javax.servlet.http.HttpServletRequest;
 import static org.easymock.EasyMock.*;
+import javax.servlet.http.HttpServletRequest;
+import junit.framework.TestCase;
 
 public class UtilTest extends TestCase {
 
