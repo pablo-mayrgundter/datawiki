@@ -10,6 +10,16 @@ public class UtilTest extends TestCase {
     super(UtilTest.class.getName());
   }
 
+  public void testIndent() {
+    assertEquals("", Util.indent("", 0));
+    assertEquals("", Util.indent("", 1));
+    assertEquals("a", Util.indent("a", 0));
+    assertEquals(" a", Util.indent(" a", 0));
+    assertEquals(" a", Util.indent("a", 1));
+    assertEquals("  a\n  a", Util.indent("a\na", 2));
+    assertEquals("a", Util.indent("a", -1));
+  }
+
   public void testValidFormatName() {
     final String [] names = {"Name", "Test_Name"};
     for (final String name : names) {
@@ -33,6 +43,23 @@ public class UtilTest extends TestCase {
     }
   }
 
+  // Namespaces.
+  public void testGetParentNamespace() {
+    assertEquals("/foo/bar/", Util.getParentNamespace("/foo/bar/baz"));
+    assertEquals("/foo/bar/", Util.getParentNamespace("/foo/bar/baz/"));
+  }
+
+  public void testGetNameFromNamespace() {
+    assertEquals("baz", Util.getNameFromNamespace("/foo/bar/baz"));
+    assertEquals("baz", Util.getNameFromNamespace("/foo/bar/baz/"));
+  }
+
+  public void testCreateNamespace() {
+    assertEquals("/foo/bar/baz", Util.createNamespace("/foo/bar/", "baz"));
+    assertEquals("/foo/bar/baz", Util.createNamespace("/foo/bar", "baz"));
+  }
+
+  // Http params.
   public void testGetParameterInt() {
     final HttpServletRequest req = createMock(HttpServletRequest.class);
     expect(req.getParameter("foo")).andReturn("1");

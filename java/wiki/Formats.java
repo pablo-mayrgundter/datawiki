@@ -92,7 +92,7 @@ public class Formats extends PersistentList<Format> {
     final List<Format> formats = query(Format.gqlFilterForMatchingFormat(formatName));
     if (formats.size() == 0) {
       if (action != null && action.equals("edit")) {
-        format = new Format(formatName, makeFormatNamespace(req), "");
+        format = new Format(formatName, Util.getRootNamespace(req), "");
       } else {
         return formatNotFound(formatName, req, rsp);
       }
@@ -137,7 +137,7 @@ public class Formats extends PersistentList<Format> {
       req.getRequestDispatcher(JSP_CREATE).include(req, rsp);
       return Response.ok().build();
     }
-    format = new Format(name, makeFormatNamespace(req, "/wiki/formats/"+ name), "", title);
+    format = new Format(name, Util.getRootNamespace(req), "", title);
     save(format);
     req.setAttribute("format", format);
     req.setAttribute("formatName", format.getName());
@@ -242,7 +242,7 @@ public class Formats extends PersistentList<Format> {
     final List<Format> formats = query(Format.gqlFilterForMatchingFormat(formatName));
     Format format = null;
     if (formats.size() == 0) {
-      format = new Format(formatName, makeFormatNamespace(req), description, title);
+      format = new Format(formatName, Util.getRootNamespace(req), description, title);
       logger.info("Created: "+ format);
     } else {
       format = formats.get(0);
@@ -281,13 +281,5 @@ public class Formats extends PersistentList<Format> {
     req.setAttribute("format", format);
     logger.info(format.toString());
     req.getRequestDispatcher(JSP_SINGLE).include(req, rsp);
-  }
-
-  String makeFormatNamespace(final HttpServletRequest req) {
-    return makeFormatNamespace(req, req.getRequestURI());
-  }
-
-  String makeFormatNamespace(final HttpServletRequest req, final String uri) {
-    return Util.getHostURL(req) + uri;
   }
 }

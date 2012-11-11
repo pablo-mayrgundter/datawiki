@@ -12,8 +12,8 @@ import org.w3c.dom.Element;
  */
 public class XmlSerializerTest extends TestCase {
 
-  static final String FORMAT_NAME = "test";
-  static final String FORMAT_NS = "http://datawiki.googlelabs.com/wiki/test";
+  static final String FORMAT_NAME = "Format_name";
+  static final String FORMAT_NS = "http://datawiki.googlelabs.com/wiki/Format_name";
 
   static String makeTestSchema() {
     final Document schema =
@@ -34,9 +34,10 @@ public class XmlSerializerTest extends TestCase {
   }
 
   static String makeTestDoc(final String schema) {
-    final Document doc = XmlSerializer.getBuilder(schema).getDOMImplementation().createDocument(FORMAT_NS, FORMAT_NAME, null);
+    final Document doc = XmlSerializer.getBuilder(schema)
+      .getDOMImplementation().createDocument(FORMAT_NS, FORMAT_NAME, null);
     final Element root = doc.getDocumentElement();
-    //root.appendChild(doc.createElement("node"));
+    // root.appendChild(doc.createElement("node"));
     try {
       return XmlSerializer.toXml(doc);
     } catch(Exception e) {

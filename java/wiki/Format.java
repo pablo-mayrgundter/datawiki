@@ -30,17 +30,21 @@ public class Format extends MetaDocument<Format> {
   @Persistent
   public String flags = null;
 
-  public Format(final String name, final String namespace) {
-    this(name, namespace, "");
+  public Format(String namespace) {
+    this(Util.getNameFromNamespace(namespace), Util.getParentNamespace(namespace));
   }
 
-  public Format(final String name, final String namespace, final String description) {
-    this(name, namespace, description, name.replaceAll("_", " "));
+  public Format(String name, String parentNamespace) {
+    this(name, parentNamespace, "");
   }
 
-  public Format(final String name, final String namespace, final String description, final String title) {
+  public Format(String name, String parentNamespace, String description) {
+    this(name, parentNamespace, description, name.replaceAll("_", " "));
+  }
+
+  public Format(String name, String parentNamespace, String description, String title) {
     super(name, title, description);
-    this.namespace = Util.validFormatNamepsace(namespace);
+    this.namespace = Util.createNamespace(parentNamespace, name);
     fields = new ArrayList<FormField>();
   }
 

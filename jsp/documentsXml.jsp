@@ -24,23 +24,22 @@
   <title>Documents of format: <%= formatName %> from <%= request.getServerName() %></title>
   <link href="<%= wikiPage %>?output=xml" rel="self"/>
   <link href="<%= wikiPage %>" />
-  <id>urn:uuid:<%= java.util.UUID.randomUUID() %></id>
+  <id><%= wikiPage %></id>
   <updated><%= feedUpdateDate %></updated>
+  <generator>http://code.google.com/p/datawiki</generator>
 <%
   int count = 0;
   for (final MultiPartDocument doc : matchingDocs) {
     final String xml = XmlSerializer.toXml(doc, format);
-    
 %>
   <entry>
-    <title><%= formatName%> document #<%= count++ %></title>
+    <title>/<%= formatName %>/<%= doc.getId() %></title>
     <author><name>anonymous</name></author>
-    <summary>Serialized XML according to the format described at <%= wikiPage %></summary>
-    <link href="<%= host %>/wiki/<%= formatName %>/<%= doc.getId() %>"/>
-    <id>urn:uuid:<%= java.util.UUID.randomUUID() %></id>
+    <link href="<%= host %>/wiki/docs/<%= doc.getId() %>"/>
+    <id>urn:uuid:<%= java.util.UUID.nameUUIDFromBytes(xml.getBytes()) %></id>
     <updated><%= dateFormat.format(doc.getUpdatedDate()) %></updated>
     <content type="application/xml+<%= formatName %>">
-<%= xml %>
+      <%= Util.indent(xml, 6).trim() %>
     </content>
   </entry>
 <%
