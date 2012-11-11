@@ -8,13 +8,19 @@ ul.tabs {
 ul.tabs > li {
   float: left;
   position: relative;
-  top: 2px;
+  top: 1px;
   z-index: 1;
   margin-right: -3px;
-  padding: 0.5em 1em;
+  padding: 0.9em 1em;
+  height: 0.9em;
   background-color: #f7f7f7;
   border: solid 1px #a7d7f9;
   border-radius: 3px 3px 0 0;
+}
+
+ul > li.searchTab {
+  float: right;
+  margin-right: 0;
 }
 
 .tabs > li:first-child {
@@ -42,12 +48,4 @@ ul > li.activeTab {
 
 .activeTabbed {
   display: block;
-}
-
-ul > li.searchTab {
-  position: relative;
-  float: right;
-  top: 1px;
-  margin-right: 0;
-  padding: 0.5em 0.75em;
 }

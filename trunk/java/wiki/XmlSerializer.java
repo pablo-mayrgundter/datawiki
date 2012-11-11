@@ -46,10 +46,15 @@ public class XmlSerializer {
    *
    * @TODO(pmy): Use only the schema instead of the template.
    */
-  public static Format formatFromXml(final String name, final String schemaXml) throws SAXException, IOException {
+  public static Format formatFromXml(final String name, final String schemaXml)
+    throws SAXException, IOException {
     final LinkedHashMap<String,String> fieldValues = new LinkedHashMap<String,String>();
     final Element root = fromXml(schemaXml, null, fieldValues, false);
-    final Format format = new Format(name, root.getAttribute("targetNamespace"));
+    String ns = root.getAttribute("targetNamespace");
+    if (!Util.getNameFromNamespace(ns).equals(name)) {
+      throw new IllegalArgumentException("Given schema's targetNamespace does not match the given format name");
+    }
+    final Format format = new Format(ns);
     format.setSchema(schemaXml);
     return format;
   }
@@ -59,7 +64,8 @@ public class XmlSerializer {
    * nodes as the field names.  The root node prefix is stripped from
    * path names.
    */
-  public static MultiPartDocument docFromXml(final String xml, final String schema) throws SAXException, IOException {
+  public static MultiPartDocument docFromXml(final String xml, final String schema)
+    throws SAXException, IOException {
     final LinkedHashMap<String,String> fieldValues = new LinkedHashMap<String,String>();
     final Node root = fromXml(xml, schema, fieldValues, true);
     final MultiPartDocument doc = new MultiPartDocument(root.getLocalName());
@@ -143,8 +149,8 @@ public class XmlSerializer {
   static String toXml(final Format format, final String formatName, final String formatNamespace,
                       final LinkedHashMap<String,String> fieldValues, final boolean emitValues)
     throws TransformerException {
-    final Document doc = getBuilder(emitValues ? format.getSchema() : null).getDOMImplementation().createDocument(formatNamespace,
-                                                                                                                  formatName, null);
+    final Document doc = getBuilder(emitValues ? format.getSchema() : null)
+      .getDOMImplementation().createDocument(formatNamespace, formatName, null);
 
     final Stack<Node> nodeStack = new Stack<Node>();
     nodeStack.push(doc.getDocumentElement());

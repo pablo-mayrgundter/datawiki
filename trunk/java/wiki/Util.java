@@ -13,6 +13,25 @@ public class Util {
   public static final String XML_SAFE_CHARS = "-a-zA-Z_";
   public static final String XML_SAFE_STRING = String.format("^[%s]+$", XML_SAFE_CHARS);
 
+  // String utils
+  /**
+   * Prefix each line of the string with the given number of spaces.
+   * This includes the first line unless the string is empty, in which
+   * case the given string is itself returned.
+   */
+  public static String indent(String s, int numSpaces) {
+    // Special case of not prefixing with tab if string is
+    if (s.equals("")) {
+      return s;
+    }
+    String tab = "";
+    for (int i = 0; i < numSpaces; i++) {
+      tab += " ";
+    }
+    return tab + s.replaceAll("\n", "\n" + tab);
+  }
+
+  // XSS utils
   /**
    * Implements ESAPI's Rule #1 escaping.
    * TODO(pmy): replace with ESAPI.
@@ -72,11 +91,69 @@ public class Util {
    */
   static String validFormatName(final String s) {
     if (!s.matches(XML_SAFE_STRING)) {
-      throw new IllegalArgumentException(String.format("The given name cannot be used."
+      throw new IllegalArgumentException(String.format("The given name (%s) cannot be used.  "
                                                        + "It must match only these characters: "
-                                                       + XML_SAFE_CHARS));
+                                                       + XML_SAFE_CHARS, s));
     }
     return s;
+  }
+
+  // Namepaces.
+
+  /**
+   * Given /foo/bar/baz/, will return /foo/bar/.
+   *
+   * @throws IllegalArgumentException if no slash is present or if the
+   * only slash present is the terminal character.
+   */
+  static String getParentNamespace(String namespace) {
+    int ndx = namespace.lastIndexOf("/");
+    if (ndx == -1) {
+      throw new IllegalArgumentException("Malformed namespace, must have at least one slash.");
+    }
+    if (ndx == namespace.length() - 1) {
+      ndx = namespace.lastIndexOf("/", ndx - 1);
+      if (ndx == -1) {
+        throw new IllegalArgumentException("Namespace has no parent, must have at least one non-terminal slash.");
+      }
+    }
+    // Include trailing "/".
+    return namespace.substring(0, ndx + 1);
+  }
+
+  /**
+   * Given /foo/bar/baz/, will return baz.
+   */
+  static String getNameFromNamespace(String namespace) {
+    String [] parts = namespace.split("/");
+    return parts[parts.length - 1];
+  }
+
+  /**
+   * The root namespace for this server.  This is inferred from the
+   * given request, e.g. "http://localhost:8080/wiki/".
+   */
+  static String getRootNamespace(HttpServletRequest req) {
+    return getHostURL(req) + "/wiki/";
+  }
+
+  /**
+   * Create a new namespace with the given name under the given
+   * parentNamespace.
+   *
+   * NOTE: it's good practice to ensure a trailing slash on a
+   * namespace, but this method does not.  This is because the
+   * namespaces are also wiki-style article names.
+   *
+   * @throws IllegalArgumentException if the given name is invalid or
+   * if the new namespace is invalid.
+   */
+  static String createNamespace(String parentNamespace, String name) {
+    if (!parentNamespace.endsWith("/")) {
+      parentNamespace += "/";
+    }
+    validFormatName(name);
+    return validFormatNamespace(parentNamespace + name);
   }
 
   /**
@@ -86,7 +163,7 @@ public class Util {
    * @throws IllegalArgumentException If the given string is not
    * valid to use as a namespace.
    */
-  static String validFormatNamepsace(final String s) {
+  static String validFormatNamespace(final String s) {
     try {
       new URI(s);
       return s;
