@@ -4,7 +4,7 @@
   links.put("Home", "/");
   links.put("Project", "http://code.google.com/p/datawiki/");
 %><!-- nav -->
-<span class="sidePanel trans">
+<span class="sidePanel">
 <%
   for (final String name : links.keySet()) {
     final String link = links.get(name);

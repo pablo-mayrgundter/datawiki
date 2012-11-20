@@ -23,7 +23,7 @@
       </div>
 
       <h1>Create Format</h1>
-      <form action="/wiki/formats" method="POST" enctype="multipart/form-data" id="createForm">
+      <form action="/formats" method="POST" enctype="multipart/form-data" id="createForm">
         <p>Title:<br/>
           <input id="newFormatTitle" name="title" value="" onchange="creator.checkValid()"/><em class="warning"></em>
         </p>

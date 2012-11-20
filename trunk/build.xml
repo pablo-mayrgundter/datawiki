@@ -2,56 +2,54 @@
 <project name="datawiki" basedir="." default="war">
   <property environment="env"/>
   <fail message="Error: must set environment variable GAE_HOME" unless="env.GAE_HOME"/>
-  <property name="appengine.home" value="${env.GAE_HOME}"/>
+  <property name="appengine.sdk" value="${env.GAE_HOME}"/>
   <property name="appname" value="datawiki"/>
   <property name="classes" value="build/classes"/>
   <property name="srcDir" value="${basedir}/java"/>
-  <import file="ant-macros.xml"/>
+  <import file="${appengine.sdk}/config/user/ant-macros.xml" />
 
   <target name="init">
     <mkdir dir="build"/>
-    <mkdir dir="build/classes"/>
+    <mkdir dir="${classes}"/>
     <mkdir dir="build/lib"/>
     <copy toDir="build/lib" failonerror="true" flatten="true">
       <fileset dir="lib">
-        <include name="**/*.jar"/>
-      </fileset>
-      <fileset dir="${appengine.home}/lib/shared">
-        <include name="**/*.jar"/>
-        <exclude name="**/jsp/**"/>
-      </fileset>
-      <fileset dir="${appengine.home}/lib/user">
-        <include name="**/*.jar"/>
-      </fileset>
-      <fileset dir="${appengine.home}/lib/testing">
         <include name="**/*.jar"/>
       </fileset>
     </copy>
   </target>
 
   <target name="clean">
+    <delete dir="war/WEB-INF/appengine-generated"/>
+    <delete dir="war/WEB-INF/lib"/>
     <delete dir="build"/>
-    <delete dir="war"/>
+    <delete verbose="true">
+      <fileset dir="java" includes="**/*.class" />
+      <fileset dir="test" includes="**/*.class" />
+      <fileset dir="." defaultexcludes="no" includes="**/*~" />
+    </delete>
   </target>
 
   <path id="classpath">
     <fileset dir="build/lib">
       <include name="*.jar"/>
     </fileset>
-    <fileset dir="${appengine.home}/lib/user">
-      <include name="*.jar"/>
+    <fileset dir="${appengine.sdk}/lib">
+      <include name="impl/*.jar"/>
+      <include name="shared/**/*.jar"/>
+      <include name="user/**/*.jar"/>
+      <include name="testing/appengine-testing.jar"/>
     </fileset>
   </path>
 
-  <target name="classpath.print" depends="init">
+  <target name="classpath" depends="init">
     <property name="cp" refid="classpath"/>
-    <echo message="export CLASSPATH=${cp}:${srcDir}"></echo>
+    <echo message="export CLASSPATH=${cp}:${basedir}/java"></echo>
   </target>
 
   <target name="compile" depends="init">
-    <javac debug="on" memoryMaximumSize="256m" memoryInitialSize="256m"
-           fork="true" destdir="${classes}" includeantruntime="false">
-      <!--<compilerarg value="-Xlint"/>-->
+    <javac debug="on" fork="true" destdir="${classes}" includeantruntime="false">
+      <compilerarg value="-Xlint"/>
       <classpath refid="classpath"/>
       <src path="java"/>
       <src path="test"/>
@@ -60,10 +58,10 @@
 
   <target name="enhance" depends="compile">
     <enhance failonerror="true">
-      <jvmarg value="-Dappengine.sdk.root=${appengine.home}"/>
+      <jvmarg value="-Dappengine.sdk.root=${appengine.sdk}"/>
       <classpath>
         <path refid="classpath"/>
-        <pathelement location="build/classes"/>
+        <pathelement location="${classes}"/>
         <pathelement path="${appengine.tools.classpath}"/>
       </classpath>
       <fileset dir="${classes}" includes="wiki/AbstractDocument.class"/>
@@ -75,8 +73,19 @@
     </enhance>
   </target>
 
-  <target name="test" depends="enhance">
-    <junit fork="true" showoutput="true">
+  <target name="jar" depends="enhance">
+    <jar destfile="build/lib/${appname}.jar" basedir="${classes}">
+      <manifest>
+        <attribute name="Built-By" value="${user.name}"/>
+        <attribute name="Implementation-Vendor" value="Google"/>
+        <attribute name="Implementation-Title" value="{$appname}"/>
+        <attribute name="Implementation-Version" value="0.1"/>
+      </manifest>
+    </jar>
+  </target>
+
+  <target name="test" depends="jar">
+    <junit fork="true" showoutput="true" haltonfailure="true">
       <classpath>
         <path>
           <path refid="classpath"/>
@@ -88,71 +97,28 @@
     </junit>
   </target>
 
-  <target name="jar" depends="test">
-    <jar destfile="build/lib/${appname}.jar" basedir="build/classes">
-      <manifest>
-        <attribute name="Built-By" value="${user.name}"/>
-        <attribute name="Implementation-Vendor" value="Google"/>
-        <attribute name="Implementation-Title" value="{$appname}"/>
-        <attribute name="Implementation-Version" value="0.1"/>
-      </manifest>
-    </jar>
-  </target>
-
-  <!-- Standalone target for now to create shared common.jar for other .org projects. -->
-  <target name="common-src" depends="compile">
-    <jar destfile="build/src/common-src.jar" basedir="${srcDir}" includes="common/*.java">
-      <manifest>
-        <attribute name="Built-By" value="${user.name}"/>
-        <attribute name="Implementation-Vendor" value="Google"/>
-        <attribute name="Implementation-Title" value="{$appname}"/>
-        <attribute name="Implementation-Version" value="0.1"/>
-      </manifest>
-    </jar>
-  </target>
-
-  <!-- Standalone target for now to create shared common.jar for other .org projects. -->
-  <target name="common-jar" depends="common-src">
-    <jar destfile="build/lib/common.jar" basedir="build/classes" includes="common/**">
-      <manifest>
-        <attribute name="Built-By" value="${user.name}"/>
-        <attribute name="Implementation-Vendor" value="Google"/>
-        <attribute name="Implementation-Title" value="{$appname}"/>
-        <attribute name="Implementation-Version" value="0.1"/>
-      </manifest>
-    </jar>
-  </target>
-
   <target name="war" depends="jar">
-    <mkdir dir="war"/>
-    <mkdir dir="war/WEB-INF"/>
-    <copy toDir="war/WEB-INF" failonerror="true">
-      <fileset dir="config/WEB-INF/"/>
-    </copy>
     <mkdir dir="war/WEB-INF/appengine-generated"/>
-    <mkdir dir="war/WEB-INF/static"/>
-    <copy toDir="war" failonerror="true">
-      <fileset dir="css"/>
-      <fileset dir="html"/>
-      <fileset dir="img"/>
-      <fileset dir="js"/>
-      <fileset dir="jsp"/>
-    </copy>
     <mkdir dir="war/WEB-INF/lib"/>
     <copy toDir="war/WEB-INF/lib" failonerror="true">
-      <fileset dir="lib">
-        <include name="*.jar"/>
-      </fileset>
       <fileset dir="build/lib">
         <include name="*.jar"/>
       </fileset>
-      <fileset dir="${appengine.home}/lib/user">
-	<include name="*.jar"/>
+      <fileset dir="build">
+        <include name="${ant.project.name}.jar"/>
+      </fileset>
+      <fileset dir="${appengine.sdk}/lib/user">
+        <include name="*.jar"/>
       </fileset>
     </copy>
   </target>
 
-  <target name="server" depends="war">
-    <dev_appserver war="war"/>
+  <target name="server" depends="war"
+          description="Starts the development server.">
+    <dev_appserver war="war" address="0.0.0.0">
+      <options>
+        <arg value="--disable_update_check"/>
+      </options>
+    </dev_appserver>
   </target>
 </project>

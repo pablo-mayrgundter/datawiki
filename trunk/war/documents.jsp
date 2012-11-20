@@ -31,7 +31,7 @@
     <div class="mainPanel trans">
       <ul class="tabs">
         <li class="activeTab">Dataset</li>
-        <li><a href="/wiki/formats/<%= formatName %>">Format</a></li>
+        <li><a href="/formats/<%= formatName %>">Format</a></li>
         <jsp:include page="search.jsp"/>
       </ul>
       <div id="formatBox" class="box tabbed activeTabbed">

@@ -1,7 +1,6 @@
-<%@page import="wiki.Format,wiki.FormField,wiki.Util"%>
+<%@page import="wiki.Util"%>
 <%
   final String formatName = (String) request.getAttribute("formatName");
-  final Format format = (Format) request.getAttribute("format");
   final String formId = Util.encodeForHTML(request.getParameter("jspFormId"));
   final String action = Util.encodeForHTML(request.getParameter("jspFormAction"));
   final String method = Util.encodeForHTML(request.getParameter("jspFormMethod"));
@@ -17,12 +16,13 @@
 %>
   <table id="<%= formId %>-table" class="form">
 <% 
-  if (format != null) {
-    int fieldCount = 0;
-    for (final FormField field : format.getFields()) {
-      final String name = Util.encodeForHTML(field.getName());
-      final String text = Util.encodeForHTML(field.getText());
-      String value = field.getValue(); // i.e. default value.
+  int fieldCount = 0;
+  String [][] fields = {{"formatName1", "formatText1", "formatValue1"},
+                        {"formatName1", "formatText1", "formatValue1"}};
+  for (final String [] field : fields) {
+      final String name = Util.encodeForHTML(field[0]);
+      final String text = Util.encodeForHTML(field[1]);
+      String value = field[2]; // i.e. default value.
       if (request.getParameter("q") != null && request.getParameter(name) != null) {
         value = request.getParameter(name);
       }
@@ -39,7 +39,6 @@
       </td>
     </tr>
 <%
-    }
   }
 %>
     <tr>

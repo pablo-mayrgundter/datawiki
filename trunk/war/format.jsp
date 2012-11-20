@@ -23,7 +23,7 @@
   <body onload="Format(<%= startEdit %>);">
     <jsp:include page="onebar.jsp"/>
     <jsp:include page="nav.jsp"/>
-    <div class="mainPanel trans">
+    <div class="mainPanel">
       <ul class="tabs">
         <li><a href="/wiki/<%= safeName %>">Dataset</a></li>
         <li class="activeTab">Format</li>
