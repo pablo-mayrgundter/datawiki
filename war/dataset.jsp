@@ -9,40 +9,34 @@
   boolean hasGeep = geepServer != null;
   boolean showGeo = hasGeo && (online || hasGeep);
 %>
-<script>
- Documents();
-<% if (!online && showGeo) { %>
- InitMap();
-<% } %>
-</script>
 <div class="mainPanel" ng-controller="DatasetCtrl">
   <ul class="tabs">
+    <li id="mainTab"><a href="/#" tabindex="0">Welcome!</a></li>
     <li class="activeTab"><a tabindex="0">Dataset</a></li>
-    <li><a href="#/format/formatName" tabindex="0">Format</a></li>
+    <li><a href="#/format/{{formatName}}" tabindex="0">Format</a></li>
     <jsp:include page="search.jsp"/>
   </ul>
   <div id="formatBox" class="box tabbed activeTabbed">
     <div id="formatPanelLeft">
-      TODO: datasetSummary.jsp
-      <p>Format: {{format}}
+      <p>{{format.description}}</p>
     </div>
     <div id="formatPanelRight">
       <ul id="formTabs" class="tabs">
-        <li class="activeTab"><a tabindex="0">Find</a></li>
-        <li><a tabindex="0">Create</a></li>
+        <li class="activeTab"><a tabindex="0">Create</a></li>
+        <li><a tabindex="0">Find</a></li>
       </ul>
       <div id="tabbedForms">
-        <jsp:include page="form.jsp">
-          <jsp:param name="jspFormId" value="formFind"/>
-          <jsp:param name="jspFormTitle" value="Find"/>
-          <jsp:param name="jspFormMethod" value="GET"/>
-          <jsp:param name="jspFormAction" value="/wiki/TODO_formatName"/>
-        </jsp:include>
         <jsp:include page="form.jsp">
           <jsp:param name="jspFormId" value="formCreate"/>
           <jsp:param name="jspFormTitle" value="Create"/>
           <jsp:param name="jspFormMethod" value="POST"/>
-          <jsp:param name="jspFormAction" value="/wiki/TODO_formatName"/>
+          <jsp:param name="jspFormAction" value="/wiki/{{datasetName}}"/>
+        </jsp:include>
+        <jsp:include page="form.jsp">
+          <jsp:param name="jspFormId" value="formFind"/>
+          <jsp:param name="jspFormTitle" value="Find"/>
+          <jsp:param name="jspFormMethod" value="GET"/>
+          <jsp:param name="jspFormAction" value="/wiki/{{datasetName}}"/>
           <jsp:param name="jspFormActive" value="false"/>
         </jsp:include>
       </div>

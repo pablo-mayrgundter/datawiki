@@ -8,12 +8,12 @@
       <!-- <img alt="TODO/qrcode" src="TODO/qrcode" style="margin-bottom: 1em"/><br/> -->
       Scannable link to this page
     </div>
-    <p><a href="#/wiki/{{dataset}}">
+    <p><a href="#/wiki/{{datasetName}}">
         « Return to dataset
     </a></p>
     <h2>Fields</h2>
     <div style="width: 50%">
-      <form action="/wiki/{{dataset}}/{{id}}" method="POST" enctype="multipart/form-data">
+      <form action="/wiki/{{datasetName}}/{{docId}}" method="POST" enctype="multipart/form-data">
         <table class="form">
           <tr ng-repeat="(key,val) in document">
             <td><label for="{{key}}">{{key}}</label>:</td>

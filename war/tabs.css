@@ -18,6 +18,10 @@ ul.tabs > li {
   border-radius: 3px 3px 0 0;
 }
 
+#mainTab {
+  margin-right: 2em;
+}
+
 ul > li.searchTab {
   float: right;
   margin-right: 0;

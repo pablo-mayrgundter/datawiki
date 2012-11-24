@@ -7,6 +7,7 @@ body {
   font-family: Arial,sans-serif;
 /*  background: no-repeat url(/ears.png); */
 /*  background-position: 300px -10px; */
+  margin: 3em;
 }
 
 a {
@@ -96,28 +97,6 @@ pre {
 #searchForm button {
   height: 2em;
   border: none;
-}
-
-/* The next two together put the nav text and the main tab level, and
-   then margin-top for .mainPanel moves it up to align the text. */
-.sidePanel {
-  position: absolute;
-  left: 0;
-  width: 60px;
-  padding: 26px 0.5em 1em 1em;
-}
-
-.sidePanel li {
-  list-style-type: none;
-  margin-bottom: 5px;
-}
-
-.mainPanel {
-  position: absolute;
-  left: 80px;
-  min-width: 400px;
-  right: 1em;
-  padding: 1em;
 }
 
 .mainPanel > h2 {
