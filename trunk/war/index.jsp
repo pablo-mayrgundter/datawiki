@@ -6,8 +6,6 @@
     <link rel="stylesheet" href="index.css" type="text/css"/>
   </head>
   <body ng-controller="WikiCtrl">
-    <jsp:include page="onebar.jsp"/>
-    <jsp:include page="nav.jsp"/>
     <div ng-view></div>
   </body>
 </html>
