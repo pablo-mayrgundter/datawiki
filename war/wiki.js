@@ -36,7 +36,7 @@ function DatasetCtrl($scope, $http, $routeParams, Format, Dataset) {
   $scope.format = Format.get({name: $routeParams.datasetName}, function(f) {});
   $scope.dataset = Dataset.get({name: $routeParams.datasetName}, function(d) {});
   $http({method: 'GET',
-        url: '/wiki/schema(' + $routeParams.datasetName + '}'})
+        url: '/wiki/schema(' + $routeParams.datasetName + ')'})
     .success(function(f) {
         $scope.format.schema = f;
       })
