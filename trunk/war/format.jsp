@@ -3,13 +3,10 @@
 <script src="/FormConverter.js" type="text/javascript"></script>
 <script src="/FieldEditor.js" type="text/javascript"></script>
 <link rel="stylesheet" href="/format.css" type="text/css"/>
-<script>
-  Format(false);
-</script>
-<div class="mainPanel" ng-controller="FormatCtrl">
+<div class="mainPanel" ng-controller="DatasetCtrl">
   <ul class="tabs">
     <li id="mainTab"><a href="/#" tabindex="0">Welcome!</a></li>
-    <li><a href="#/wiki/{{formatName}}">Dataset</a></li>
+    <li><a href="#/wiki/{{datasetName}}">Dataset</a></li>
     <li class="activeTab">Format</li>
     <jsp:include page="search.jsp"/>
   </ul>
@@ -25,8 +22,6 @@
         <jsp:include page="form.jsp">
           <jsp:param name="jspFormId" value="formEdit"/>
           <jsp:param name="jspFormTitle" value="Edit"/>
-          <jsp:param name="jspFormMethod" value="GET"/>
-          <jsp:param name="jspFormAction" value="/format/{{formatName}}"/>
         </jsp:include>
       </div>
     </div>
