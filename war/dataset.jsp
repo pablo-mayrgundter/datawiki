@@ -11,9 +11,9 @@
 %>
 <div class="mainPanel" ng-controller="DatasetCtrl">
   <ul class="tabs">
-    <li id="mainTab"><a href="/#" tabindex="0">Welcome!</a></li>
+    <li id="mainTab"><a ng-href="/#" tabindex="0">Welcome!</a></li>
     <li class="activeTab"><a tabindex="0">Dataset</a></li>
-    <li><a href="#/format/{{formatName}}" tabindex="0">Format</a></li>
+    <li><a ng-href="#/format/{{datasetName}}" tabindex="0">Format</a></li>
     <jsp:include page="search.jsp"/>
   </ul>
   <div id="formatBox" class="box tabbed activeTabbed">
@@ -21,24 +21,27 @@
       <p>{{format.description}}</p>
     </div>
     <div id="formatPanelRight">
-      <ul id="formTabs" class="tabs">
-        <li class="activeTab"><a tabindex="0">Create</a></li>
-        <li><a tabindex="0">Find</a></li>
+      <ul id="formTabs" class="tabs" ng-init="ftc='activeTab';ffc='activeTabbed';ctc='';cfc='tabbed'">
+        <li class="{{ftc}}">
+          <a tabindex="0" ng-click="ftc='activeTab';ffc='activeTabbed';ctc='';cfc='tabbed'">Find</a>
+        </li>
+        <li class="{{ctc}}">
+          <a tabindex="0" ng-click="ftc='';ffc='tabbed';ctc='activeTab';cfc='activeTabbed'">Create</a>
+        </li>
       </ul>
       <div id="tabbedForms">
-        <jsp:include page="form.jsp">
-          <jsp:param name="jspFormId" value="formCreate"/>
-          <jsp:param name="jspFormTitle" value="Create"/>
-          <jsp:param name="jspFormMethod" value="POST"/>
-          <jsp:param name="jspFormAction" value="/wiki/{{datasetName}}"/>
-        </jsp:include>
-        <jsp:include page="form.jsp">
-          <jsp:param name="jspFormId" value="formFind"/>
-          <jsp:param name="jspFormTitle" value="Find"/>
-          <jsp:param name="jspFormMethod" value="GET"/>
-          <jsp:param name="jspFormAction" value="/wiki/{{datasetName}}"/>
-          <jsp:param name="jspFormActive" value="false"/>
-        </jsp:include>
+        <div class="{{ffc}}">
+          <jsp:include page="form.jsp">
+            <jsp:param name="jspFormId" value="formFind"/>
+            <jsp:param name="jspFormTitle" value="Find"/>
+          </jsp:include>
+        </div>
+        <div class="{{cfc}}">
+          <jsp:include page="form.jsp">
+            <jsp:param name="jspFormId" value="formCreate"/>
+            <jsp:param name="jspFormTitle" value="Create"/>
+          </jsp:include>
+        </div>
       </div>
     </div>
     <div>&nbsp;</div>
@@ -59,7 +62,7 @@
                 <th></th>
               </tr>
               <tr ng-repeat="(id,info) in dataset">
-                <td><a href="#/wiki{{id}}">{{id}}</a></td>
+                <td><a ng-href="#/wiki{{id}}">{{id}}</a></td>
                 <td ng-repeat="val in info">
                   {{val}}
                 </td>

@@ -1,4 +1,3 @@
-console.log('Documents script loaded.');
 function Documents() {
   console.log('Documents script init.');
   new Tabs(get('formTabs').getElementsByTagName('li'),

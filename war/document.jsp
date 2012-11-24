@@ -13,12 +13,12 @@
     </a></p>
     <h2>Fields</h2>
     <div style="width: 50%">
-      <form action="/wiki/{{datasetName}}/{{docId}}" method="POST" enctype="multipart/form-data">
+      <form ng-submit="update()">
         <table class="form">
           <tr ng-repeat="(key,val) in document">
             <td><label for="{{key}}">{{key}}</label>:</td>
             <td>
-              <input name="{{key}}" value="{{val}}"/>
+              <input name="{{key}}" ng-model="document[key]"/>
             </td>
           </tr>
           <tr>
