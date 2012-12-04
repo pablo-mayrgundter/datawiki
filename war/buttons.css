@@ -1,12 +1,10 @@
-.button {
+.button, .buttons input[type=submit], .buttons input[type=reset] {
   height: 2.4em;
   margin: 0;
+  font-size: 1em;
   white-space: nowrap;
-  color: #333;
-  font-weight: bold;
   background-color: #f7f7f7;
-  border: solid 1px #bbb;
-  border-radius: 2px;
+  border-radius: 5px;
   cursor: pointer;
 }
 

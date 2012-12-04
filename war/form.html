@@ -1,19 +1,6 @@
-<%@page import="wiki.Util"%>
-<%
-  final String formId = Util.encodeForHTML(request.getParameter("jspFormId"));
-  if (formId.equals("formFind")) {
-%>
-<form name="<%= formId %>" id="<%= formId %>" ng-submit="find()" ng-controller="DatasetCtrl">
-  <input name="q" value="" type="hidden"/>
-<%
-  } else {
-%>
-<form name="<%= formId %>" id="<%= formId %>" ng-submit="create()" ng-controller="DatasetCtrl">
-<%
-  }
-%>
+<form name="{{formId}}" id="{{formId}}" ng-submit="{{formAction}}">
   <table class="form">
-    <tr ng-repeat="(key,val) in format">
+    <tr ng-repeat="(key,val) in noMetaFilter(format)">
       <td><label for="{{ key }}">{{ key }}</label>:</td>
       <td>
         <input name="{{ key }}" ng-model="queryForm[key]">
@@ -27,7 +14,7 @@
       <td colspan="2">
         <div class="buttons formButtons">
           <input type="submit" value="Submit"/>
-          <input type="reset" value="Clear" onclick="clearForm('<%= formId %>')"/>
+          <input type="reset" value="Clear"/>
         </div>
       </td>
     </tr>

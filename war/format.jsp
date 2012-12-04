@@ -5,10 +5,9 @@
 <link rel="stylesheet" href="/format.css" type="text/css"/>
 <div class="mainPanel" ng-controller="DatasetCtrl">
   <ul class="tabs">
-    <li id="mainTab"><a href="/#" tabindex="0">Welcome!</a></li>
-    <li><a href="#/wiki/{{datasetName}}">Dataset</a></li>
+    <li id="mainTab"><a href="/#" tabindex="0">DataWiki</a></li>
+    <li><a href="#/wiki/{{datasetName}}">{{datasetName}}</a></li>
     <li class="activeTab">Format</li>
-    <jsp:include page="search.jsp"/>
   </ul>
   <div id="formatBox" class="box">
     <div id="formatPanelLeft">

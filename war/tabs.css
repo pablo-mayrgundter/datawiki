@@ -10,29 +10,19 @@ ul.tabs > li {
   position: relative;
   top: 1px;
   z-index: 1;
-  margin-right: -3px;
+  margin-right: -1px;
   padding: 0.9em 1em;
   height: 0.9em;
   background-color: #f7f7f7;
   border: solid 1px #a7d7f9;
-  border-radius: 3px 3px 0 0;
-}
-
-#mainTab {
-  margin-right: 2em;
-}
-
-ul > li.searchTab {
-  float: right;
-  margin-right: 0;
 }
 
 .tabs > li:first-child {
-  border-top-left-radius: 3px;
+  border-top-left-radius: 5px;
 }
 
 .tabs > li:last-child {
-  border-top-right-radius: 3px;
+  border-top-right-radius: 5px;
 }
 
 ul > li.activeTab {

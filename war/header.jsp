@@ -23,4 +23,5 @@
     <script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=false"></script>
 <% } %>
     <script src="/Documents.js" type="text/javascript"></script>
+    <script src="/FormEditor.js" type="text/javascript"></script>
     <link href="/documents.css" rel="stylesheet" type="text/css"/>
