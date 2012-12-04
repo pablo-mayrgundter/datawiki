@@ -35,6 +35,10 @@ h3 {
   margin: 0.25em 0px;
 }
 
+table, label, input {
+  font-size: 1em;
+}
+
 input[readonly] {
   background-color: inherit;
   border: none;
@@ -59,6 +63,16 @@ pre {
 }
 
 /* Elements */
+
+.mainPanel > h2 {
+  margin-top: 0;
+}
+
+.box {
+  padding: 1em;
+  border: solid 1px #a7d7f9;
+  background-color: white;
+}
 
 /* Onebar */
 
@@ -89,22 +103,14 @@ pre {
 
 #searchForm input {
   height: 2em;
+  font-size: 1em;
+  padding: 0.5em;
+  margin: -1em 0 0 -0.5em;
   border: solid 1px #ccc;
-  padding: 0 3px;
-  margin: 0 5px 0 0;
+  border-radius: 3px;
 }
 
 #searchForm button {
   height: 2em;
   border: none;
-}
-
-.mainPanel > h2 {
-  margin-top: 0;
-}
-
-.box {
-  padding: 1em;
-  border: solid 1px #a7d7f9;
-  background-color: white;
 }

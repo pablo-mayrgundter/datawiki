@@ -2,8 +2,9 @@
  * The FormEditor provides UI actions for adding, deleting and
  * modifying form fields.
  */
-function FormEditor(startEdit) {
-  this.form = get('formEdit');
+function FormEditor(eltName, startEdit) {
+  this.formId = eltName;
+  this.form = get(this.formId);
   this.init();
   if (startEdit) {
     this.editForm(get('button-form-edit'));
@@ -38,11 +39,11 @@ FormEditor.prototype.addEditButtonActions = function(editButton, deleteButton) {
 FormEditor.prototype.editForm = function(button) {
 
   // Activate hover behavior.
-  addClass(get('formEdit-table'), 'editing');
+  addClass(get(this.formId + '-formEdit-table'), 'editing');
 
   // Deactivate buttons.
   this.form.onsubmit = function(){ return false; };
-  get('formEdit-buttons').style.display = 'none';
+  get(this.formId += '-formEdit-buttons').style.display = 'none';
 
   // Deactivate input elements.
   var elts = this.form.getElementsByTagName('input');
@@ -60,33 +61,37 @@ FormEditor.prototype.editForm = function(button) {
 
   // Title editing control.
   var title = get('title');
-  var curTitle = title.innerHTML;
-  var titleEdit = create('input', {'id':'titleEdit',
-                                   'name':'title',
-                                   'size':'40',
-                                   'value':curTitle});
-  child = title.childNodes[0];
-  if (child)
-    title.removeChild(child);
-  add(title, 'label', {'for':'titleEdit'}, 'Title:');
-  title.appendChild(titleEdit);
+  if (title) {
+    var curTitle = title.innerHTML;
+    var titleEdit = create('input', {'id':'titleEdit',
+                                     'name':'title',
+                                     'size':'40',
+                                     'value':curTitle});
+    child = title.childNodes[0];
+    if (child) {
+      title.removeChild(child);
+    }
+    add(title, 'label', {'for':'titleEdit'}, 'Title:');
+    title.appendChild(titleEdit);
+  }
 
   // Description editing control.
   var desc = get('description');
-  var curText = desc.innerHTML;
-  var ta = create('textarea', {'id':'descEdit',
-                               'name':'description',
-                               'cols':'80',
-                               'rows':'20'},
-                  curText);
-  var child = desc.childNodes[0];
-  if (child)
-    desc.removeChild(child);
-  add(desc, 'label', {'for':'descEdit'}, 'Description:');
-  desc.appendChild(ta);
-
-  this.newFieldButton(button);
-  titleEdit.focus();
+  if (desc) {
+    var curText = desc.innerHTML;
+    var ta = create('textarea', {'id':'descEdit',
+                                 'name':'description',
+                                 'cols':'80',
+                                 'rows':'20'},
+      curText);
+    var child = desc.childNodes[0];
+    if (child)
+      desc.removeChild(child);
+    add(desc, 'label', {'for':'descEdit'}, 'Description:');
+    desc.appendChild(ta);
+    this.newFieldButton(button);
+    titleEdit.focus();
+  }
 
   // Change save button behavior.
   button.onclick = func(this, this.saveForm, [button]);

@@ -1,8 +1,6 @@
 @import '/main.css';
 
 .activeTab {
-  font-weight: bold;
-  color: green;
 }
 
 #featured {

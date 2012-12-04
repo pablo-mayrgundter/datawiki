@@ -1,0 +1,80 @@
+<div class="mainPanel" ng-controller="DatasetCtrl">
+  <ul class="tabs">
+    <li id="mainTab"><a ng-href="/#" tabindex="0">DataWiki</a></li>
+    <li class="activeTab"><a tabindex="0">{{datasetName}}</a></li>
+  </ul>
+  <div id="formatBox" class="box tabbed activeTabbed">
+    <div id="formatPanelLeft">
+      <h1>{{datasetName}}</h1>
+      <p>{{format.description}}</p>
+    </div>
+    <div id="formatPanelRight">
+      <ul id="formTabs" class="tabs" ng-init="ftc='activeTab';ffc='activeTabbed';ctc='';cfc='tabbed'">
+        <li class="{{ftc}}">
+          <a tabindex="0" ng-click="ftc='activeTab';ffc='activeTabbed';ctc='';cfc='tabbed'">Find</a>
+        </li>
+        <li class="{{ctc}}">
+          <a tabindex="0" ng-click="ftc='';ffc='tabbed';ctc='activeTab';cfc='activeTabbed'">Create</a>
+        </li>
+      </ul>
+      <div id="tabbedForms">
+        <div class="{{ffc}}" ng-init="formId=formFind;formAction=find">
+          <div ng-include src="'form.html'"></div>
+        </div>
+        <div class="{{cfc}}" ng-init="formId=formCreate;formAction=create">
+          <div ng-include src="'form.html'"></div>
+        </div>
+      </div>
+    </div>
+    <div>&nbsp;</div>
+  </div>
+  <ul id="chartTabs" class="tabs">
+    <li class="activeTab"><a tabindex="0">Data</a></li>
+    <!-- TODO(pmy): <li><a ng-href="#/format/{{datasetName}}" tabindex="0">Format</a></li> -->
+    <!-- TODO(pmy): <li><a tabindex="0">Stats</a></li> -->
+  </ul>
+  <div id="tabbedCharts">
+    <div id="detailCharts" class="box tabbed chart activeTabbed">
+      <table>
+        <tr>
+          <td width="100%" valign="top">
+            <table id="doclist">
+              <tr>
+                <th style="width: 2em">ID</th>
+                <th ng-repeat="(key,val) in noMetaFilter(format)">{{key}}</th>
+              </tr>
+              <tr ng-repeat="(path,obj) in dataset">
+                <td><a ng-href="#/wiki{{path}}">{{idDisplay(path)}}</a></td>
+                <td ng-repeat="(key,val) in noMetaFilter(format)">
+                  {{dataDisplay(obj, key)}}
+                </td>
+              </tr>
+            </table>
+            <!--
+                <div id="listChart">
+                  <div style="margin: 1em"><img src="/loader.gif" alt="Loading..."></div>
+                </div>
+                -->
+          </td>
+        </tr>
+      </table>
+    </div>
+    <div id="statsCharts" class="box tabbed chart">
+      <table>
+        <tr>
+          <td width="50%" valign="top" class="statsLeft">
+            <h3>Format</h3>
+            <ul>
+              <li>Created on: TODO</li>
+              <li>Namespace: TODO</li>
+            </ul>
+            <h3>Documents</h3>
+            <div id="statsChart" style="width:50%; height:90%"></div>
+          </td>
+          <td width="50%">
+          </td>
+        </tr>
+      </table>
+    </div>
+  </div>
+</div>
