@@ -1,6 +1,6 @@
-@import '/main.css';
-@import '/formatBox.css';
-@import '/charts.css';
+@import 'main.css';
+@import 'formatBox.css';
+@import 'charts.css';
 
 #detailCharts {
   margin: 0;

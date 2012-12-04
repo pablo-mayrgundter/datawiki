@@ -1,6 +1,6 @@
-@import '/main.css';
-@import '/formatBox.css';
-@import '/fieldEditor.css';
+@import 'main.css';
+@import 'formatBox.css';
+@import 'fieldEditor.css';
 
 #formatPanelRight {
   margin-bottom: 1em;
