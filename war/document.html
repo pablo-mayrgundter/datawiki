@@ -8,13 +8,13 @@
     <h2>Fields</h2>
     <div style="width: 50%">
       <form id="docForm" ng-submit="update()">
-        <table class="form" id="docForm-formEdit-table" style="">
-          <tr ng-repeat="(key,val) in document">
+        <table class="form" id="docForm-formEdit-table">
+          <tr ng-repeat="(key,val) in noMetaFilter(document)">
             <td><label for="{{key}}">{{key}}</label>:</td>
             <td>
               <input name="{{key}}"
                      ng-model="mods[key]"
-                     ng-init="mods[key] = document[key]"/>
+                     ng-init="mods[key] = document[key]" value="{{val}}"/>
               <div class="edit-buttons hover-reveal">
                 <button class="button delete"><div></div>&nbsp;</button>
                 <button class="button edit"><div></div>&nbsp;</button>
@@ -23,7 +23,7 @@
           </tr>
           <tr>
             <td colspan="2">
-              <div id="docForm-formEdit-buttons" class="buttons formButtons">
+              <div class="buttons formButtons">
                 <input type="submit" value="Save"/>
                 <input type="reset" value="Reset"/>
               </div>
