@@ -5,7 +5,7 @@ angular.module('datawiki', ['datasetService']).
         $routeProvider.
           when('/', {templateUrl: 'welcome.html', controller: WikiCtrl}).
           when('/wiki/:datasetName', {templateUrl: 'dataset.html', controller: DatasetCtrl}).
-          when('/wiki/:datasetName/:docId', {templateUrl: 'doc.html', controller: DocumentCtrl}).
+          when('/wiki/:datasetName/:docId', {templateUrl: 'document.html', controller: DocumentCtrl}).
           otherwise({redirectTo: '/'});
       }]);
 
@@ -39,7 +39,8 @@ function WelcomeCtrl($scope, $http) {
 
 var gScope;
 
-function DatasetCtrl($scope, $http, $routeParams, $resource, $filter, Dataset, Format, Document) {
+function DatasetCtrl($scope, $http, $routeParams, $resource, $filter,
+                     Dataset, Format, Document) {
   $scope.datasetName = $routeParams.datasetName;
   $scope.dataset = Dataset.get({name: $routeParams.datasetName}, ok, err);
   $scope.create = function() {
@@ -114,13 +115,21 @@ function DocumentCtrl($scope, $routeParams, Document) {
   $scope.docId = $routeParams.docId;
   $scope.document = Document.get({name: $routeParams.datasetName,
                                   id: $routeParams.docId}, function() {
-      new FormEditor('docForm', true);
+      // TODO(pmy):
+      // new FormEditor('docForm', true);
     }, err);
+  $scope.noMetaFilter = function(doc) {
+    var clean = {};
+    for (var key in doc) {
+      if (key == 'updated' || key == 'updater') {
+        continue;
+      }
+      clean[key] = doc[key];
+    }
+    return clean;
+  };
   $scope.mods = {};
   $scope.update = function() {
-    console.log('update');
-    console.log($scope.document);
-    console.log($scope.mos);
     new Document($scope.mods).$update({name: $routeParams.datasetName, id: $scope.docId});
   };
 }

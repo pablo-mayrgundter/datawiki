@@ -2,31 +2,7 @@
 <!DOCTYPE web-app PUBLIC
  "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN"
  "http://java.sun.com/dtd/web-app_2_3.dtd">
-
 <web-app xmlns="http://java.sun.com/xml/ns/javaee" version="2.5">
-
-  <welcome-file-list>
-    <welcome-file>index.jsp</welcome-file>
-  </welcome-file-list>
-
-  <error-page>
-    <error-code>500</error-code>
-    <location>/error.jsp</location>
-  </error-page>
-
-<!--  <servlet>
-    <servlet-name>wiki</servlet-name>
-    <servlet-class>com.sun.jersey.spi.container.servlet.ServletContainer</servlet-class>
-    <init-param>
-      <param-name>javax.ws.rs.Application</param-name>
-      <param-value>wiki.FormApp</param-value>
-    </init-param>
-  </servlet>
-  <servlet-mapping>
-    <servlet-name>wiki</servlet-name>
-    <url-pattern>/formats/*</url-pattern>
-  </servlet-mapping> -->
-
   <servlet>
     <servlet-name>matches</servlet-name>
     <servlet-class>com.google.code.datahub.MatchResponseServlet</servlet-class>
@@ -67,15 +43,5 @@
   <servlet-mapping>
     <servlet-name>rsrc</servlet-name>
     <url-pattern>/wiki/*</url-pattern>
-  </servlet-mapping>
-  
-
-  <servlet>
-    <servlet-name>chart</servlet-name>
-    <servlet-class>wiki.TableViz</servlet-class>
-  </servlet>
-  <servlet-mapping>
-    <servlet-name>chart</servlet-name>
-    <url-pattern>/chart</url-pattern>
   </servlet-mapping>
 </web-app>

@@ -1,9 +1,9 @@
-<form name="{{formId}}" id="{{formId}}" ng-submit="{{formAction}}">
+<form name="{{formId}}" id="{{formId}}" ng-submit="{{formAction}}()">
   <table class="form">
     <tr ng-repeat="(key,val) in noMetaFilter(format)">
-      <td><label for="{{ key }}">{{ key }}</label>:</td>
+      <td><label for="{{key}}">{{key}}</label>:</td>
       <td>
-        <input name="{{ key }}" ng-model="queryForm[key]">
+        <input name="{{key}}" ng-model="queryForm[key]">
         <div class="edit-buttons hover-reveal">
           <button class="button delete"><div></div>&nbsp;</button>
           <button class="button edit"><div></div>&nbsp;</button>
