@@ -1,6 +1,12 @@
-<div class="mainPanel" ng-controller="WelcomeCtrl">
+<div class="mainPanel">
   <ul class="tabs">
     <li class="activeTab">DataWiki</li>
+    <li ng-controller="DatasetsCtrl">
+      <form name="findCreate" ng-submit="find() && go()" id="findCreate">
+        <input name="searchQuery" ng-model="query.name" ng-click="queryActive()" ng-class="queryClass"/>
+        <button>?</button>
+      </form>
+    </li>
   </ul>
   <div id="formatBox" class="box tabbed activeTabbed">
     <h2>Welcome!</h2>
@@ -10,7 +16,7 @@
       <h2>Recent Data</h2>
       <!-- Collection view of /wiki/ -->
       <ul>
-        <li ng-repeat="(name,info) in datasetList">
+        <li ng-repeat="(name,info) in datasets">
           <a href="#/wiki{{name}}">{{name}}</a>
         </li>
       </ul>

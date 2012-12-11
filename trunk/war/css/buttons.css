@@ -1,20 +1,9 @@
-.button, .buttons input[type=submit], .buttons input[type=reset] {
-  height: 2.4em;
-  margin: 0;
+button {
   font-size: 1em;
   white-space: nowrap;
-  background-color: #f7f7f7;
-  border-radius: 5px;
   cursor: pointer;
-}
-
-/* Adding spriting common attrs. */
-.button > div {
-  display: inline-block;
-  width: 13px;
-  height: 13px;
-  background: transparent url(/img/sprites_2.png);
-  vertical-align: top;
+  border-radius: 5px;
+  background-color: #f7f7f7;
 }
 
 /* TODO(pmy): hack to handle textNode-less buttons dropping down. */
@@ -23,26 +12,26 @@ button[class='button edit'], button[class='button plus'], button[class='button d
   width: 2.75em;
 }
 
-.search > div {
-  background-position: -87px -25px;
+/* Adding spriting common attrs. */
+.sprite {
+  background: transparent url(/img/sprites_2.png) no-repeat;
+  padding: 9px;
+  width: 20px;
+  height: 20px;
 }
 
-.edit > div {
+.search {
+  background-position: -83px -22px;
+}
+
+.edit {
   background-position: -55px -61px;
 }
 
-.plus > div {
+.plus {
   background-position: -117px -41px;
 }
 
-.delete > div {
+.delete {
   background-position: -87px -60px;
-}
-
-button.text.delete {
-  width: 6em;
-}
-
-button.text > div {
-  margin-right: 0.5em;
 }

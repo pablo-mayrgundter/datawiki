@@ -15,7 +15,6 @@ public class AllTests {
    */
   public static TestSuite suite() {
     final TestSuite suite = new TestSuite();
-    suite.addTest(new common.AllTests().suite());
     suite.addTest(new wiki.AllTests().suite());
     return suite;
   }

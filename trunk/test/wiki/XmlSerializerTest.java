@@ -62,19 +62,6 @@ public class XmlSerializerTest extends TestCase {
     schema = testXml = null;
   }
 
-  public void testFormatFromAndToXml() throws Exception {
-    final Format format = XmlSerializer.formatFromXml(FORMAT_NAME, schema);
-    final String xml = XmlSerializer.toXml(format);
-    assertEquals(testXml, xml);
-  }
-
-  public void testMPDFromAndToXml() throws Exception {
-    final Format format = XmlSerializer.formatFromXml(FORMAT_NAME, schema);
-    final MultiPartDocument doc = XmlSerializer.docFromXml(testXml, schema);
-    final String docXml = XmlSerializer.toXml(doc, format);
-    assertEquals(testXml, docXml);
-  }
-
   public static void main(final String [] args) {
     junit.textui.TestRunner.run(XmlSerializerTest.class);
   }

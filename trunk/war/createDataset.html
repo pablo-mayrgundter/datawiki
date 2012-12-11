@@ -1,0 +1,23 @@
+<div class="mainPanel" ng-controller="DatasetCtrl">
+  <ul class="tabs">
+    <li id="mainTab"><a ng-href="/#" tabindex="0">DataWiki</a></li>
+    <li class="activeTab"><a tabindex="0">{{datasetName}}</a></li>
+  </ul>
+  <div id="formatBox" class="box tabbed activeTabbed">
+    <div id="formatPanelLeft">
+      <h1>{{datasetName}}</h1>
+      <p>{{format.description}}</p>
+    </div>
+    <div id="formatPanelRight">
+      <ul id="formTabs" class="tabs activeTab">
+        <li class="">Fields</li>
+      </ul>
+      <div id="tabbedForms">
+        <div class="activeTabbed" ng-init="formId=formFields;formAction='fields'">
+          <div ng-include src="'form.html'"></div>
+        </div>
+      </div>
+    </div>
+    <div>&nbsp;</div>
+  </div>
+</div>
