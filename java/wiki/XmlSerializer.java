@@ -40,42 +40,24 @@ public class XmlSerializer {
 
   static final Logger logger = Logger.getLogger(XmlSerializer.class.getName());
 
-  /**
-   * Creates a Format from the given XML template of a document in the
-   * target format.
-   *
-   * @TODO(pmy): Use only the schema instead of the template.
-   */
-  public static Format formatFromXml(final String name, final String schemaXml)
-    throws SAXException, IOException {
-    final LinkedHashMap<String,String> fieldValues = new LinkedHashMap<String,String>();
-    final Element root = fromXml(schemaXml, null, fieldValues, false);
-    String ns = root.getAttribute("targetNamespace");
-    if (!Util.getNameFromNamespace(ns).equals(name)) {
-      throw new IllegalArgumentException("Given schema's targetNamespace does not match the given format name");
+  static String toXml(final Document doc) throws TransformerException {
+    final StringWriter outputWriter = new StringWriter();
+    try {
+      // http://forums.sun.com/thread.jspa?forumID=34&threadID=562510
+      final TransformerFactory tf = TransformerFactory.newInstance();
+      try {
+        tf.setAttribute("indent-number", "2");
+      } catch (Exception e) {}
+      final Transformer trans = tf.newTransformer();
+      trans.setOutputProperty(javax.xml.transform.OutputKeys.INDENT, "yes");
+      trans.setOutputProperty(javax.xml.transform.OutputKeys.OMIT_XML_DECLARATION, "yes");
+      trans.transform(new DOMSource(doc), new StreamResult(new BufferedWriter(outputWriter)));
+    } catch (TransformerConfigurationException e) {
+      // Shouldn't happen.
+      logger.severe("Can't get XML Transformer: "+ e);
+      throw new RuntimeException("Cannot initialize XML subsystem.");
     }
-    final Format format = new Format(ns);
-    format.setSchema(schemaXml);
-    return format;
-  }
-
-  /**
-   * Creates a MultiPartDocument from an XML string using the path to
-   * nodes as the field names.  The root node prefix is stripped from
-   * path names.
-   */
-  public static MultiPartDocument docFromXml(final String xml, final String schema)
-    throws SAXException, IOException {
-    final LinkedHashMap<String,String> fieldValues = new LinkedHashMap<String,String>();
-    final Node root = fromXml(xml, schema, fieldValues, true);
-    final MultiPartDocument doc = new MultiPartDocument(root.getLocalName());
-    for (String fieldName : fieldValues.keySet()) {
-      final String value = fieldValues.get(fieldName);
-      fieldName = fieldName.substring(fieldName.indexOf("/", 1) + 1, fieldName.length());
-      doc.fields.add(new DocumentField(fieldName, value));
-    }
-    doc.setXml(xml);
-    return doc;
+    return outputWriter.toString();
   }
 
   /**
@@ -117,128 +99,6 @@ public class XmlSerializer {
         }
       }
     }
-  }
-
-  /**
-   * Converts the given MultiPartDocument of the given Format to an
-   * XML encoded string.
-   */
-  public static String toXml(final MultiPartDocument doc, final Format format) throws TransformerException {
-    final LinkedHashMap<String,String> fieldValues = new LinkedHashMap<String,String>();
-    for (final DocumentField field : doc.getFields()) {
-      fieldValues.put(field.getName(), field.getValue());
-    }
-    return toXml(format, format.getName(), format.getNamespace(), fieldValues, true);
-  }
-
-  /**
-   * Converts the given Format to an XML encoded string.
-   */
-  public static String toXml(final Format format) throws TransformerException {
-    final LinkedHashMap<String,String> fieldValues = new LinkedHashMap<String,String>();
-    for (final FormField field : format.getFields()) {
-      fieldValues.put(field.getName(), null);
-    }
-    return toXml(format, format.getName(), format.getNamespace(), fieldValues, false);
-  }
-
-  /**
-   * Actual conversion method for both #toXml(MultiPartDocument,
-   * Format) and #toXml(Format).
-   */
-  static String toXml(final Format format, final String formatName, final String formatNamespace,
-                      final LinkedHashMap<String,String> fieldValues, final boolean emitValues)
-    throws TransformerException {
-    final Document doc = getBuilder(emitValues ? format.getSchema() : null)
-      .getDOMImplementation().createDocument(formatNamespace, formatName, null);
-
-    final Stack<Node> nodeStack = new Stack<Node>();
-    nodeStack.push(doc.getDocumentElement());
-
-    for (final String fieldName : fieldValues.keySet()) {
-      logger.fine("Placing field: %s"+ fieldName);
-      // Note, split on a string that starts with the split character
-      // yields an empty first array element, so handling separately.
-      final String [] fieldPath = fieldName.startsWith("/") ? fieldName.substring(1).split("/") : fieldName.split("/");
-
-      // First unroll the stack if new field isn't a child of previous field.
-      int i = 0;
-      for (;i < fieldPath.length && i < nodeStack.size(); i++) {
-        final String nodeName = nodeStack.get(i).getNodeName();
-        final String fieldPart = fieldPath[i];
-        logger.fine(String.format("Comparing: %s, %s\n", nodeName, fieldPart));
-        if (!nodeName.equals(fieldPart)) {
-          logger.fine("New path found in last compare, popping until match.");
-          // Pop until last match but leave root node for the case
-          // that fields are not absolute paths.
-          while (nodeStack.size() > i && nodeStack.size() > 1) {
-            final Node n = nodeStack.pop();
-          }
-          break;
-        }
-        logger.fine("nodeStack[i] matches: "+ fieldPath[i]);
-      }
-
-      // Push what's left onto the stack as new nodes.
-      Element elt = null;
-      for (; i < fieldPath.length; i++) {
-        elt = doc.createElement(fieldPath[i]);
-        nodeStack.peek().appendChild(elt);
-        nodeStack.add(elt);
-        logger.fine("added to stack. stack now: "+ nodeStack);
-      }
-      final String value = fieldValues.get(fieldName);
-      if (emitValues && elt != null && value != null)
-        elt.appendChild(doc.createTextNode(value));
-    }
-    return toXml(doc);
-  }
-
-  static String toXml(final Document doc) throws TransformerException {
-    final StringWriter outputWriter = new StringWriter();
-    try {
-      // http://forums.sun.com/thread.jspa?forumID=34&threadID=562510
-      final TransformerFactory tf = TransformerFactory.newInstance();
-      try {
-        tf.setAttribute("indent-number", "2");
-      } catch (Exception e) {}
-      final Transformer trans = tf.newTransformer();
-      trans.setOutputProperty(javax.xml.transform.OutputKeys.INDENT, "yes");
-      trans.setOutputProperty(javax.xml.transform.OutputKeys.OMIT_XML_DECLARATION, "yes");
-      trans.transform(new DOMSource(doc), new StreamResult(new BufferedWriter(outputWriter)));
-    } catch (TransformerConfigurationException e) {
-      // Shouldn't happen.
-      logger.severe("Can't get XML Transformer: "+ e);
-      throw new RuntimeException("Cannot initialize XML subsystem.");
-    }
-    return outputWriter.toString();
-  }
-
-  // TODO(pmy): it may be possible to have a jsp output escaped HTML.
-  public static String toFindForm(final Format format, final String hostName, final List<FormField> fields)
-    throws TransformerException {
-    String html = String.format("<form action=\"%s/wiki/%s\" method=\"GET\">\n", hostName, format.getName());
-    for (final FormField field : fields) {
-      html += String.format("  %s: <input name=\"%s\"><br/>\n",
-                            field.getText(), field.getName());
-    }
-    html += "  <input type=\"Submit\"><input type=\"Reset\">\n";
-    html += "  <input name=\"q\" type=\"hidden\">\n";
-    html += "</form>\n";
-    return html;
-  }
-
-  public static String toCreateForm(final Format format, final String hostName, final List<FormField> fields)
-    throws TransformerException {
-    String html = String.format("<form action=\"%s/wiki/%s\" method=\"POST\" enctype=\"multipart/form-data\">\n",
-                                hostName, format.getName());
-    for (final FormField field : fields) {
-      html += String.format("  %s: <input name=\"%s\"><br/>\n",
-                            field.getText(), field.getName());
-    }
-    html += "  <input type=\"Submit\"><input type=\"Reset\">\n";
-    html += "</form>\n";
-    return html;
   }
 
   /**

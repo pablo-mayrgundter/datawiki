@@ -3,47 +3,71 @@
 angular.module('datawiki', ['datasetService']).
   config(['$routeProvider', function($routeProvider) {
         $routeProvider.
-          when('/', {templateUrl: 'welcome.html', controller: WikiCtrl}).
-          when('/wiki/:datasetName', {templateUrl: 'dataset.html', controller: DatasetCtrl}).
-          when('/wiki/:datasetName/:docId', {templateUrl: 'document.html', controller: DocumentCtrl}).
+          when('/', {templateUrl: 'welcome.html',
+                controller: DatasetsCtrl}).
+
+          when('/wiki/:datasetName', {templateUrl: 'dataset.html',
+                controller: DatasetCtrl}).
+
+          when('/wiki/:datasetName/create', {templateUrl: 'createDataset.html',
+                controller: DatasetsCtrl}).
+
+          when('/wiki/:datasetName/:docId', {templateUrl: 'document.html',
+                controller: DocumentCtrl}).
+
           otherwise({redirectTo: '/'});
       }]);
 
 angular.module('datasetService', ['ngResource']).
-  factory('Format', function($resource){
+  factory('Datasets', function($resource) {
+      return $resource('/wiki/', {}, {});
+    }).
+  factory('Dataset', function($resource) {
+      return $resource('/wiki/:name/', {}, {
+          create:{method: 'PUT'},
+          query:{method: 'GET', params:{}, isArray:false}
+        });
+    }).
+  factory('Format', function($resource) {
       return $resource('/wiki/schema(:name)', {}, {});
     }).
-  factory('Dataset', function($resource){
-      return $resource('/wiki/:name/', {}, {query:{method: 'GET', params:{}, isArray:false}});
-    }).
-  factory('Document', function($resource){
+  factory('Document', function($resource) {
       return $resource('/wiki/:name/:id', {}, {
           update: {method: 'PUT'}
         });
     });
 
-function WikiCtrl($scope, $location) {
-  $scope.search = {query: 'Search'};
-  $scope.doSearch = function() {
-    console.log('search: ');
-    console.log($scope.search.query);
-    $location.path('/wiki/' + $scope.search.query);
-  }
+function DatasetsCtrl($scope, $location, $http, Datasets) {
+  $scope.datasets = Datasets.get();
+  $scope.query = {name:'Dataset name'};
+  $scope.queryClass = 'inputInactive';
+  $scope.queryActive = function() {
+    $scope.query.name = '';
+    $scope.queryClass = 'inputActive';
+  };
+  // Collection methods.
+  $scope.add = function() {
+    new Dataset({foo:'',bar:''}).$create({name: $scope.query.name});
+  };
+  $scope.find = function() {
+    $http({method: 'GET',
+           url: '/wiki/' + $scope.query.name}).
+    success(function (data) {
+        $scope.go();
+      }).
+    error(function(data) {
+        $location.path('wiki/' + $scope.query.name + '/create');
+      });
+  };
+  $scope.go = function() {
+    $location.path('wiki/' + $scope.query.name);
+  };
 }
 
-function WelcomeCtrl($scope, $http) {
-  $http.get('/wiki/').success(function(data) {
-      $scope.datasetList = data;
-    });
-}
-
-var gScope;
-
-function DatasetCtrl($scope, $http, $routeParams, $resource, $filter,
+function DatasetCtrl($scope, $http, $routeParams, $filter,
                      Dataset, Format, Document) {
-  $scope.datasetName = $routeParams.datasetName;
-  $scope.dataset = Dataset.get({name: $routeParams.datasetName}, ok, err);
-  $scope.create = function() {
+  // Collection methods.
+  $scope.add = function() {
     new Document($scope.queryForm).$save({name: $routeParams.datasetName});
   };
   $scope.find = function() {
@@ -73,6 +97,10 @@ function DatasetCtrl($scope, $http, $routeParams, $resource, $filter,
            //$scope.updateListing(data);
          });
   };
+
+  $scope.datasetName = $routeParams.datasetName;
+  $scope.dataset = Dataset.get({name: $routeParams.datasetName}, ok, err);
+
   $scope.format = Format.get({name: $routeParams.datasetName}, ok, err);
   $scope.noMetaFilter = function(fmt) {
     var clean = {};
@@ -134,9 +162,8 @@ function DocumentCtrl($scope, $routeParams, Document) {
   };
 }
 
-WikiCtrl.$inject = ['$scope', '$location'];
-WelcomeCtrl.$inject = ['$scope', '$http'];
-DatasetCtrl.$inject = ['$scope', '$http', '$routeParams', '$resource', '$filter',
+DatasetsCtrl.$inject = ['$scope', '$location', '$http', 'Datasets'];
+DatasetCtrl.$inject = ['$scope', '$http', '$routeParams', '$filter',
                        'Dataset', 'Format', 'Document'];
 DocumentCtrl.$inject = ['$scope', '$routeParams', 'Document'];
 
