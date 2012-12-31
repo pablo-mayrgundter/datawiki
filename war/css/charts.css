@@ -8,9 +8,9 @@
   width: 100%;
 }
 
-#chartTabs > li {
-  top: -1px;
-  margin-bottom: -2px;
+/* Overlap with container above. */
+#chartTabs {
+  margin-top: -1px;
 }
 
 #chartTabs .activeTab {

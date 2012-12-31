@@ -2,6 +2,9 @@
  * @license AngularJS v1.0.2
  * (c) 2010-2012 Google, Inc. http://angularjs.org
  * License: MIT
+ *
+ * LOCALLY MODIFIED:
+ *   - http://code.google.com/p/datawiki/issues/detail?id=58
  */
 (function(window, document, undefined) {
 'use strict';
@@ -12855,7 +12858,7 @@ var ngIncludeDirective = ['$http', '$templateCache', '$anchorScroll', '$compile'
               }
 
               childScope.$emit('$includeContentLoaded');
-              scope.$eval(onloadExp);
+              childScope.$eval(onloadExp);
             }).error(function() {
               if (thisChangeId === changeCounter) clearContent();
             });

@@ -1,12 +1,14 @@
-//// DOM Utils.
+'use strict';
 
-function get(id) {
+/** DOM Utils. */
+
+function $(id) {
   return document.getElementById(id);
-};
+}
 
 function elts(name) {
   return document.getElementsByTagName(name);
-};
+}
 
 function eltsByIdPrefix(prefix, node)  {
   if (!node) {
@@ -21,7 +23,7 @@ function eltsByIdPrefix(prefix, node)  {
     }
   }
   return elts;
-};
+}
 
 function add(parent, name, attrs, text) {
   var e = create(name, attrs, text);
@@ -407,7 +409,7 @@ Tabs.prototype.handleClick = function(ndx) {
 // Forms.
 
 function clearForm(formId) {
-  var formElt = get(formId);
+  var formElt = $(formId);
   var inputElts = formElt.getElementsByTagName('input');
   for (var eltNdx in inputElts) {
     var e = inputElts[eltNdx];

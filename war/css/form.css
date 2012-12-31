@@ -1,22 +1,20 @@
+/* The find/create form in dataset.html and single-doc view form. */
+
 .form {
-  width: 40%;
-  padding-top: 1em;
+  width: 100%;
+  margin: 0;
   border: solid 1px #ccc;
   border-spacing: 0;
   background-color: #ffffe8;
 }
 
-/* Hack to push down doclist after relative elements. */
-.form + div {
-  clear: both;
+.form > table {
+  width: 95%;
+  margin: 1em auto;
 }
 
 .form td {
   height: 2em;
-}
-
-.form td:first-child {
-  padding-left: 1em;
 }
 
 .form input[name] {
@@ -27,10 +25,6 @@
 [class~=hover-reveal] {
   background-color: inherit;
   display: none;
-}
-
-.form.editing input[name] {
-  width: 70%;
 }
 
 .form td + td {
@@ -52,10 +46,18 @@
   float: right;
 }
 
-.form.editing tr:hover {
+.form .editing .formButtons {
+  opacity: 0.2;
+}
+
+.form .editing tbody tr:hover {
   background-color: #fff4c2;
 }
 
-.form.editing tr:hover [class~=hover-reveal] {
+.form .editing input[name] {
+  width: 70%;
+}
+
+.form .editing tr:hover [class~=hover-reveal] {
   display: inline;
 }

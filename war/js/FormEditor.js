@@ -1,49 +1,29 @@
+'use strict';
+
 /**
  * The FormEditor provides UI actions for adding, deleting and
  * modifying form fields.
  */
-function FormEditor(eltName, startEdit) {
-  this.formId = eltName;
-  this.form = get(this.formId);
-  this.init();
-  if (startEdit) {
-    this.editForm(get('button-form-edit'));
-  }
-};
-
-FormEditor.prototype.init = function() {
-  var formContainer = get('formatBox');
-  var button = create('button',
-                     {'id':'button-form-edit',
-                      'class':'button edit text'},
-                      '<div></div>Edit');
-  before(button, formContainer.firstChild);
-  button.onclick = func(this, this.editForm, [button]);
-};
-
-FormEditor.prototype.editRow = function(row) {
-  new FieldEditor(this, row);
-};
-
-FormEditor.prototype.deleteRow = function(row) {
-  row.parentNode.removeChild(row);
-};
-
-FormEditor.prototype.addEditButtonActions = function(editButton, deleteButton) {
-  var row = editButton.parentNode.parentNode.parentNode;
-  editButton.onclick = func(this, this.editRow, [row]);
-  deleteButton.onclick = func(this, this.deleteRow, [row]);
+function FormEditor(formId, startEdit) {
+  this.formId = formId;
+  this.form = $(this.formId);
+  this.fieldTable = $(this.formId + '-table');
+  this.editButton = $(this.formId + '-edit-button');
+  this.modfieldButtons = $(this.formId + '-modfield-buttons');
+  this.submitButtons = $(this.formId + '-submit-buttons');
+  //if (startEdit) {
+  //  this.editForm(this.editButton);
+  //}
 };
 
 /** Modify form controls for field editing. */
-FormEditor.prototype.editForm = function(button) {
+FormEditor.prototype.editForm = function() {
+
+  // Deactivate form.
+  this.form.onsubmit = function(){ return false; };
 
   // Activate hover behavior.
-  addClass(get(this.formId + '-formEdit-table'), 'editing');
-
-  // Deactivate buttons.
-  this.form.onsubmit = function(){ return false; };
-  get(this.formId += '-formEdit-buttons').style.display = 'none';
+  addClass(this.fieldTable, 'editing');
 
   // Deactivate input elements.
   var elts = this.form.getElementsByTagName('input');
@@ -60,7 +40,7 @@ FormEditor.prototype.editForm = function(button) {
   }
 
   // Title editing control.
-  var title = get('title');
+  var title = $('title');
   if (title) {
     var curTitle = title.innerHTML;
     var titleEdit = create('input', {'id':'titleEdit',
@@ -76,7 +56,7 @@ FormEditor.prototype.editForm = function(button) {
   }
 
   // Description editing control.
-  var desc = get('description');
+  var desc = $('description');
   if (desc) {
     var curText = desc.innerHTML;
     var ta = create('textarea', {'id':'descEdit',
@@ -89,34 +69,49 @@ FormEditor.prototype.editForm = function(button) {
       desc.removeChild(child);
     add(desc, 'label', {'for':'descEdit'}, 'Description:');
     desc.appendChild(ta);
-    this.newFieldButton(button);
     titleEdit.focus();
   }
 
-  // Change save button behavior.
-  button.onclick = func(this, this.saveForm, [button]);
-  button.childNodes[1].nodeValue = 'Save';
+  this.newFieldButton();
+  this.editButton.childNodes[1].nodeValue = 'Save';
+};
+
+FormEditor.prototype.editRow = function(row) {
+  new FieldEditor(this, row);
+};
+
+FormEditor.prototype.deleteRow = function(row) {
+  row.parentNode.removeChild(row);
+};
+
+FormEditor.prototype.addEditButtonActions = function(editButton, deleteButton) {
+  var row = editButton.parentNode.parentNode.parentNode;
+  editButton.onclick = func(this, this.editRow, [row]);
+  deleteButton.onclick = func(this, this.deleteRow, [row]);
 };
 
 FormEditor.prototype.saveForm = function(button) {
-  makePOSTRequest(location.href,
+  /*  makePOSTRequest(location.href,
                   this.getFields(),
                   func(this, this.wakeForm, [button]));
+  */
+  this.wakeForm();
 };
 
-FormEditor.prototype.wakeForm = function(button) {
-  remove(get('button-add-field'));
-  button.childNodes[1].nodeValue = 'Edit';
-  button.onclick = func(this, this.editForm, [button]);
-  this.form.onsubmit = null;
+FormEditor.prototype.wakeForm = function() {
+  remove($('button-add-field'));
+  var button = this.editButton;
+  button.childNodes[1].nodeValue = 'Modify';
 
-  var desc = get('description');
-  var ta = get('descEdit');
+  /*
+  var desc = $('description');
+  var ta = $('descEdit');
   desc.innerHTML = ta.value;
 
-  var title = get('title');
-  var titleEdit = get('titleEdit');
+  var title = $('title');
+  var titleEdit = $('titleEdit');
   title.innerHTML = titleEdit.value;
+  */
 
   var inputs = this.form.getElementsByTagName('input');
   for (var ndx in inputs) {
@@ -125,12 +120,11 @@ FormEditor.prototype.wakeForm = function(button) {
       input.removeAttribute('disabled');
   }
 
-  get('formEdit-buttons').style.display = 'block';
-  removeClass(this.form, 'editing');
+  removeClass(this.fieldTable, 'editing');
 };
 
 FormEditor.prototype.visitFields = function() {
-  var form = get('formatBox');
+  var form = $('formatBox');
   var fields = [];
   var nodes = [];
   var tags = form.getElementsByTagName('input');
@@ -234,16 +228,15 @@ function encodeFieldAttrs(attrs) {
   return encField;
 }
 
-FormEditor.prototype.newFieldButton = function(editButton) {
+FormEditor.prototype.newFieldButton = function() {
   var button = create('button',
-                     {'id':'button-add-field',
-                      'class':'button button-add-field plus text'},
+                      {'id':'button-add-field',
+                       'class':'button button-add-field plus text'},
                       '<div></div>Add Field');
+  before(button, $(this.formId + '-submit-buttons'));
   // TODO(pmy): can't get this working with func.
   var me = this;
-  button.onclick = function() { new FieldEditor(me); };
-  after(button, get('formEdit-buttons'));
-  get('formEdit-buttons').parentNode.parentNode.style.backgroundColor = 'inherit';
+  button.onclick = function() { new FieldEditor(me, null, me.fieldTable); };
 };
 
 FormEditor.prototype.newField = function(editorRow, label, name, required) {
@@ -260,6 +253,6 @@ FormEditor.prototype.newField = function(editorRow, label, name, required) {
   var deleteButton = add(editButtons, 'button', {'class':'button delete'}, '<div></div>&nbsp;');
   var editButton = add(editButtons, 'button', {'class':'button edit'}, '<div></div>&nbsp;');
   this.addEditButtonActions(editButton, deleteButton);
-  get('button-add-field').focus();
+  $('button-add-field').focus();
   return true;
 };

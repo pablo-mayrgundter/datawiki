@@ -1,7 +1,9 @@
+'use strict';
+
 /**
  * The FieldEditor provides controls for editing a row of a form.
  */
-function FieldEditor(form, row) {
+function FieldEditor(form, row, table) {
   var oldHelpText = null;
   var oldFieldName = null;
   if (row) {
@@ -10,8 +12,7 @@ function FieldEditor(form, row) {
     oldHelpText = fieldTableCells[0].getElementsByTagName('label')[0].innerHTML;
     oldFieldName = fieldTableCells[1].getElementsByTagName('input')[0].name;
   } else {
-    this.editorRow = create('tr', {'class':'fieldEditor'});
-    before(this.editorRow, get('formEdit-buttons').parentNode.parentNode);
+    this.editorRow = add(table, 'tr', {'class':'fieldEditor'});
   }
   var prefixAndObjById = loadTemplate(this.editorRow, 'fieldEditor');
   this.prefix = prefixAndObjById[0];
@@ -36,7 +37,6 @@ FieldEditor.prototype.remove = function() {
 FieldEditor.prototype.done = function(editorRow, form) {
   if (form.newField(editorRow,
                     this.myElt('text').value,
-                    this.myElt('name').value,
-                    this.myElt('required').checked))
+                    this.myElt('name').value))
     this.remove();
 };

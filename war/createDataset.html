@@ -13,8 +13,10 @@
         <li class="">Fields</li>
       </ul>
       <div id="tabbedForms">
-        <div class="activeTabbed" ng-init="formId=formFields;formAction='fields'">
-          <div ng-include src="'form.html'"></div>
+        <div class="activeTabbed">
+          <div ng-include
+               onload="formId='formFields-form'; formAction='fields'"
+               src="'form.html'"/></div>
         </div>
       </div>
     </div>

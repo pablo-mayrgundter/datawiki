@@ -39,33 +39,50 @@ angular.module('datasetService', ['ngResource']).
 
 function DatasetsCtrl($scope, $location, $http, Datasets) {
   $scope.datasets = Datasets.get();
-  $scope.query = {name:'Dataset name'};
+  $scope.query = {val:'Search'};
   $scope.queryClass = 'inputInactive';
   $scope.queryActive = function() {
-    $scope.query.name = '';
+    $scope.query.val = '';
     $scope.queryClass = 'inputActive';
   };
   // Collection methods.
   $scope.add = function() {
-    new Dataset({foo:'',bar:''}).$create({name: $scope.query.name});
+    new Dataset({foo:'',bar:''}).$create({name: $scope.query.val});
+  };
+  $scope.checkQuery = function() {
+    var q = $scope.query.val;
+    if (q == '' || q == 'Search') {
+      return false;
+    }
+    return true;
   };
   $scope.find = function() {
     $http({method: 'GET',
-           url: '/wiki/' + $scope.query.name}).
+           url: '/wiki/' + $scope.query.val}).
     success(function (data) {
         $scope.go();
       }).
     error(function(data) {
-        $location.path('wiki/' + $scope.query.name + '/create');
+        $location.path('wiki/' + $scope.query.val + '/create');
       });
   };
   $scope.go = function() {
-    $location.path('wiki/' + $scope.query.name);
+    $location.path('wiki/' + $scope.query.val);
   };
 }
 
 function DatasetCtrl($scope, $http, $routeParams, $filter,
                      Dataset, Format, Document) {
+  $scope.editForm = function(formId) {
+    if ($scope.editing) {
+      $scope.editing = false;
+      $scope.editor.saveForm();
+    } else {
+      $scope.editing = true;
+      $scope.editor = new FormEditor(formId, true);
+      $scope.editor.editForm();
+    }
+  };
   // Collection methods.
   $scope.add = function() {
     new Document($scope.queryForm).$save({name: $routeParams.datasetName});
@@ -135,8 +152,6 @@ function DatasetCtrl($scope, $http, $routeParams, $filter,
       return obj[key];
   };
 }
-
-var gData;
 
 function DocumentCtrl($scope, $routeParams, Document) {
   $scope.datasetName = $routeParams.datasetName;
