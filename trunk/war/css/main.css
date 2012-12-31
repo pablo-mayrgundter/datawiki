@@ -54,6 +54,9 @@ pre {
 
 /* Styles */
 
+.normal {
+}
+
 .removed {
   display: none;
 }
@@ -74,35 +77,27 @@ pre {
   background-color: white;
 }
 
-/* Onebar */
-
-#onebar {
-  position: absolute;
-  top: 0;
-  right: 2em;
-  padding: 35px 0 0 0;
-  white-space: nowrap;
+.inputInactive {
+  color: lightgrey;
 }
 
-#onebar * {
-  white-space: nowrap;
+.inputActive {
+  color: black;
 }
 
-#langControl {
-  margin-right: 0;
-}
-
-#langSelect {
-  margin-left: 5px;
-}
-
-#findCreate > * {
-  position: relative;
-  top: -8px;
+/* Search box in welcome.html. For some reason, adding form inputs to
+ * it breaks it out of line; hacking around found that display: inline
+ * fixes.
+ *
+ * TODO(pmy): fix overlap with #formatBox.
+ */
+#searchTab, #findCreate, #findCreate > * {
+  display: inline;
 }
 
 #findCreate input {
   height: 2em;
+  margin-left: -0.5em;
   border: solid 1px #ccc;
   border-radius: 3px;
   padding: 0 0.5em;
@@ -110,12 +105,6 @@ pre {
 
 #findCreate button {
   color: blue;
-}
-
-.inputInactive {
-  color: lightgrey;
-}
-
-.inputActive {
-  color: black;
+  margin-right: -0.5em;
+  font-weight: bold;
 }

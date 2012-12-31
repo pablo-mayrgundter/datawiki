@@ -18,11 +18,15 @@
         </li>
       </ul>
       <div id="tabbedForms">
-        <div class="{{ffc}}" ng-init="formId=formFind;formAction='find'">
-          <div ng-include src="'form.html'"></div>
+        <div class="{{ffc}}">
+          <div ng-include
+               onload="formId='formFind'; formAction='find'; editClass='removed'"
+               src="'form.html'"></div>
         </div>
-        <div class="{{cfc}}" ng-init="formId=formAdd;formAction='add'">
-          <div ng-include src="'form.html'"></div>
+        <div class="{{cfc}}">
+          <div ng-include
+               onload="formId='formAdd'; formAction='add'"
+               src="'form.html'"></div>
         </div>
       </div>
     </div>

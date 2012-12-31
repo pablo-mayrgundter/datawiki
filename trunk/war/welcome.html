@@ -1,15 +1,20 @@
 <div class="mainPanel">
   <ul class="tabs">
     <li class="activeTab">DataWiki</li>
-    <li ng-controller="DatasetsCtrl">
-      <form name="findCreate" ng-submit="find() && go()" id="findCreate">
-        <input name="searchQuery" ng-model="query.name" ng-click="queryActive()" ng-class="queryClass"/>
+    <li ng-controller="DatasetsCtrl" id="searchTab">
+      <form name="findCreate" ng-submit="checkQuery() && find() && go()" id="findCreate">
+        <input name="searchQuery"
+               ng-model="query.val"
+               ng-click="queryActive()"
+               ng-class="queryClass"/>
         <button>?</button>
       </form>
     </li>
   </ul>
   <div id="formatBox" class="box tabbed activeTabbed">
     <h2>Welcome!</h2>
+
+    <p>DataWiki is a tool for creating, linking and sharing datasets.</p>
 
     <div id="featured">
       <!--<div id="createButton"><a href="/formats?action=new"><button class="button plus text"><div></div>Create New</button></a></div>-->
