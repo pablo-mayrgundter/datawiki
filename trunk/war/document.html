@@ -7,28 +7,37 @@
   <div id="formatBox" class="box tabbed activeTabbed">
     <h2>Fields</h2>
     <div style="width: 50%">
-      <form id="docForm" ng-submit="update()">
-        <table class="form" id="docForm-formEdit-table">
-          <tr ng-repeat="(key,val) in noMetaFilter(document)">
-            <td><label for="{{key}}">{{key}}</label>:</td>
-            <td>
-              <input name="{{key}}"
-                     ng-model="mods[key]"
-                     ng-init="mods[key] = document[key]" value="{{val}}"/>
-              <div class="edit-buttons hover-reveal">
-                <button class="button delete"><div></div>&nbsp;</button>
-                <button class="button edit"><div></div>&nbsp;</button>
-              </div>
-            </td>
-          </tr>
-          <tr>
-            <td colspan="2">
-              <div class="buttons formButtons">
-                <input type="submit" value="Save"/>
-                <input type="reset" value="Reset"/>
-              </div>
-            </td>
-          </tr>
+      <!-- TODO(pmy): merge this with form.html. Just different init value handling. -->
+      <form id="docForm" class="form">
+        <button id="docForm-edit-button"
+                class="button edit text formedit"
+                ng-class="editClass"
+                ng-click="editForm('docForm')"><div></div>Modify</button>
+        <table id="docForm-table">
+          <tbody id="docForm-table-body">
+            <tr ng-repeat="(key,val) in noMetaFilter(document)">
+              <td><label for="{{key}}">{{key}}</label>:</td>
+              <td>
+                <input name="{{key}}"
+                       ng-model="mods[key]"
+                       ng-init="mods[key] = document[key]" value="{{val}}"/>
+                <div class="edit-buttons hover-reveal">
+                  <button class="button delete"><div></div>&nbsp;</button>
+                  <button class="button edit"><div></div>&nbsp;</button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+          <tfoot>
+            <tr>
+              <td colspan="2">
+                <div class="buttons formButtons" id="docForm-submit-buttons">
+                  <input ng-click="update()" type="submit" value="Save"/>
+                  <input type="reset" value="Reset"/>
+                </div>
+              </td>
+            </tr>
+          </tfoot>
         </table>
       </form>
     </div>

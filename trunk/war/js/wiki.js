@@ -24,12 +24,14 @@ angular.module('datasetService', ['ngResource']).
     }).
   factory('Dataset', function($resource) {
       return $resource('/wiki/:name/', {}, {
-          create:{method: 'PUT'},
+          put:{method: 'PUT'},
           query:{method: 'GET', params:{}, isArray:false}
         });
     }).
   factory('Format', function($resource) {
-      return $resource('/wiki/schema(:name)', {}, {});
+      return $resource('/wiki/schema(:name)', {}, {
+          put:{method: 'PUT'},
+        });
     }).
   factory('Document', function($resource) {
       return $resource('/wiki/:name/:id', {}, {
@@ -37,7 +39,7 @@ angular.module('datasetService', ['ngResource']).
         });
     });
 
-function DatasetsCtrl($scope, $location, $http, Datasets) {
+function DatasetsCtrl($scope, $location, $http, Datasets, Dataset) {
   $scope.datasets = Datasets.get();
   $scope.query = {val:'Search'};
   $scope.queryClass = 'inputInactive';
@@ -46,9 +48,6 @@ function DatasetsCtrl($scope, $location, $http, Datasets) {
     $scope.queryClass = 'inputActive';
   };
   // Collection methods.
-  $scope.add = function() {
-    new Dataset({foo:'',bar:''}).$create({name: $scope.query.val});
-  };
   $scope.checkQuery = function() {
     var q = $scope.query.val;
     if (q == '' || q == 'Search') {
@@ -63,31 +62,59 @@ function DatasetsCtrl($scope, $location, $http, Datasets) {
         $scope.go();
       }).
     error(function(data) {
-        $location.path('wiki/' + $scope.query.val + '/create');
+        $http({method: 'PUT',
+               url: '/wiki/' + $scope.query.val,
+               data: {}}).
+        success(function (data) {
+            $location.path('/wiki/' + $scope.query.val);
+          })
       });
   };
   $scope.go = function() {
-    $location.path('wiki/' + $scope.query.val);
+    $location.path('/wiki/' + $scope.query.val);
   };
 }
 
 function DatasetCtrl($scope, $http, $routeParams, $filter,
                      Dataset, Format, Document) {
+  $scope.saveSchema = function() {
+    console.log('setSchema');
+    // TODO(pmy): have FormEditor operate directly on angular model.
+    var jsonSchema = $scope.editor.toJson();
+    console.log(jsonSchema);
+    new Format(jsonSchema).$put({name: $routeParams.datasetName});
+  };
   $scope.editForm = function(formId) {
+    console.log('edit');
     if ($scope.editing) {
       $scope.editing = false;
       $scope.editor.saveForm();
     } else {
       $scope.editing = true;
-      $scope.editor = new FormEditor(formId, true);
+      $scope.editor = new FormEditor(formId, true,
+                                     function() {
+                                       $scope.saveSchema();
+                                     });
+      console.log($scope);
       $scope.editor.editForm();
+    }
+  };
+  $scope.handleFormSubmit = function(action) {
+    if (action === 'add') {
+      $scope.add();
+    } else if (action === 'find') {
+      $scope.find();
+    } else {
+      console.log('unknown form action: ' + action);
     }
   };
   // Collection methods.
   $scope.add = function() {
+    console.log('add');
     new Document($scope.queryForm).$save({name: $routeParams.datasetName});
   };
   $scope.find = function() {
+    console.log('find');
     var query = '', form = $scope.queryForm;
     for (var prop in form) {
       var val = form[prop];
@@ -104,20 +131,19 @@ function DatasetCtrl($scope, $http, $routeParams, $filter,
       return;
     }
     $http({method: 'GET',
-          url: '/wiki/' + $scope.datasetName,
-          params: {q: query}}).
-       success(function (data) {
-           console.log('find success:');
-           console.log(data);
-           //$scope.dataset.results.length = 0;
-           //$scope.dataset.results.concat(data.results);
-           //$scope.updateListing(data);
-         });
+           url: '/wiki/' + $scope.datasetName,
+           params: {q: query}}).
+    success(function (data) {
+        console.log('find success:');
+        console.log(data);
+        //$scope.dataset.results.length = 0;
+        //$scope.dataset.results.concat(data.results);
+        //$scope.updateListing(data);
+      });
   };
 
   $scope.datasetName = $routeParams.datasetName;
   $scope.dataset = Dataset.get({name: $routeParams.datasetName}, ok, err);
-
   $scope.format = Format.get({name: $routeParams.datasetName}, ok, err);
   $scope.noMetaFilter = function(fmt) {
     var clean = {};
@@ -153,7 +179,7 @@ function DatasetCtrl($scope, $http, $routeParams, $filter,
   };
 }
 
-function DocumentCtrl($scope, $routeParams, Document) {
+function DocumentCtrl($scope, $routeParams, Document, Format) {
   $scope.datasetName = $routeParams.datasetName;
   $scope.docId = $routeParams.docId;
   $scope.document = Document.get({name: $routeParams.datasetName,
@@ -174,6 +200,20 @@ function DocumentCtrl($scope, $routeParams, Document) {
   $scope.mods = {};
   $scope.update = function() {
     new Document($scope.mods).$update({name: $routeParams.datasetName, id: $scope.docId});
+  };
+  // TODO(pmy): following copied from Dataset.
+  // Form edit should directly modify ng model; currently edits don't take effect.
+  $scope.editForm = function(formId) {
+    console.log('edit');
+    if ($scope.editing) {
+      $scope.editing = false;
+      $scope.editor.saveForm();
+    } else {
+      $scope.editing = true;
+      $scope.editor = new FormEditor(formId, true, null);
+      console.log($scope);
+      $scope.editor.editForm();
+    }
   };
 }
 

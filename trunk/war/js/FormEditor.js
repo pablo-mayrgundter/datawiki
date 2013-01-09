@@ -4,13 +4,15 @@
  * The FormEditor provides UI actions for adding, deleting and
  * modifying form fields.
  */
-function FormEditor(formId, startEdit) {
+function FormEditor(formId, startEdit, saveCb) {
   this.formId = formId;
   this.form = $(this.formId);
   this.fieldTable = $(this.formId + '-table');
+  this.fieldTableBody = $(this.formId + '-table-body');
   this.editButton = $(this.formId + '-edit-button');
   this.modfieldButtons = $(this.formId + '-modfield-buttons');
   this.submitButtons = $(this.formId + '-submit-buttons');
+  this.saveCallback = saveCb;
   //if (startEdit) {
   //  this.editForm(this.editButton);
   //}
@@ -91,10 +93,9 @@ FormEditor.prototype.addEditButtonActions = function(editButton, deleteButton) {
 };
 
 FormEditor.prototype.saveForm = function(button) {
-  /*  makePOSTRequest(location.href,
-                  this.getFields(),
-                  func(this, this.wakeForm, [button]));
-  */
+  if (this.saveCallback) {
+    this.saveCallback();
+  }
   this.wakeForm();
 };
 
@@ -124,18 +125,17 @@ FormEditor.prototype.wakeForm = function() {
 };
 
 FormEditor.prototype.visitFields = function() {
-  var form = $('formatBox');
+  var form = this.fieldTableBody;
   var fields = [];
-  var nodes = [];
-  var tags = form.getElementsByTagName('input');
-  for (var ndx in tags)
-    nodes.push(tags[ndx]);
-  tags = form.getElementsByTagName('textarea');
-  for (var ndx in tags)
-    nodes.push(tags[ndx]);
+  var nodes = form.getElementsByTagName('input');
   var fieldCount = 0;
   for (var i = 0; i < nodes.length; i++) {
     var node = nodes[i];
+    // TODO(pmy): Why is this filtering necessary?
+    if (node.name === undefined ||
+	node.name === 'item') {
+      continue;
+    }
     var attrs = node.attributes;
     var value = node.value ? node.value : null;
     var parsedAttrs = {};
@@ -168,27 +168,42 @@ FormEditor.prototype.visitFields = function() {
   return fields;
 };
 
-FormEditor.prototype.getFields = function() {
-  var arrIn = this.visitFields();
-  var mapOut = {};
-  for (var idx in arrIn) {
-    var field = arrIn[idx];
-    mapOut[field.name] = encodeFieldAttrs(field.attrs);
+FormEditor.prototype.toJson = function() {
+  var fieldArr = this.visitFields();
+  var json = {};
+  for (var ndx in fieldArr) {
+    json[fieldArr[ndx].name] = null;
   }
-  return mapOut;
-}
+  return json;
+};
 
-FormEditor.prototype.getXsd = function() {
+/**
+ * Quick and broken json. TODO(pmy): use json.org's.
+ *
+ * @param obj A map of name:value attributes.
+ * @return "field1Attr1Name: "field1Attr1Value"; ..."
+ */
+FormEditor.prototype.toJsonStr = function() {
+  var fieldArr = this.visitFields();
+  var encField = '';
+  for (var ndx in fieldArr) {
+    var field = fieldArr[ndx];
+    if (encField != '')
+      encField += ",";
+    console.log(field, field['attrs']);
+    encField += '"'+ encodeURI(field.name) +'":null';
+  }
+  return '{'+ encField +'}';
+};
+
+FormEditor.prototype.toXsd = function() {
   var arrIn = this.visitFields();
   var arrOut = [];
   var title = "";
-  for (idx in arrIn) {
+  for (var idx in arrIn) {
     var field = arrIn[idx];
     // TODO(pmy): Why is this filtering necessary?
-    if (field.name === undefined ||
-	field.name === 'item') {
-      continue;
-    } else if (field.name === 'title') {
+    if (field.name === 'title') {
       title = field.attrs.value;
       continue;
     } else if (field.name === 'description') {
@@ -213,20 +228,7 @@ FormEditor.prototype.getXsd = function() {
   xsd += '</xs:schema>\n';
 
   return xsd;
-}
-/**
- * @param attrs An map of name:value attributes.
- * @return "field1Attr1Name,field1Attr1Value;field1Attr2Name,field1Attr2Value;..."
- */
-function encodeFieldAttrs(attrs) {
-  var encField = '';
-  for (var name in attrs) {
-    if (encField != '')
-      encField += ";";
-    encField += encodeURI(name) +','+ encodeURI(attrs[name]);
-  }
-  return encField;
-}
+};
 
 FormEditor.prototype.newFieldButton = function() {
   var button = create('button',
@@ -236,7 +238,8 @@ FormEditor.prototype.newFieldButton = function() {
   before(button, $(this.formId + '-submit-buttons'));
   // TODO(pmy): can't get this working with func.
   var me = this;
-  button.onclick = function() { new FieldEditor(me, null, me.fieldTable); };
+  // TODO(pmy): add to tbody, not table.
+  button.onclick = function() { new FieldEditor(me, null, me.fieldTableBody); };
 };
 
 FormEditor.prototype.newField = function(editorRow, label, name, required) {

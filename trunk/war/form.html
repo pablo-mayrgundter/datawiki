@@ -1,13 +1,10 @@
-<div ng-form="{{formId}}"
-     ng-submit="{{formAction}}()"
-     id="{{formId}}"
-     class="form">
+<form name="{{formId}}" id="{{formId}}" class="form">
   <button id="{{formId}}-edit-button"
           class="button edit text formedit"
           ng-class="editClass"
           ng-click="editForm(formId)"><div></div>Modify</button>
   <table id="{{formId}}-table">
-    <tbody>
+    <tbody id="{{formId}}-table-body">
       <tr ng-repeat="(key,val) in noMetaFilter(format)">
         <td><label for="{{key}}">{{key}}</label>:</td>
         <td>
@@ -23,11 +20,11 @@
       <tr>
         <td colspan="2">
           <div class="buttons formButtons" id="{{formId}}-submit-buttons">
-            <input type="submit" value="Submit"/>
+            <input ng-click="handleFormSubmit(formAction)" type="submit" value="Submit"/>
             <input type="reset" value="Clear"/>
           </div>
         </td>
       </tr>
     </tfoot>
   </table>
-</div>
+</form>
