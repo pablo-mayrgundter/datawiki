@@ -31,13 +31,16 @@ FormEditor.prototype.editForm = function() {
   var elts = this.form.getElementsByTagName('input');
   for (var ndx in elts) {
     var elt = elts[ndx];
-    if (!elt.parentNode)
+    if (!elt.parentNode) {
       continue;
+    }
     var buttons = elt.parentNode.getElementsByTagName('button');
-    if (!buttons || buttons.length != 2)
+    if (!buttons || buttons.length != 2) {
       continue;
-    if (elt.setAttribute)
-      elt.setAttribute('disabled');
+    }
+    if (elt.setAttribute) {
+      elt.setAttribute('disabled', true);
+    }
     this.addEditButtonActions(buttons[1], buttons[0]);
   }
 
