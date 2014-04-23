@@ -7,13 +7,22 @@
   padding: 0;
 }
 
-#detailCharts > table, #detailCharts > table > tbody, #detailCharts > table > tbody > tr, #detailCharts > table > tbody > tr > td {
+#detailCharts > table,
+#detailCharts > table > tbody,
+#detailCharts > table > tbody > tr,
+#detailCharts > table > tbody > tr > td {
   margin: 0;
   padding: 0;
   border-spacing: 0;
 }
 
-#doclist tr, #doclist th, #doclist td {
+table#doclist {
+  table-layout: fixed;
+}
+
+#doclist tr,
+#doclist th,
+#doclist td {
   margin: 0;
   padding: 0;
   border-spacing: 0;
