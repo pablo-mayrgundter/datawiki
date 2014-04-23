@@ -32,6 +32,8 @@ import javax.servlet.http.HttpServletResponse;
 /** Adapted from Google Visualization SimpleExampleServlet. */
 public class TableViz extends DataSourceServlet {
 
+  static final long serialVersionUID = 3195901871617722111L;
+
   static final Logger logger = Logger.getLogger(TableViz.class.getName());
 
   protected void doGet(final HttpServletRequest req, final HttpServletResponse rsp)
@@ -112,6 +114,7 @@ public class TableViz extends DataSourceServlet {
    * or including MONTH and MILLISECONDS or specify a value of -1 for
    * no bucketing.
    */
+  @SuppressWarnings("fallthrough")
   DateTimeValue dateToDateTime(final Date date, final int timeBucket) {
     int month, day, hour, min, sec, mil;
     month = day = hour = min = sec = mil = 1;
