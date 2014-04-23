@@ -48,7 +48,7 @@
                 <th ng-repeat="(key,val) in noMetaFilter(format)">{{key}}</th>
               </tr>
               <tr ng-repeat="(path,obj) in dataset">
-                <td><a ng-href="#/wiki{{path}}">{{idDisplay(path)}}</a></td>
+                <td><a ng-href="#/wiki/{{datasetName}}/{{path}}">{{idDisplay(path)}}</a></td>
                 <td ng-repeat="(key,val) in noMetaFilter(format)">
                   {{dataDisplay(obj, key)}}
                 </td>
