@@ -249,7 +249,7 @@ FormEditor.prototype.newField = function(editorRow, label, name, required) {
   add(labelCell, 'label', {'for':name}, label);
   labelCell.innerHTML += ":";
   var input = add(inputCell, 'input', {'name':name, 'value':''});
-  input.setAttribute('disabled');
+  input.setAttribute('disabled', 'true');
   before(fieldRow, editorRow);
   var editButtons = add(inputCell, 'div', {'class':'edit-buttons hover-reveal'});
   // Delete first as floating both to the right reverses direction.
