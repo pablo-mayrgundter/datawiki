@@ -26,7 +26,7 @@ public final class QR {
   @SuppressWarnings("unchecked") // Hashtable API to QRCodeWriter.
   public QR(final String msg) throws Exception {
     final ErrorCorrectionLevel encLevel = ErrorCorrectionLevel.H; // L for lowest, H for highest.
-    final Hashtable hints = new Hashtable();
+    final Hashtable<EncodeHintType,ErrorCorrectionLevel> hints = new Hashtable<>();
     hints.put(EncodeHintType.ERROR_CORRECTION, encLevel);
     // QRCodeWriter picks max(1, bitMatrix.getWidth(), ...), which
     // means we'll just use its computed values.
