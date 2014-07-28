@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('datawiki', ['datasetService']).
+var datawiki = angular.module('datawiki', ['ngRoute', 'datasetService']).
   config(['$routeProvider', function($routeProvider) {
         $routeProvider.
           when('/', {templateUrl: 'welcome.html',
@@ -20,13 +20,15 @@ angular.module('datawiki', ['datasetService']).
 
 angular.module('datasetService', ['ngResource']).
   factory('Datasets', function($resource) {
-      return $resource('/wiki/', {}, {});
+      return $resource('/wiki/', {}, {},
+                       {stripTrailingSlashes: false});
     }).
   factory('Dataset', function($resource) {
       return $resource('/wiki/:name/', {}, {
-          put:{method: 'PUT'},
-          query:{method: 'GET', params:{}, isArray:false}
-        });
+          put: {method: 'PUT'},
+          query: {method: 'GET', params:{}, isArray:false}
+        },
+        {stripTrailingSlashes: false});
     }).
   factory('Format', function($resource) {
       return $resource('/wiki/schema(:name)', {}, {
@@ -39,14 +41,18 @@ angular.module('datasetService', ['ngResource']).
         });
     });
 
+
 function DatasetsCtrl($scope, $location, $http, Datasets, Dataset) {
+
   $scope.datasets = Datasets.get();
-  $scope.query = {val:'Search'};
+  $scope.query = {val: 'Search'};
   $scope.queryClass = 'inputInactive';
+
   $scope.queryActive = function() {
     $scope.query.val = '';
     $scope.queryClass = 'inputActive';
   };
+
   // Collection methods.
   $scope.checkQuery = function() {
     var q = $scope.query.val;
@@ -55,6 +61,7 @@ function DatasetsCtrl($scope, $location, $http, Datasets, Dataset) {
     }
     return true;
   };
+
   $scope.find = function() {
     $http({method: 'GET',
            url: '/wiki/' + $scope.query.val}).
@@ -74,6 +81,10 @@ function DatasetsCtrl($scope, $location, $http, Datasets, Dataset) {
     $location.path('/wiki/' + $scope.query.val);
   };
 }
+datawiki.controller('DatasetsCtrl',
+    ['$scope', '$location', '$http',
+     'Datasets', 'Dataset', DatasetsCtrl]);
+
 
 function DatasetCtrl($scope, $http, $routeParams, $filter,
                      Dataset, Format, Document) {
@@ -84,6 +95,7 @@ function DatasetCtrl($scope, $http, $routeParams, $filter,
     console.log(jsonSchema);
     new Format(jsonSchema).$put({name: $routeParams.datasetName});
   };
+
   $scope.editForm = function(formId) {
     console.log('edit');
     if ($scope.editing) {
@@ -99,6 +111,7 @@ function DatasetCtrl($scope, $http, $routeParams, $filter,
       $scope.editor.editForm();
     }
   };
+
   $scope.handleFormSubmit = function(action) {
     if (action === 'add') {
       $scope.add();
@@ -108,11 +121,13 @@ function DatasetCtrl($scope, $http, $routeParams, $filter,
       console.log('unknown form action: ' + action);
     }
   };
+
   // Collection methods.
   $scope.add = function() {
     console.log('add');
     new Document($scope.queryForm).$save({name: $routeParams.datasetName});
   };
+
   $scope.find = function() {
     console.log('find');
     var query = '', form = $scope.queryForm;
@@ -145,6 +160,7 @@ function DatasetCtrl($scope, $http, $routeParams, $filter,
   $scope.datasetName = $routeParams.datasetName;
   $scope.dataset = Dataset.get({name: $routeParams.datasetName}, ok, err);
   $scope.format = Format.get({name: $routeParams.datasetName}, ok, err);
+
   $scope.noMetaFilter = function(fmt) {
     var clean = {};
     for (var key in fmt) {
@@ -155,6 +171,7 @@ function DatasetCtrl($scope, $http, $routeParams, $filter,
     }
     return clean;
   };
+
   $scope.idDisplay = function(id) {
     var match = id.match(/__(\d+)__/);
     if (match) {
@@ -162,31 +179,42 @@ function DatasetCtrl($scope, $http, $routeParams, $filter,
     }
     return id;
   };
+
   $scope.dataDisplay = function(obj, key) {
     var val = obj[key];
     if (key == 'updated')
       return $filter('date')(val);
     return val;
   };
+
   $scope.queryForm = {};
+
   $scope.getKey = function(obj) {
     for (var key in obj)
       return key;
   };
+
   $scope.getVal = function(obj) {
     for (var key in obj)
       return obj[key];
   };
 }
+datawiki.controller('DatasetCtrl',
+    ['$scope', '$http', '$routeParams', '$filter',
+     'Dataset', 'Format', 'Document', DatasetCtrl]);
+
 
 function DocumentCtrl($scope, $routeParams, Document, Format) {
+
   $scope.datasetName = $routeParams.datasetName;
   $scope.docId = $routeParams.docId;
+
   $scope.document = Document.get({name: $routeParams.datasetName,
                                   id: $routeParams.docId}, function() {
       // TODO(pmy):
       // new FormEditor('docForm', true);
     }, err);
+
   $scope.noMetaFilter = function(doc) {
     var clean = {};
     for (var key in doc) {
@@ -197,10 +225,13 @@ function DocumentCtrl($scope, $routeParams, Document, Format) {
     }
     return clean;
   };
+
   $scope.mods = {};
+
   $scope.update = function() {
     new Document($scope.mods).$update({name: $routeParams.datasetName, id: $scope.docId});
   };
+
   // TODO(pmy): following copied from Dataset.
   // Form edit should directly modify ng model; currently edits don't take effect.
   $scope.editForm = function(formId) {
@@ -216,11 +247,15 @@ function DocumentCtrl($scope, $routeParams, Document, Format) {
     }
   };
 }
+datawiki.controller('DocumentCtrl',
+    ['$scope', '$routeParams',
+     'Document', 'Format', DocumentCtrl]);
 
-DatasetsCtrl.$inject = ['$scope', '$location', '$http', 'Datasets'];
-DatasetCtrl.$inject = ['$scope', '$http', '$routeParams', '$filter',
-                       'Dataset', 'Format', 'Document'];
-DocumentCtrl.$inject = ['$scope', '$routeParams', 'Document'];
+
+//DatasetsCtrl.$inject = ['$scope', '$location', '$http', 'Datasets'];
+//DatasetCtrl.$inject = ['$scope', '$http', '$routeParams', '$filter',
+//                       'Dataset', 'Format', 'Document'];
+//DocumentCtrl.$inject = ['$scope', '$routeParams', 'Document'];
 
 function ok(e) {
 }
